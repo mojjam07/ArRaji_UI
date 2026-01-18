@@ -48,4 +48,4 @@ coverage
 *.pem
 .cache
 
-TODO.md
+TODO*.md
