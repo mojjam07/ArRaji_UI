@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Input, Checkbox, Card, Alert } from '../../components';
+import { Button, Input, Checkbox, Card } from '../../components';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -17,30 +17,17 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
-  const passwordStrength = {
-    hasLength: false,
-    hasUpper: false,
-    hasLower: false,
-    hasNumber: false,
-    hasSpecial: false,
-  };
-
   const getPasswordStrength = (password) => {
-    const strength = { ...passwordStrength };
-    strength.hasLength = password.length >= 8;
-    strength.hasUpper = /[A-Z]/.test(password);
-    strength.hasLower = /[a-z]/.test(password);
-    strength.hasNumber = /[0-9]/.test(password);
-    strength.hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    return strength;
-  };
-
-  const calculateStrength = (password) => {
-    const strength = getPasswordStrength(password);
-    const count = Object.values(strength).filter(Boolean).length;
+    const hasLength = password.length >= 8;
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const count = [hasLength, hasUpper, hasLower, hasNumber, hasSpecial].filter(Boolean).length;
+    
     if (count <= 1) return { width: '20%', color: 'bg-accent-500', label: 'Weak' };
     if (count <= 2) return { width: '40%', color: 'bg-accent-400', label: 'Fair' };
-    if (count <= 3) return { width: '60%', color: 'bg-warning-500', label: 'Good' };
+    if (count <= 3) return { width: '60%', color: 'bg-yellow-500', label: 'Good' };
     if (count <= 4) return { width: '80%', color: 'bg-secondary-500', label: 'Strong' };
     return { width: '100%', color: 'bg-secondary-600', label: 'Very Strong' };
   };
@@ -106,7 +93,6 @@ export default function Register() {
       setIsLoading(false);
       setShowAlert(true);
 
-      // Redirect to login after successful registration
       setTimeout(() => {
         setShowAlert(false);
         navigate('/login');
@@ -114,37 +100,112 @@ export default function Register() {
     }, 1500);
   };
 
-  const strength = calculateStrength(formData.password);
+  const strength = getPasswordStrength(formData.password);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4 py-12">
-      <div className="max-w-lg w-full">
-        {/* Logo/Brand */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center h-16 w-16 rounded-xl bg-primary-100 mb-4">
-            <svg className="h-10 w-10 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-            </svg>
+    <div className="min-h-screen bg-neutral-100 flex items-center justify-center p-4">
+      {/* Split Card */}
+      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col lg:flex-row">
+        
+        {/* Left Side - Info */}
+        <div className="lg:w-5/12 bg-primary-600 p-8 lg:p-12 flex flex-col justify-between text-white">
+          <div>
+            <Link to="/" className="inline-flex items-center gap-2 mb-8">
+              <div className="h-10 w-10 rounded-lg bg-white/20 flex items-center justify-center">
+                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <span className="text-xl font-bold">ArRaji</span>
+            </Link>
+            
+            <h1 className="text-2xl lg:text-3xl font-bold mb-4">Create Account</h1>
+            <p className="text-primary-100 mb-8">
+              Join thousands of users who trust ArRaji for their application management needs.
+            </p>
+            
+            {/* Benefits */}
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium">Easy Application Process</p>
+                  <p className="text-sm text-primary-200">Simple steps to submit your applications</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium">Real-time Tracking</p>
+                  <p className="text-sm text-primary-200">Stay updated on your application progress</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium">Secure Data</p>
+                  <p className="text-sm text-primary-200">Your information is encrypted and safe</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium">24/7 Support</p>
+                  <p className="text-sm text-primary-200">We're here to help you anytime</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-neutral-900">Create Account</h1>
-          <p className="text-neutral-500 mt-2">Fill in the details below to get started</p>
+          
+          <div className="mt-8 pt-8 border-t border-white/20">
+            <p className="text-sm text-primary-200">
+              Already have an account?{' '}
+              <Link to="/login" className="text-white font-medium hover:underline">
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
 
-        {/* Alert */}
-        {showAlert && (
-          <Alert variant="success" title="Registration Successful" className="mb-6" onClose={() => setShowAlert(false)}>
-            Your account has been created. Please check your email to verify your account.
-          </Alert>
-        )}
+        {/* Right Side - Form */}
+        <div className="lg:w-7/12 p-8 lg:p-12">
+          <div className="max-w-md mx-auto">
+            <h2 className="text-2xl font-bold text-neutral-900 mb-2">Create Account</h2>
+            <p className="text-neutral-500 mb-8">Fill in the details below to get started</p>
 
-        {/* Registration Form */}
-        <Card>
-          <Card.Body className="p-8">
+            {/* Alert */}
+            {showAlert && (
+              <div className="mb-6 p-4 rounded-lg bg-secondary-50 border border-secondary-200">
+                <div className="flex items-center gap-2">
+                  <svg className="h-5 w-5 text-secondary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <p className="text-sm text-secondary-700 font-medium">Registration Successful - Redirecting...</p>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Name Fields */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="firstName" className="label">
+                  <label htmlFor="firstName" className="block text-sm font-medium text-neutral-700 mb-1.5">
                     First Name
                   </label>
                   <Input
@@ -158,7 +219,7 @@ export default function Register() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="label">
+                  <label htmlFor="lastName" className="block text-sm font-medium text-neutral-700 mb-1.5">
                     Last Name
                   </label>
                   <Input
@@ -175,7 +236,7 @@ export default function Register() {
 
               {/* Email Field */}
               <div>
-                <label htmlFor="email" className="label">
+                <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-1.5">
                   Email Address
                 </label>
                 <Input
@@ -192,7 +253,7 @@ export default function Register() {
 
               {/* Phone Field */}
               <div>
-                <label htmlFor="phone" className="label">
+                <label htmlFor="phone" className="block text-sm font-medium text-neutral-700 mb-1.5">
                   Phone Number
                 </label>
                 <Input
@@ -206,9 +267,9 @@ export default function Register() {
                 />
               </div>
 
-              {/* Password Field with Strength Indicator */}
+              {/* Password Field */}
               <div>
-                <label htmlFor="password" className="label">
+                <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-1.5">
                   Password
                 </label>
                 <Input
@@ -225,38 +286,29 @@ export default function Register() {
                 {/* Password Strength Bar */}
                 {formData.password && (
                   <div className="mt-2">
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2 mb-1">
                       <div className="h-2 flex-1 rounded-full bg-neutral-200 overflow-hidden">
                         <div 
                           className={`h-full ${strength.color} transition-all duration-300`}
                           style={{ width: strength.width }}
                         />
                       </div>
-                      <span className="ml-2 text-xs font-medium text-neutral-600">{strength.label}</span>
+                      <span className="text-xs font-medium text-neutral-600">{strength.label}</span>
                     </div>
                     
-                    {/* Password Requirements */}
-                    <div className="grid grid-cols-2 gap-1 mt-2 text-xs">
-                      <span className={formData.password.length >= 8 ? 'text-secondary-600' : 'text-neutral-400'}>
-                        At least 8 characters
-                      </span>
-                      <span className={/[A-Z]/.test(formData.password) ? 'text-secondary-600' : 'text-neutral-400'}>
-                        Uppercase letter
-                      </span>
-                      <span className={/[a-z]/.test(formData.password) ? 'text-secondary-600' : 'text-neutral-400'}>
-                        Lowercase letter
-                      </span>
-                      <span className={/[0-9]/.test(formData.password) ? 'text-secondary-600' : 'text-neutral-400'}>
-                        Number
-                      </span>
+                    <div className="grid grid-cols-2 gap-1 text-xs">
+                      <span className={formData.password.length >= 8 ? 'text-secondary-600' : 'text-neutral-400'}>8+ characters</span>
+                      <span className={/[A-Z]/.test(formData.password) ? 'text-secondary-600' : 'text-neutral-400'}>Uppercase</span>
+                      <span className={/[a-z]/.test(formData.password) ? 'text-secondary-600' : 'text-neutral-400'}>Lowercase</span>
+                      <span className={/[0-9]/.test(formData.password) ? 'text-secondary-600' : 'text-neutral-400'}>Number</span>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Confirm Password Field */}
+              {/* Confirm Password */}
               <div>
-                <label htmlFor="confirmPassword" className="label">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-neutral-700 mb-1.5">
                   Confirm Password
                 </label>
                 <Input
@@ -271,7 +323,7 @@ export default function Register() {
                 />
               </div>
 
-              {/* Terms & Conditions */}
+              {/* Terms */}
               <div>
                 <Checkbox
                   id="agree-terms"
@@ -297,16 +349,8 @@ export default function Register() {
                 Create Account
               </Button>
             </form>
-          </Card.Body>
-        </Card>
-
-        {/* Login Link */}
-        <p className="mt-6 text-center text-neutral-500">
-          Already have an account?{' '}
-          <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium">
-            Sign in
-          </Link>
-        </p>
+          </div>
+        </div>
       </div>
     </div>
   );
