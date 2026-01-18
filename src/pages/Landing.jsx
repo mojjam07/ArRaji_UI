@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card } from '../components';
+import ChatbotTrigger from '../components/ui/ChatbotTrigger';
 
 export default function Landing() {
   return (
@@ -156,6 +157,8 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      <ChatbotTrigger />
     </div>
   );
 }

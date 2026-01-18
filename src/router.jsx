@@ -17,6 +17,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ApplicationReview from './pages/admin/ApplicationReview';
 import UserManagement from './pages/admin/UserManagement';
 import Reports from './pages/admin/Reports';
+import AdminSettings from './pages/admin/AdminSettings';
 
 /**
  * Application Router Configuration
@@ -39,6 +40,7 @@ import Reports from './pages/admin/Reports';
  * - /admin/users - User management (admin only)
  * - /admin/review - Application review (admin/officer only)
  * - /admin/reports - Reporting & analytics (admin only)
+ * - /admin/settings - Admin settings (admin only)
  */
 
 const router = createBrowserRouter([
@@ -126,6 +128,10 @@ const router = createBrowserRouter([
       {
         path: 'reports',
         element: <Reports />,
+      },
+      {
+        path: 'settings',
+        element: <AdminSettings />,
       },
     ],
   },

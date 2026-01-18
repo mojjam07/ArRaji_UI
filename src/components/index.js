@@ -8,6 +8,7 @@ export { default as Modal } from './ui/Modal';
 export { default as Alert } from './ui/Alert';
 export { default as Badge } from './ui/Badge';
 export { default as ProgressBar } from './ui/ProgressBar';
+export { default as ChatbotTrigger } from './ui/ChatbotTrigger';
 
 // Layout Components
 export { default as Layout } from './layout/Layout';

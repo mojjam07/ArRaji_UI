@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Button, Input, Select, Checkbox, Alert } from '../../components';
+import { Card, Button, Input, Select, Checkbox, Alert, Badge } from '../../components';
 
 /**
  * User Settings Page - Notifications & Preferences
