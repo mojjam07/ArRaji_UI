@@ -1,16 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card } from '../components';
 import ChatbotTrigger from '../components/ui/ChatbotTrigger';
 
 export default function Landing() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-4 relative">
             <div className="flex items-center">
+              {/* Mobile menu button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 mr-2"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+
               <div className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-primary-100">
                 <svg className="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-1.657 0-3-4.03-3-9s1.343-9 3-9m0 18c1.657 0 3-4.03 3-9s-1.343-9-3-9" />
@@ -18,7 +30,9 @@ export default function Landing() {
               </div>
               <span className="ml-2 text-xl font-bold text-neutral-900">ArRaji</span>
             </div>
-            <div className="flex items-center gap-4">
+
+            {/* Desktop buttons */}
+            <div className="hidden md:flex items-center gap-4">
               <Link to="/login">
                 <Button variant="outline">Sign In</Button>
               </Link>
@@ -26,6 +40,20 @@ export default function Landing() {
                 <Button variant="primary">Apply for Visa</Button>
               </Link>
             </div>
+
+            {/* Mobile menu */}
+            {isMobileMenuOpen && (
+              <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-neutral-200 shadow-lg z-50">
+                <div className="px-4 py-4 space-y-3">
+                  <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full">Sign In</Button>
+                  </Link>
+                  <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="primary" className="w-full mt-2">Apply for Visa</Button>
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -402,49 +430,65 @@ export default function Landing() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* USA */}
+            {/* US/UK/Canada */}
             <Card className="hover:shadow-lg transition-shadow">
-              <div className="h-48 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-xl flex items-center justify-center">
-                <svg className="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              <div className="h-48 bg-gradient-to-r from-blue-500 to-red-600 rounded-t-xl flex items-center justify-center">
+                <div className="text-center">
+                  <svg className="h-12 w-12 text-white mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <h4 className="text-lg font-semibold text-white">US/UK/Canada</h4>
+                </div>
               </div>
               <Card.Body className="text-center">
-                <h3 className="text-xl font-semibold text-neutral-900 mb-2">United States</h3>
+                <div className="space-y-2 mb-4">
+                  <p className="text-sm text-neutral-600">United States | United Kingdom | Canada</p>
+                </div>
                 <p className="text-neutral-600 mb-4">
-                  Tourist & Business visas available. Processing time: 3-5 weeks
+                  Tourist, Business & Work visas available. Processing time: 2-8 weeks
                 </p>
                 <Button variant="primary" size="sm">Apply Now</Button>
               </Card.Body>
             </Card>
 
-            {/* UK */}
+            {/* UAE */}
             <Card className="hover:shadow-lg transition-shadow">
-              <div className="h-48 bg-gradient-to-r from-red-500 to-red-600 rounded-t-xl flex items-center justify-center">
-                <svg className="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              <div className="h-48 bg-gradient-to-r from-green-500 to-green-600 rounded-t-xl flex items-center justify-center">
+                <div className="text-center">
+                  <svg className="h-12 w-12 text-white mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <h4 className="text-lg font-semibold text-white">UAE</h4>
+                </div>
               </div>
               <Card.Body className="text-center">
-                <h3 className="text-xl font-semibold text-neutral-900 mb-2">United Kingdom</h3>
+                <div className="space-y-2 mb-4">
+                  <p className="text-sm text-neutral-600">United Arab Emirates</p>
+                </div>
                 <p className="text-neutral-600 mb-4">
-                  Tourist, Business & Student visas. Processing time: 2-4 weeks
+                  Tourist & Business visas available. Processing time: 1-3 weeks
                 </p>
                 <Button variant="primary" size="sm">Apply Now</Button>
               </Card.Body>
             </Card>
 
-            {/* Canada */}
+            {/* Others */}
             <Card className="hover:shadow-lg transition-shadow">
-              <div className="h-48 bg-gradient-to-r from-red-600 to-white rounded-t-xl flex items-center justify-center">
-                <svg className="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              <div className="h-48 bg-gradient-to-r from-purple-500 to-pink-500 rounded-t-xl flex items-center justify-center">
+                <div className="text-center">
+                  <svg className="h-12 w-12 text-white mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <h4 className="text-lg font-semibold text-white">Others</h4>
+                </div>
               </div>
               <Card.Body className="text-center">
-                <h3 className="text-xl font-semibold text-neutral-900 mb-2">Canada</h3>
+                <div className="space-y-2 mb-4">
+                  <p className="text-sm text-neutral-600">Australia</p>
+                  <p className="text-sm text-neutral-600">Japan</p>
+                </div>
                 <p className="text-neutral-600 mb-4">
-                  Tourist, Business & Work visas. Processing time: 2-8 weeks
+                  Tourist, Business & Student visas available. Processing time: 2-7 weeks
                 </p>
                 <Button variant="primary" size="sm">Apply Now</Button>
               </Card.Body>
