@@ -8,18 +8,18 @@ import { Card, Badge, ProgressBar, Button, Alert } from '../../components';
 export default function UserDashboard() {
   // Personal stats for the user
   const stats = [
-    { title: 'My Applications', value: '12', change: '+3', positive: true, icon: '📋', color: 'primary' },
-    { title: 'In Progress', value: '5', change: '-2', positive: true, icon: '🔄', color: 'info' },
-    { title: 'Completed', value: '7', change: '+1', positive: true, icon: '✅', color: 'success' },
-    { title: 'Drafts', value: '2', change: '0', positive: true, icon: '📝', color: 'warning' },
+    { title: 'My Visa Applications', value: '12', change: '+3', positive: true, icon: '📋', color: 'primary' },
+    { title: 'In Progress Visas', value: '5', change: '-2', positive: true, icon: '🔄', color: 'info' },
+    { title: 'Completed Visas', value: '7', change: '+1', positive: true, icon: '✅', color: 'success' },
+    { title: 'Draft Applications', value: '2', change: '0', positive: true, icon: '📝', color: 'warning' },
   ];
 
   // User's personal applications
   const myApplications = [
-    { id: 'APP-001', name: 'Business License Application', status: 'In Review', date: '2 days ago', progress: 75 },
-    { id: 'APP-002', name: 'Permit Renewal', status: 'Approved', date: '1 week ago', progress: 100 },
-    { id: 'APP-003', name: 'Document Update', status: 'Pending', date: '3 days ago', progress: 25 },
-    { id: 'APP-004', name: 'New Registration', status: 'Draft', date: 'Today', progress: 10 },
+    { id: 'VISA-001', name: 'Tourist Visa - UAE', status: 'In Review', date: '2 days ago', progress: 75 },
+    { id: 'VISA-002', name: 'Business Visa - UK', status: 'Approved', date: '1 week ago', progress: 100 },
+    { id: 'VISA-003', name: 'Student Visa - Australia', status: 'Pending', date: '3 days ago', progress: 25 },
+    { id: 'VISA-004', name: 'Work Visa - Canada', status: 'Draft', date: 'Today', progress: 10 },
   ];
 
   // Notifications specific to user
@@ -56,7 +56,7 @@ export default function UserDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-neutral-900">Welcome back, John!</h1>
-          <p className="text-neutral-500 mt-1">Here's an overview of your applications</p>
+          <p className="text-neutral-500 mt-1">Here's an overview of your visa applications</p>
         </div>
         <Button variant="primary" className="flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
           <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -108,9 +108,9 @@ export default function UserDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* My Applications */}
         <Card className="lg:col-span-2">
-          <Card.Header 
-            title="My Applications" 
-            subtitle="Track your application status"
+        <Card.Header
+            title="My Visa Applications"
+            subtitle="Track your visa application status"
             action={
               <button className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors">
                 View all →
@@ -184,8 +184,8 @@ export default function UserDashboard() {
               ),
               bgColor: 'bg-primary-50',
               iconColor: 'text-primary-600',
-              title: 'New Application',
-              description: 'Start a new application',
+              title: 'New Visa Application',
+              description: 'Start a new visa application',
               link: '/applications/new',
             },
             {

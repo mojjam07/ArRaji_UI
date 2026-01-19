@@ -65,7 +65,7 @@ export default function Landing() {
           <div className="text-center">
             <div className="flex items-center justify-center gap-4 mb-6">
               <div className="inline-flex items-center justify-center h-24 w-24 rounded-full bg-primary-100 overflow-hidden">
-                <img src="https://res.cloudinary.com/doi8mindp/image/upload/v1768837281/cld-sample-2.png" alt="Airplane" className="h-20 w-20 object-contain" />
+                <img src="https://res.cloudinary.com/doi8mindp/image/upload/v1768837281/cld-sample-2.png" alt="Airplane" className="h-100 w-100 object-contain" />
               </div>
               <div className="inline-flex items-center justify-center h-24 w-24 rounded-full bg-primary-100 overflow-hidden">
                 <img src="https://res.cloudinary.com/doi8mindp/image/upload/v1768837312/samples/waves.png" alt="Globe" className="h-20 w-20 object-contain" />

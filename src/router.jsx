@@ -11,13 +11,17 @@ import UserDashboard from './pages/user/UserDashboard';
 import Applications from './pages/applications/Applications';
 import Documents from './pages/documents/Documents';
 import Payment from './pages/payment/Payment';
+import CostEstimation from './pages/payment/CostEstimation';
 import Tracking from './pages/tracking/Tracking';
 import Settings from './pages/settings/Settings';
+import Biometrics from './pages/biometrics/Biometrics';
+import Notifications from './pages/notifications/Notifications';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ApplicationReview from './pages/admin/ApplicationReview';
 import UserManagement from './pages/admin/UserManagement';
 import Reports from './pages/admin/Reports';
 import AdminSettings from './pages/admin/AdminSettings';
+import PassportManagement from './pages/admin/PassportManagement';
 
 /**
  * Application Router Configuration
@@ -29,16 +33,20 @@ import AdminSettings from './pages/admin/AdminSettings';
  * 
  * Protected routes (Main Layout):
  * - /user - User dashboard
- * - /user/applications - Application management
+ * - /user/applications - Visa application form
  * - /user/documents - Document upload & validation
+ * - /user/biometrics - Biometrics scheduling
+ * - /user/cost-estimation - Cost review & payment
  * - /user/payment - Payment processing
  * - /user/tracking - Status tracking
+ * - /user/notifications - Notifications center
  * - /user/settings - User settings
  * 
  * Admin routes (Admin Layout):
  * - /admin - Admin dashboard (admin only)
  * - /admin/users - User management (admin only)
  * - /admin/review - Application review (admin/officer only)
+ * - /admin/passport - Passport & courier tracking (admin only)
  * - /admin/reports - Reporting & analytics (admin only)
  * - /admin/settings - Admin settings (admin only)
  */
@@ -94,12 +102,24 @@ const router = createBrowserRouter([
         element: <Documents />,
       },
       {
+        path: 'biometrics',
+        element: <Biometrics />,
+      },
+      {
+        path: 'cost-estimation',
+        element: <CostEstimation />,
+      },
+      {
         path: 'payment',
         element: <Payment />,
       },
       {
         path: 'tracking',
         element: <Tracking />,
+      },
+      {
+        path: 'notifications',
+        element: <Notifications />,
       },
       {
         path: 'settings',
@@ -124,6 +144,10 @@ const router = createBrowserRouter([
       {
         path: 'users',
         element: <UserManagement />,
+      },
+      {
+        path: 'passport',
+        element: <PassportManagement />,
       },
       {
         path: 'reports',

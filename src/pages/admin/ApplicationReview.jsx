@@ -1,61 +1,85 @@
 import React, { useState } from 'react';
-import { Card, Button, Badge, Input, Select, Alert } from '../../components';
+import { Card, Button, Badge, Input, Select, Alert, ProgressBar } from '../../components';
 
 /**
  * Application Review Page (Admin/Officer View)
- * Review and manage applications with tabs
+ * Review and manage visa applications with full processing workflow
  */
 export default function ApplicationReview() {
   const [activeTab, setActiveTab] = useState('pending');
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [reviewNote, setReviewNote] = useState('');
 
+  // Visa applications with processing stages
   const applications = {
     pending: [
       {
-        id: 'APP-2024-001',
+        id: 'VISA-2024-001',
         applicant: { name: 'Ahmed Al-Rashid', email: 'ahmed@example.com', phone: '+971 50 123 4567' },
-        type: 'Business License',
+        visaType: 'Tourist Visa - UAE',
         submittedDate: '2024-01-18',
         priority: 'high',
-        documents: ['ID Copy.pdf', 'Business License.pdf', 'Tax Registration.pdf'],
+        currentStage: 'documents_review',
+        stages: ['Application Received', 'Documents Review', 'Cost Provided', 'Payment', 'Biometrics', 'Embassy', 'Collection'],
+        documents: ['Passport Data Page.pdf', 'Invitation Letter.pdf', 'Passport Photo.jpg', 'Residence Permit.pdf'],
       },
       {
-        id: 'APP-2024-002',
+        id: 'VISA-2024-002',
         applicant: { name: 'Sarah Johnson', email: 'sarah@example.com', phone: '+971 55 987 6543' },
-        type: 'Permit Renewal',
+        visaType: 'Business Visa - UK',
         submittedDate: '2024-01-17',
         priority: 'medium',
-        documents: ['Permit Renewal Form.pdf', 'Current Permit.pdf'],
+        currentStage: 'cost_provided',
+        stages: ['Application Received', 'Documents Review', 'Cost Provided', 'Payment', 'Biometrics', 'Embassy', 'Collection'],
+        documents: ['Passport Data Page.pdf', 'Invitation Letter.pdf', 'Passport Photo.jpg'],
       },
       {
-        id: 'APP-2024-003',
+        id: 'VISA-2024-003',
         applicant: { name: 'Mohammed Ali', email: 'mohammed@example.com', phone: '+971 52 456 7890' },
-        type: 'New Registration',
+        visaType: 'Tourist Visa - USA',
         submittedDate: '2024-01-16',
         priority: 'low',
-        documents: ['ID Copy.pdf', 'Company Registration.pdf'],
+        currentStage: 'application_received',
+        stages: ['Application Received', 'Documents Review', 'Cost Provided', 'Payment', 'Biometrics', 'Embassy', 'Collection'],
+        documents: ['Passport Data Page.pdf'],
       },
     ],
-    reviewed: [
+    processing: [
       {
-        id: 'APP-2023-156',
+        id: 'VISA-2023-156',
         applicant: { name: 'Fatima Hassan', email: 'fatima@example.com', phone: '+971 58 321 0987' },
-        type: 'Document Update',
+        visaType: 'Work Visa - Canada',
         submittedDate: '2024-01-15',
-        status: 'approved',
-        reviewedDate: '2024-01-16',
-        reviewer: 'Officer A',
+        priority: 'high',
+        currentStage: 'biometrics',
+        stages: ['Application Received', 'Documents Review', 'Cost Provided', 'Payment', 'Biometrics', 'Embassy', 'Collection'],
+        documents: ['All Documents.pdf'],
+        biometricsDate: '2024-01-20',
+        embassyDate: '2024-01-25',
       },
       {
-        id: 'APP-2023-155',
+        id: 'VISA-2023-155',
         applicant: { name: 'John Smith', email: 'john@example.com', phone: '+971 54 789 0123' },
-        type: 'Business License',
+        visaType: 'Student Visa - Australia',
         submittedDate: '2024-01-14',
-        status: 'rejected',
-        reviewedDate: '2024-01-15',
-        reviewer: 'Officer B',
-        rejectionReason: 'Incomplete documentation',
+        priority: 'medium',
+        currentStage: 'embassy',
+        stages: ['Application Received', 'Documents Review', 'Cost Provided', 'Payment', 'Biometrics', 'Embassy', 'Collection'],
+        documents: ['All Documents.pdf'],
+        embassyDate: '2024-01-18',
+      },
+    ],
+    completed: [
+      {
+        id: 'VISA-2023-150',
+        applicant: { name: 'Emily Davis', email: 'emily@example.com', phone: '+971 56 111 2222' },
+        visaType: 'Tourist Visa - UAE',
+        submittedDate: '2024-01-10',
+        priority: 'low',
+        currentStage: 'completed',
+        stages: ['Application Received', 'Documents Review', 'Cost Provided', 'Payment', 'Biometrics', 'Embassy', 'Collection'],
+        documents: ['All Documents.pdf'],
+        completedDate: '2024-01-16',
       },
     ],
   };
@@ -64,21 +88,35 @@ export default function ApplicationReview() {
     const variants = {
       high: 'error',
       medium: 'warning',
-      low: 'success',
+      low: 'default',
     };
     return <Badge variant={variants[priority]}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</Badge>;
   };
 
-  const getStatusBadge = (status) => {
+  const getStageBadge = (stage) => {
     const variants = {
-      approved: 'success',
-      rejected: 'error',
+      application_received: 'primary',
+      documents_review: 'info',
+      cost_provided: 'warning',
+      payment: 'warning',
+      biometrics: 'primary',
+      embassy: 'info',
+      completed: 'success',
     };
-    return <Badge variant={variants[status]}>{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
+    const labels = {
+      application_received: 'Application Received',
+      documents_review: 'Documents Review',
+      cost_provided: 'Cost Provided',
+      payment: 'Payment',
+      biometrics: 'Biometrics',
+      embassy: 'Embassy',
+      completed: 'Completed',
+    };
+    return <Badge variant={variants[stage]}>{labels[stage] || stage}</Badge>;
   };
 
   const handleApprove = (id) => {
-    alert(`Application ${id} approved!`);
+    alert(`Application ${id} approved and moved to next stage!`);
     setSelectedApplication(null);
   };
 
@@ -92,10 +130,17 @@ export default function ApplicationReview() {
     setReviewNote('');
   };
 
+  const updateStage = (id, newStage) => {
+    alert(`Application ${id} stage updated to ${newStage}`);
+  };
+
   const tabs = [
     { id: 'pending', label: 'Pending Review', count: applications.pending.length },
-    { id: 'reviewed', label: 'Reviewed', count: applications.reviewed.length },
+    { id: 'processing', label: 'In Processing', count: applications.processing.length },
+    { id: 'completed', label: 'Completed', count: applications.completed.length },
   ];
+
+  const currentApps = applications[activeTab] || [];
 
   return (
     <div className="space-y-6">
@@ -103,7 +148,7 @@ export default function ApplicationReview() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-neutral-900">Application Review</h1>
-          <p className="text-neutral-500 mt-1">Review and manage application submissions</p>
+          <p className="text-neutral-500 mt-1">Review and manage visa application submissions</p>
         </div>
         <div className="flex items-center gap-4">
           <Input
@@ -113,12 +158,43 @@ export default function ApplicationReview() {
           <Select
             options={[
               { value: 'all', label: 'All Types' },
-              { value: 'business', label: 'Business License' },
-              { value: 'permit', label: 'Permit Renewal' },
-              { value: 'registration', label: 'New Registration' },
+              { value: 'tourist', label: 'Tourist Visa' },
+              { value: 'business', label: 'Business Visa' },
+              { value: 'work', label: 'Work Visa' },
+              { value: 'student', label: 'Student Visa' },
             ]}
           />
         </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <Card.Body className="text-center">
+            <p className="text-3xl font-bold text-primary-600">
+              {applications.pending.length + applications.processing.length}
+            </p>
+            <p className="text-sm text-neutral-500">Active Applications</p>
+          </Card.Body>
+        </Card>
+        <Card>
+          <Card.Body className="text-center">
+            <p className="text-3xl font-bold text-warning-600">{applications.pending.length}</p>
+            <p className="text-sm text-neutral-500">Pending Review</p>
+          </Card.Body>
+        </Card>
+        <Card>
+          <Card.Body className="text-center">
+            <p className="text-3xl font-bold text-info-600">{applications.processing.length}</p>
+            <p className="text-sm text-neutral-500">In Processing</p>
+          </Card.Body>
+        </Card>
+        <Card>
+          <Card.Body className="text-center">
+            <p className="text-3xl font-bold text-secondary-600">{applications.completed.length}</p>
+            <p className="text-sm text-neutral-500">Completed</p>
+          </Card.Body>
+        </Card>
       </div>
 
       {/* Tabs */}
@@ -148,98 +224,74 @@ export default function ApplicationReview() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Application List */}
         <div className="lg:col-span-2 space-y-4">
-          {activeTab === 'pending' && (
-            <>
-              {applications.pending.map((app) => (
-                <Card key={app.id} hover={selectedApplication?.id !== app.id}>
-                  <Card.Body>
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-4">
-                        <div className="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-lg font-medium text-primary-700">
-                            {app.applicant.name.split(' ').map(n => n[0]).join('')}
-                          </span>
+          {currentApps.length > 0 ? (
+            currentApps.map((app) => (
+              <Card key={app.id} hover={selectedApplication?.id !== app.id}>
+                <Card.Body>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-4">
+                      <div className="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+                        <span className="text-lg font-medium text-primary-700">
+                          {app.applicant.name.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-neutral-900">{app.applicant.name}</h3>
+                          {getPriorityBadge(app.priority)}
+                          {getStageBadge(app.currentStage)}
                         </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-neutral-900">{app.applicant.name}</h3>
-                            {getPriorityBadge(app.priority)}
-                          </div>
-                          <p className="text-sm text-neutral-500">{app.type} • {app.id}</p>
-                          <p className="text-sm text-neutral-500 mt-1">
-                            Submitted: {app.submittedDate}
+                        <p className="text-sm text-neutral-500">{app.visaType} • {app.id}</p>
+                        <p className="text-sm text-neutral-500 mt-1">
+                          Submitted: {app.submittedDate}
+                        </p>
+                        {app.biometricsDate && (
+                          <p className="text-sm text-primary-600 mt-1">
+                            Biometrics: {app.biometricsDate}
                           </p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <span className="text-xs text-neutral-500">Documents:</span>
-                            {app.documents.map((doc, index) => (
-                              <Badge key={index} variant="secondary">{doc}</Badge>
-                            ))}
-                          </div>
+                        )}
+                        <div className="flex items-center gap-2 mt-2 flex-wrap">
+                          <span className="text-xs text-neutral-500">Documents:</span>
+                          {app.documents.slice(0, 3).map((doc, index) => (
+                            <Badge key={index} variant="secondary" size="sm">{doc}</Badge>
+                          ))}
+                          {app.documents.length > 3 && (
+                            <Badge variant="secondary" size="sm">+{app.documents.length - 3} more</Badge>
+                          )}
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => setSelectedApplication(app)}
-                        >
-                          View Details
-                        </Button>
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setSelectedApplication(app)}
+                      >
+                        View Details
+                      </Button>
+                      {activeTab === 'pending' && (
                         <Button
                           variant="primary"
                           size="sm"
                           onClick={() => handleApprove(app.id)}
                         >
-                          Quick Approve
+                          Approve
                         </Button>
-                      </div>
+                      )}
                     </div>
-                  </Card.Body>
-                </Card>
-              ))}
-            </>
-          )}
-
-          {activeTab === 'reviewed' && (
-            <>
-              {applications.reviewed.map((app) => (
-                <Card key={app.id}>
-                  <Card.Body>
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-4">
-                        <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
-                          app.status === 'approved' ? 'bg-secondary-100' : 'bg-accent-100'
-                        }`}>
-                          <span className={`text-lg font-medium ${
-                            app.status === 'approved' ? 'text-secondary-700' : 'text-accent-700'
-                          }`}>
-                            {app.applicant.name.split(' ').map(n => n[0]).join('')}
-                          </span>
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-neutral-900">{app.applicant.name}</h3>
-                            {getStatusBadge(app.status)}
-                          </div>
-                          <p className="text-sm text-neutral-500">{app.type} • {app.id}</p>
-                          <p className="text-sm text-neutral-500 mt-1">
-                            Reviewed: {app.reviewedDate} by {app.reviewer}
-                          </p>
-                          {app.rejectionReason && (
-                            <Alert variant="error" className="mt-2">
-                              Reason: {app.rejectionReason}
-                            </Alert>
-                          )}
-                        </div>
-                      </div>
-                      <Button variant="secondary" size="sm">
-                        View Full History
-                      </Button>
-                    </div>
-                  </Card.Body>
-                </Card>
-              ))}
-            </>
+                  </div>
+                </Card.Body>
+              </Card>
+            ))
+          ) : (
+            <Card>
+              <Card.Body className="text-center py-12">
+                <svg className="h-12 w-12 text-neutral-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <p className="text-neutral-500">No applications in this category</p>
+              </Card.Body>
+            </Card>
           )}
         </div>
 
@@ -262,20 +314,50 @@ export default function ApplicationReview() {
                 }
               />
               <Card.Body className="space-y-4">
+                {/* Applicant Info */}
                 <div>
                   <h4 className="text-sm font-medium text-neutral-500 mb-1">Applicant Information</h4>
                   <p className="font-medium text-neutral-900">{selectedApplication.applicant.name}</p>
                   <p className="text-sm text-neutral-600">{selectedApplication.applicant.email}</p>
                   <p className="text-sm text-neutral-600">{selectedApplication.applicant.phone}</p>
                 </div>
+
+                {/* Visa Type */}
                 <div>
-                  <h4 className="text-sm font-medium text-neutral-500 mb-1">Application Type</h4>
-                  <p className="text-neutral-900">{selectedApplication.type}</p>
+                  <h4 className="text-sm font-medium text-neutral-500 mb-1">Visa Type</h4>
+                  <p className="text-neutral-900">{selectedApplication.visaType}</p>
                 </div>
+
+                {/* Dates */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-neutral-500 mb-1">Submitted</h4>
+                    <p className="text-neutral-900">{selectedApplication.submittedDate}</p>
+                  </div>
+                  {selectedApplication.completedDate && (
+                    <div>
+                      <h4 className="text-sm font-medium text-neutral-500 mb-1">Completed</h4>
+                      <p className="text-neutral-900">{selectedApplication.completedDate}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Current Stage */}
                 <div>
-                  <h4 className="text-sm font-medium text-neutral-500 mb-1">Submitted Date</h4>
-                  <p className="text-neutral-900">{selectedApplication.submittedDate}</p>
+                  <h4 className="text-sm font-medium text-neutral-500 mb-1">Processing Stage</h4>
+                  {getStageBadge(selectedApplication.currentStage)}
                 </div>
+
+                {/* Progress */}
+                <div>
+                  <h4 className="text-sm font-medium text-neutral-500 mb-2">Workflow Progress</h4>
+                  <ProgressBar
+                    value={(selectedApplication.stages.indexOf(selectedApplication.currentStage.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())) / selectedApplication.stages.length) * 100}
+                    variant={selectedApplication.currentStage === 'completed' ? 'success' : 'primary'}
+                  />
+                </div>
+
+                {/* Documents */}
                 <div>
                   <h4 className="text-sm font-medium text-neutral-500 mb-1">Documents</h4>
                   <ul className="space-y-1">
@@ -289,31 +371,51 @@ export default function ApplicationReview() {
                     ))}
                   </ul>
                 </div>
+
+                {/* Review Notes */}
                 <div>
                   <h4 className="text-sm font-medium text-neutral-500 mb-1">Review Notes</h4>
                   <textarea
                     className="w-full border border-neutral-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    rows={4}
+                    rows={3}
                     placeholder="Add review notes..."
                     value={reviewNote}
                     onChange={(e) => setReviewNote(e.target.value)}
                   />
                 </div>
               </Card.Body>
-              <Card.Footer className="flex gap-2">
+              <Card.Footer className="flex gap-2 flex-wrap">
                 <Button
-                  variant="secondary"
+                  variant="outline"
+                  size="sm"
                   className="flex-1"
                   onClick={() => handleReject(selectedApplication.id)}
                 >
                   Reject
                 </Button>
                 <Button
+                  variant="secondary"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setSelectedApplication(null)}
+                >
+                  Close
+                </Button>
+                <Button
                   variant="primary"
+                  size="sm"
                   className="flex-1"
                   onClick={() => handleApprove(selectedApplication.id)}
                 >
                   Approve
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => updateStage(selectedApplication.id, 'next')}
+                >
+                  Next Stage
                 </Button>
               </Card.Footer>
             </Card>
