@@ -63,10 +63,13 @@ export default function Landing() {
         <div className="absolute inset-0 bg-gradient-to-r from-primary-600/10 to-secondary-600/10"></div>
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-6">
-              <svg className="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="inline-flex items-center justify-center h-24 w-24 rounded-full bg-primary-100 overflow-hidden">
+                <img src="https://res.cloudinary.com/doi8mindp/image/upload/v1768837281/cld-sample-2.png" alt="Airplane" className="h-20 w-20 object-contain" />
+              </div>
+              <div className="inline-flex items-center justify-center h-24 w-24 rounded-full bg-primary-100 overflow-hidden">
+                <img src="https://res.cloudinary.com/doi8mindp/image/upload/v1768837312/samples/waves.png" alt="Globe" className="h-20 w-20 object-contain" />
+              </div>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-neutral-900 mb-6">
               Your Gateway to
@@ -432,15 +435,15 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* US/UK/Canada */}
             <Card className="hover:shadow-lg transition-shadow">
-              <div className="h-48 bg-gradient-to-r from-blue-500 to-red-600 rounded-t-xl flex items-center justify-center">
-                <div className="text-center">
-                  <svg className="h-12 w-12 text-white mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <h4 className="text-lg font-semibold text-white">US/UK/Canada</h4>
+              <div className="h-48 bg-gradient-to-r from-blue-500 to-red-600 rounded-t-xl flex items-center justify-center p-4">
+                <div className="flex gap-4 justify-center items-center">
+                  <img src="https://flagcdn.com/w320/us.png" alt="USA" className="h-16 w-24 object-cover rounded shadow-md" />
+                  <img src="https://flagcdn.com/w320/gb.png" alt="UK" className="h-16 w-24 object-cover rounded shadow-md" />
+                  <img src="https://flagcdn.com/w320/ca.png" alt="Canada" className="h-16 w-24 object-cover rounded shadow-md" />
                 </div>
               </div>
               <Card.Body className="text-center">
+                <h4 className="text-lg font-semibold text-neutral-900 mb-2">US/UK/Canada</h4>
                 <div className="space-y-2 mb-4">
                   <p className="text-sm text-neutral-600">United States | United Kingdom | Canada</p>
                 </div>
@@ -453,15 +456,11 @@ export default function Landing() {
 
             {/* UAE */}
             <Card className="hover:shadow-lg transition-shadow">
-              <div className="h-48 bg-gradient-to-r from-green-500 to-green-600 rounded-t-xl flex items-center justify-center">
-                <div className="text-center">
-                  <svg className="h-12 w-12 text-white mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <h4 className="text-lg font-semibold text-white">UAE</h4>
-                </div>
+              <div className="h-48 bg-gradient-to-r from-green-500 to-green-600 rounded-t-xl flex items-center justify-center p-4">
+                <img src="https://flagcdn.com/w320/ae.png" alt="UAE" className="h-24 w-36 object-cover rounded shadow-md" />
               </div>
               <Card.Body className="text-center">
+                <h4 className="text-lg font-semibold text-neutral-900 mb-2">UAE</h4>
                 <div className="space-y-2 mb-4">
                   <p className="text-sm text-neutral-600">United Arab Emirates</p>
                 </div>
@@ -474,15 +473,14 @@ export default function Landing() {
 
             {/* Others */}
             <Card className="hover:shadow-lg transition-shadow">
-              <div className="h-48 bg-gradient-to-r from-purple-500 to-pink-500 rounded-t-xl flex items-center justify-center">
-                <div className="text-center">
-                  <svg className="h-12 w-12 text-white mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <h4 className="text-lg font-semibold text-white">Others</h4>
+              <div className="h-48 bg-gradient-to-r from-purple-500 to-pink-500 rounded-t-xl flex items-center justify-center p-4">
+                <div className="flex gap-4 justify-center items-center">
+                  <img src="https://flagcdn.com/w320/au.png" alt="Australia" className="h-16 w-24 object-cover rounded shadow-md" />
+                  <img src="https://flagcdn.com/w320/jp.png" alt="Japan" className="h-16 w-24 object-cover rounded shadow-md" />
                 </div>
               </div>
               <Card.Body className="text-center">
+                <h4 className="text-lg font-semibold text-neutral-900 mb-2">Others</h4>
                 <div className="space-y-2 mb-4">
                   <p className="text-sm text-neutral-600">Australia</p>
                   <p className="text-sm text-neutral-600">Japan</p>
