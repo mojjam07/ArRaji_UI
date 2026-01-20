@@ -259,22 +259,22 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-neutral-900 mb-4">
-              Simple Application Process
+              Complete Visa Processing Journey
             </h2>
             <p className="text-lg text-neutral-600">
-              Get your visa approved in just a few easy steps
+              From application to visa collection - our comprehensive 11-stage process ensures your success
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Step 1 */}
             <div className="text-center">
               <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-4">
                 <span className="text-xl font-bold text-primary-600">1</span>
               </div>
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">Fill Application</h3>
+              <h3 className="text-xl font-semibold text-neutral-900 mb-2">Application & Documents</h3>
               <p className="text-neutral-600">
-                Complete your visa application form with our guided process
+                Complete visa application form and upload required documents (Invitation Letter, Passport, Photo, Residence Permit)
               </p>
             </div>
 
@@ -283,9 +283,9 @@ export default function Landing() {
               <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-secondary-100 mb-4">
                 <span className="text-xl font-bold text-secondary-600">2</span>
               </div>
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">Upload Documents</h3>
+              <h3 className="text-xl font-semibold text-neutral-900 mb-2">Cost Estimation (24h)</h3>
               <p className="text-neutral-600">
-                Securely upload all required documents and photos
+                Receive detailed cost breakdown within 24 hours including visa fees, biometrics, and courier services
               </p>
             </div>
 
@@ -294,9 +294,9 @@ export default function Landing() {
               <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-accent-100 mb-4">
                 <span className="text-xl font-bold text-accent-600">3</span>
               </div>
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">Pay Fees</h3>
+              <h3 className="text-xl font-semibold text-neutral-900 mb-2">Payment & Biometrics</h3>
               <p className="text-neutral-600">
-                Make secure payment for visa processing fees
+                Complete secure payment and schedule biometrics appointment (Lagos/Abuja locations, weekday slots)
               </p>
             </div>
 
@@ -305,10 +305,43 @@ export default function Landing() {
               <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-neutral-100 mb-4">
                 <span className="text-xl font-bold text-neutral-600">4</span>
               </div>
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">Track Status</h3>
+              <h3 className="text-xl font-semibold text-neutral-900 mb-2">Processing & Collection</h3>
               <p className="text-neutral-600">
-                Monitor your application status in real-time
+                Track embassy processing, visa collection, and passport return with real-time notifications
               </p>
+            </div>
+          </div>
+
+          {/* Additional Process Details */}
+          <div className="mt-12 text-center">
+            <p className="text-neutral-600 mb-6">
+              Our system includes 11 comprehensive stages: Application → Document Verification → Cost Estimation → Payment → Biometrics → Embassy Submission → Processing → Visa Collection → Passport Return
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 text-sm">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary-100 text-primary-700">
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                24h Cost Estimation
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-secondary-100 text-secondary-700">
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                Real-time Tracking
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-accent-100 text-accent-700">
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                Biometrics Scheduling
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-neutral-100 text-neutral-700">
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                Courier Integration
+              </span>
             </div>
           </div>
         </div>
@@ -456,13 +489,14 @@ export default function Landing() {
 
             {/* UAE */}
             <Card className="hover:shadow-lg transition-shadow">
-              <div className="h-48 bg-gradient-to-r from-green-500 to-green-600 rounded-t-xl flex items-center justify-center p-4">
-                <img src="https://flagcdn.com/w320/ae.png" alt="UAE" className="h-24 w-36 object-cover rounded shadow-md" />
+              <div className="h-48 bg-gradient-to-r from-green-500 to-green-600 rounded-t-xl flex gap-4 items-center justify-center p-4">
+                <img src="https://flagcdn.com/w320/ae.png" alt="UAE" className="h-16 w-24 object-cover rounded shadow-md" />
+                <img src="https://flagcdn.com/w320/sa.png" alt="UAE" className="h-16 w-24 object-cover rounded shadow-md" />
               </div>
               <Card.Body className="text-center">
-                <h4 className="text-lg font-semibold text-neutral-900 mb-2">UAE</h4>
+                <h4 className="text-lg font-semibold text-neutral-900 mb-2">UAE & Saudi Arabia</h4>
                 <div className="space-y-2 mb-4">
-                  <p className="text-sm text-neutral-600">United Arab Emirates</p>
+                  <p className="text-sm text-neutral-600">United Arab Emirates | Saudi Arabia</p>
                 </div>
                 <p className="text-neutral-600 mb-4">
                   Tourist & Business visas available. Processing time: 1-3 weeks
@@ -480,10 +514,10 @@ export default function Landing() {
                 </div>
               </div>
               <Card.Body className="text-center">
-                <h4 className="text-lg font-semibold text-neutral-900 mb-2">Others</h4>
+                <h4 className="text-lg font-semibold text-neutral-900 mb-2">Other Countries</h4>
                 <div className="space-y-2 mb-4">
-                  <p className="text-sm text-neutral-600">Australia</p>
-                  <p className="text-sm text-neutral-600">Japan</p>
+                  <p className="text-sm text-neutral-600">Australia | Japan | Others</p>
+                  {/* <p className="text-sm text-neutral-600">Japan</p> */}
                 </div>
                 <p className="text-neutral-600 mb-4">
                   Tourist, Business & Student visas available. Processing time: 2-7 weeks
