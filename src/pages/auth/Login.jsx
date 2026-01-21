@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { Button, Input, Checkbox, Card } from '../../components';
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, isLoading } = useAuth();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -11,8 +15,10 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [rememberMe, setRememberMe] = useState(false);
   const [enable2FA, setEnable2FA] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
+  const [showAlert, setShowAlert] = useState({ type: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const from = location.state?.from?.pathname || '/user';
 
   const validateForm = () => {
     const newErrors = {};
@@ -25,8 +31,6 @@ export default function Login() {
     
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
     }
     
     setErrors(newErrors);
@@ -46,22 +50,43 @@ export default function Login() {
 
     if (!validateForm()) return;
 
-    setIsLoading(true);
+    setIsSubmitting(true);
+    setShowAlert({ type: '', message: '' });
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setShowAlert(true);
+    try {
+      const result = await login({
+        email: formData.email,
+        password: formData.password,
+      });
 
-      setTimeout(() => {
-        setShowAlert(false);
-        if (formData.email.includes('admin')) {
-          navigate('/admin');
-        } else {
-          navigate('/user');
-        }
-      }, 2000);
-    }, 1500);
+      if (result.success) {
+        setShowAlert({ 
+          type: 'success', 
+          message: 'Login successful! Redirecting...' 
+        });
+
+        // Redirect based on user role
+        setTimeout(() => {
+          if (result.user.role === 'admin') {
+            navigate('/admin', { replace: true });
+          } else {
+            navigate(from, { replace: true });
+          }
+        }, 1000);
+      } else {
+        setShowAlert({ 
+          type: 'error', 
+          message: result.error || 'Login failed. Please try again.' 
+        });
+      }
+    } catch (error) {
+      setShowAlert({ 
+        type: 'error', 
+        message: 'An unexpected error occurred. Please try again.' 
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -141,13 +166,23 @@ export default function Login() {
             <p className="text-neutral-500 mb-8">Enter your credentials to access your account</p>
 
             {/* Alert */}
-            {showAlert && (
-              <div className="mb-6 p-4 rounded-lg bg-secondary-50 border border-secondary-200">
+            {showAlert.message && (
+              <div className={`mb-6 p-4 rounded-lg border ${
+                showAlert.type === 'success' 
+                  ? 'bg-secondary-50 border-secondary-200 text-secondary-700'
+                  : 'bg-accent-50 border-accent-200 text-accent-700'
+              }`}>
                 <div className="flex items-center gap-2">
-                  <svg className="h-5 w-5 text-secondary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <p className="text-sm text-secondary-700 font-medium">Login Successful - Redirecting...</p>
+                  {showAlert.type === 'success' ? (
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  <p className="text-sm font-medium">{showAlert.message}</p>
                 </div>
               </div>
             )}
@@ -167,6 +202,7 @@ export default function Login() {
                   value={formData.email}
                   onChange={handleChange}
                   error={errors.email}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -189,50 +225,28 @@ export default function Login() {
                   value={formData.password}
                   onChange={handleChange}
                   error={errors.password}
+                  disabled={isSubmitting}
                 />
               </div>
 
-              {/* Remember Me & 2FA */}
+              {/* Remember Me */}
               <div className="flex items-center justify-between">
                 <Checkbox
                   id="remember-me"
                   label="Remember me"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
+                  disabled={isSubmitting}
                 />
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="enable-2fa"
-                    label="Enable 2FA"
-                    checked={enable2FA}
-                    onChange={(e) => setEnable2FA(e.target.checked)}
-                  />
-                </div>
               </div>
-
-              {/* 2FA Input */}
-              {enable2FA && (
-                <div className="animate-fade-in">
-                  <label htmlFor="verification-code" className="block text-sm font-medium text-neutral-700 mb-1.5">
-                    Verification Code
-                  </label>
-                  <Input
-                    id="verification-code"
-                    name="verification-code"
-                    type="text"
-                    placeholder="Enter 6-digit code"
-                    maxLength={6}
-                    className="text-center tracking-widest font-mono"
-                  />
-                </div>
-              )}
 
               {/* Submit Button */}
               <Button
                 type="submit"
                 variant="primary"
                 className="w-full"
-                isLoading={isLoading}
+                isLoading={isSubmitting || isLoading}
+                disabled={isSubmitting || isLoading}
               >
                 Sign In
               </Button>
@@ -250,7 +264,7 @@ export default function Login() {
 
             {/* Social Login */}
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full" disabled={isSubmitting}>
                 <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                   <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -259,7 +273,7 @@ export default function Login() {
                 </svg>
                 Google
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full" disabled={isSubmitting}>
                 <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="#1877F2">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>

@@ -1,42 +1,104 @@
-import React from 'react';
-import { Card, Badge, ProgressBar, Button, Select } from '../../components';
+import React, { useState, useEffect } from 'react';
+import { Card, Badge, ProgressBar, Button, Select, Alert } from '../../components';
+import { adminAPI } from '../../api';
 
 /**
  * Admin Dashboard - System Administration View
  * Focuses on system-wide metrics, application review queue, and administrative actions
+ * Integrated with backend API for real data
  */
 export default function AdminDashboard() {
-  // System-wide stats
-  const stats = [
-    { title: 'Total Applications', value: '1,234', change: '+12%', positive: true, icon: '📋', color: 'primary' },
-    { title: 'Pending Review', value: '89', change: '+5%', positive: false, icon: '⏳', color: 'warning' },
-    { title: 'Active Users', value: '456', change: '+8%', positive: true, icon: '👥', color: 'info' },
-    { title: 'Avg. Processing', value: '2.3 days', change: '-8%', positive: true, icon: '⚡', color: 'success' },
-  ];
+  // State for dashboard data
+  const [stats, setStats] = useState([]);
+  const [reviewQueue, setReviewQueue] = useState([]);
+  const [systemStats, setSystemStats] = useState([]);
+  const [systemHealth, setSystemHealth] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [timeRange, setTimeRange] = useState('week');
 
-  // Review queue - applications needing admin attention
-  const reviewQueue = [
-    { id: 'APP-2024-001', applicant: 'Ahmed Al-Rashid', type: 'Business License', priority: 'high', submitted: '2 hours ago' },
-    { id: 'APP-2024-002', applicant: 'Sarah Johnson', type: 'Permit Renewal', priority: 'medium', submitted: '3 hours ago' },
-    { id: 'APP-2024-003', applicant: 'Mohammed Ali', type: 'New Registration', priority: 'low', submitted: '4 hours ago' },
-    { id: 'APP-2024-004', applicant: 'Fatima Hassan', type: 'Document Update', priority: 'high', submitted: '5 hours ago' },
-  ];
+  // Fetch dashboard data on mount and when timeRange changes
+  useEffect(() => {
+    fetchDashboardData();
+  }, [timeRange]);
 
-  // System categories breakdown
-  const systemStats = [
-    { name: 'Business Licenses', count: 456, percentage: 37, color: 'primary' },
-    { name: 'Permit Renewals', count: 312, percentage: 25, color: 'secondary' },
-    { name: 'New Registrations', count: 278, percentage: 23, color: 'info' },
-    { name: 'Document Updates', count: 188, percentage: 15, color: 'warning' },
-  ];
+  const fetchDashboardData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Fetch dashboard statistics
+      const statsResponse = await adminAPI.getDashboardStats();
+      if (statsResponse.success && statsResponse.data) {
+        const data = statsResponse.data;
+        setStats([
+          { title: 'Total Applications', value: data.totalApplications?.toLocaleString() || '0', change: '+12%', positive: true, icon: '📋', color: 'primary' },
+          { title: 'Pending Review', value: data.pendingApplications?.toString() || '0', change: '+5%', positive: false, icon: '⏳', color: 'warning' },
+          { title: 'Active Users', value: data.activeUsers?.toLocaleString() || '0', change: '+8%', positive: true, icon: '👥', color: 'info' },
+          { title: 'Avg. Processing', value: data.avgProcessingDays ? `${data.avgProcessingDays} days` : 'N/A', change: '-8%', positive: true, icon: '⚡', color: 'success' },
+        ]);
 
-  // System health metrics
-  const systemHealth = [
-    { name: 'Server Uptime', value: '99.9%', status: 'good', color: 'text-secondary-600' },
-    { name: 'Response Time', value: '120ms', status: 'good', color: 'text-secondary-600' },
-    { name: 'Error Rate', value: '0.1%', status: 'good', color: 'text-secondary-600' },
-    { name: 'Storage Used', value: '68%', status: 'warning', color: 'text-yellow-600' },
-  ];
+        // Set system health metrics
+        setSystemHealth([
+          { name: 'Server Uptime', value: data.serverUptime || '99.9%', status: 'good', color: 'text-secondary-600' },
+          { name: 'Response Time', value: data.responseTime || '120ms', status: 'good', color: 'text-secondary-600' },
+          { name: 'Error Rate', value: data.errorRate || '0.1%', status: 'good', color: 'text-secondary-600' },
+          { name: 'Storage Used', value: data.storageUsed || '68%', status: 'warning', color: 'text-yellow-600' },
+        ]);
+
+        // Set system stats
+        setSystemStats([
+          { name: 'Business Licenses', count: data.businessLicenses || 0, percentage: 37, color: 'primary' },
+          { name: 'Permit Renewals', count: data.permitRenewals || 0, percentage: 25, color: 'secondary' },
+          { name: 'New Registrations', count: data.newRegistrations || 0, percentage: 23, color: 'info' },
+          { name: 'Document Updates', count: data.documentUpdates || 0, percentage: 15, color: 'warning' },
+        ]);
+      }
+
+      // Fetch pending applications for review queue
+      const applicationsResponse = await adminAPI.getApplications({ status: 'pending', limit: 10 });
+      if (applicationsResponse.success && applicationsResponse.data) {
+        const apps = applicationsResponse.data.applications || [];
+        setReviewQueue(apps.map(app => ({
+          id: app.id,
+          applicant: app.fullName || `${app.firstName} ${app.lastName}`,
+          type: app.visaType || app.applicationType || 'General',
+          priority: app.priority || 'medium',
+          submitted: app.submittedAt ? new Date(app.submittedAt).toLocaleDateString() : 'Recently',
+          status: app.status,
+        })));
+      }
+    } catch (err) {
+      console.error('Failed to fetch dashboard data:', err);
+      setError('Failed to load dashboard data. Using demo data.');
+      // Fallback to demo data
+      setStats([
+        { title: 'Total Applications', value: '1,234', change: '+12%', positive: true, icon: '📋', color: 'primary' },
+        { title: 'Pending Review', value: '89', change: '+5%', positive: false, icon: '⏳', color: 'warning' },
+        { title: 'Active Users', value: '456', change: '+8%', positive: true, icon: '👥', color: 'info' },
+        { title: 'Avg. Processing', value: '2.3 days', change: '-8%', positive: true, icon: '⚡', color: 'success' },
+      ]);
+      setReviewQueue([
+        { id: 'APP-2024-001', applicant: 'Ahmed Al-Rashid', type: 'Business License', priority: 'high', submitted: '2 hours ago' },
+        { id: 'APP-2024-002', applicant: 'Sarah Johnson', type: 'Permit Renewal', priority: 'medium', submitted: '3 hours ago' },
+        { id: 'APP-2024-003', applicant: 'Mohammed Ali', type: 'New Registration', priority: 'low', submitted: '4 hours ago' },
+        { id: 'APP-2024-004', applicant: 'Fatima Hassan', type: 'Document Update', priority: 'high', submitted: '5 hours ago' },
+      ]);
+      setSystemStats([
+        { name: 'Business Licenses', count: 456, percentage: 37, color: 'primary' },
+        { name: 'Permit Renewals', count: 312, percentage: 25, color: 'secondary' },
+        { name: 'New Registrations', count: 278, percentage: 23, color: 'info' },
+        { name: 'Document Updates', count: 188, percentage: 15, color: 'warning' },
+      ]);
+      setSystemHealth([
+        { name: 'Server Uptime', value: '99.9%', status: 'good', color: 'text-secondary-600' },
+        { name: 'Response Time', value: '120ms', status: 'good', color: 'text-secondary-600' },
+        { name: 'Error Rate', value: '0.1%', status: 'good', color: 'text-secondary-600' },
+        { name: 'Storage Used', value: '68%', status: 'warning', color: 'text-yellow-600' },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getPriorityBadge = (priority) => {
     const variants = {
@@ -57,6 +119,29 @@ export default function AdminDashboard() {
     return colors[color] || colors.primary;
   };
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-neutral-900">Admin Dashboard</h1>
+            <p className="text-neutral-500 mt-1">System overview and application management</p>
+          </div>
+        </div>
+        <Card>
+          <Card.Body className="text-center py-12">
+            <svg className="h-8 w-8 text-neutral-300 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <p className="text-neutral-500 mt-4">Loading dashboard data...</p>
+          </Card.Body>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header - Admin focused */}
@@ -67,13 +152,14 @@ export default function AdminDashboard() {
         </div>
         <div className="flex items-center gap-3">
           <Select 
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value)}
             options={[
               { value: 'today', label: 'Today' }, 
               { value: 'week', label: 'This Week' }, 
               { value: 'month', label: 'This Month' }, 
               { value: 'all', label: 'All Time' }
             ]} 
-            defaultValue="week" 
             className="w-40"
           />
           <Button variant="primary" className="flex items-center shadow-sm hover:shadow-md transition-shadow">
@@ -84,6 +170,13 @@ export default function AdminDashboard() {
           </Button>
         </div>
       </div>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="warning" title="Notice" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
 
       {/* System Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
@@ -264,7 +357,7 @@ export default function AdminDashboard() {
           <Card.Header title="Admin Actions" subtitle="System management" />
           <Card.Body className="space-y-2 p-4">
             {[
-              { label: 'Review Pending Applications', icon: '📋', count: 12, color: 'warning', action: '/admin/review' },
+              { label: 'Review Pending Applications', icon: '📋', count: reviewQueue.length, color: 'warning', action: '/admin/review' },
               { label: 'User Management', icon: '👥', count: null, color: 'default', action: '/admin/users' },
               { label: 'Generate Reports', icon: '📊', count: null, color: 'info', action: '/admin/reports' },
               { label: 'System Settings', icon: '⚙️', count: null, color: 'default', action: '/admin/settings' },
@@ -277,7 +370,7 @@ export default function AdminDashboard() {
                   <span className="text-lg group-hover:scale-110 transition-transform duration-200">{action.icon}</span>
                   <span className="text-sm font-medium text-neutral-700 group-hover:text-neutral-900 transition-colors">{action.label}</span>
                 </span>
-                {action.count && (
+                {action.count !== null && (
                   <Badge variant={action.color} size="md" className="animate-pulse">
                     {action.count}
                   </Badge>

@@ -1,35 +1,36 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { Button, Input, Checkbox, Card } from '../../components';
 
 export default function Register() {
   const navigate = useNavigate();
+  const { register, isLoading } = useAuth();
+  
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
-    phone: '',
+    phoneNumber: '',
   });
   const [errors, setErrors] = useState({});
   const [agreeTerms, setAgreeTerms] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
+  const [showAlert, setShowAlert] = useState({ type: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getPasswordStrength = (password) => {
     const hasLength = password.length >= 8;
     const hasUpper = /[A-Z]/.test(password);
     const hasLower = /[a-z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    const count = [hasLength, hasUpper, hasLower, hasNumber, hasSpecial].filter(Boolean).length;
+    const count = [hasLength, hasUpper, hasLower, hasNumber].filter(Boolean).length;
     
-    if (count <= 1) return { width: '20%', color: 'bg-accent-500', label: 'Weak' };
-    if (count <= 2) return { width: '40%', color: 'bg-accent-400', label: 'Fair' };
-    if (count <= 3) return { width: '60%', color: 'bg-yellow-500', label: 'Good' };
-    if (count <= 4) return { width: '80%', color: 'bg-secondary-500', label: 'Strong' };
-    return { width: '100%', color: 'bg-secondary-600', label: 'Very Strong' };
+    if (count <= 1) return { width: '25%', color: 'bg-accent-500', label: 'Weak' };
+    if (count <= 2) return { width: '50%', color: 'bg-yellow-500', label: 'Fair' };
+    if (count <= 3) return { width: '75%', color: 'bg-secondary-500', label: 'Good' };
+    return { width: '100%', color: 'bg-secondary-600', label: 'Strong' };
   };
 
   const validateForm = () => {
@@ -49,10 +50,10 @@ export default function Register() {
       newErrors.email = 'Please enter a valid email';
     }
     
-    if (!formData.phone) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!/^\+?[\d\s-]{10,}$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
+    if (!formData.phoneNumber) {
+      newErrors.phoneNumber = 'Phone number is required';
+    } else if (!/^\+?[\d\s-]{10,}$/.test(formData.phoneNumber)) {
+      newErrors.phoneNumber = 'Please enter a valid phone number';
     }
     
     if (!formData.password) {
@@ -86,18 +87,41 @@ export default function Register() {
 
     if (!validateForm()) return;
 
-    setIsLoading(true);
+    setIsSubmitting(true);
+    setShowAlert({ type: '', message: '' });
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setShowAlert(true);
+    try {
+      const result = await register({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        phoneNumber: formData.phoneNumber,
+      });
 
-      setTimeout(() => {
-        setShowAlert(false);
-        navigate('/login');
-      }, 2000);
-    }, 1500);
+      if (result.success) {
+        setShowAlert({ 
+          type: 'success', 
+          message: 'Registration successful! Redirecting...' 
+        });
+
+        setTimeout(() => {
+          navigate('/user', { replace: true });
+        }, 1000);
+      } else {
+        setShowAlert({ 
+          type: 'error', 
+          message: result.error || 'Registration failed. Please try again.' 
+        });
+      }
+    } catch (error) {
+      setShowAlert({ 
+        type: 'error', 
+        message: 'An unexpected error occurred. Please try again.' 
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const strength = getPasswordStrength(formData.password);
@@ -190,13 +214,23 @@ export default function Register() {
             <p className="text-neutral-500 mb-8">Fill in the details below to get started</p>
 
             {/* Alert */}
-            {showAlert && (
-              <div className="mb-6 p-4 rounded-lg bg-secondary-50 border border-secondary-200">
+            {showAlert.message && (
+              <div className={`mb-6 p-4 rounded-lg border ${
+                showAlert.type === 'success' 
+                  ? 'bg-secondary-50 border-secondary-200 text-secondary-700'
+                  : 'bg-accent-50 border-accent-200 text-accent-700'
+              }`}>
                 <div className="flex items-center gap-2">
-                  <svg className="h-5 w-5 text-secondary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <p className="text-sm text-secondary-700 font-medium">Registration Successful - Redirecting...</p>
+                  {showAlert.type === 'success' ? (
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  <p className="text-sm font-medium">{showAlert.message}</p>
                 </div>
               </div>
             )}
@@ -216,6 +250,7 @@ export default function Register() {
                     value={formData.firstName}
                     onChange={handleChange}
                     error={errors.firstName}
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
@@ -230,6 +265,7 @@ export default function Register() {
                     value={formData.lastName}
                     onChange={handleChange}
                     error={errors.lastName}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -248,22 +284,24 @@ export default function Register() {
                   value={formData.email}
                   onChange={handleChange}
                   error={errors.email}
+                  disabled={isSubmitting}
                 />
               </div>
 
               {/* Phone Field */}
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-neutral-700 mb-1.5">
+                <label htmlFor="phoneNumber" className="block text-sm font-medium text-neutral-700 mb-1.5">
                   Phone Number
                 </label>
                 <Input
-                  id="phone"
-                  name="phone"
+                  id="phoneNumber"
+                  name="phoneNumber"
                   type="tel"
                   placeholder="+1 (234) 567-8901"
-                  value={formData.phone}
+                  value={formData.phoneNumber}
                   onChange={handleChange}
-                  error={errors.phone}
+                  error={errors.phoneNumber}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -281,6 +319,7 @@ export default function Register() {
                   value={formData.password}
                   onChange={handleChange}
                   error={errors.password}
+                  disabled={isSubmitting}
                 />
                 
                 {/* Password Strength Bar */}
@@ -320,6 +359,7 @@ export default function Register() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   error={errors.confirmPassword}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -336,6 +376,7 @@ export default function Register() {
                   checked={agreeTerms}
                   onChange={(e) => setAgreeTerms(e.target.checked)}
                   error={errors.terms}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -344,7 +385,8 @@ export default function Register() {
                 type="submit"
                 variant="primary"
                 className="w-full"
-                isLoading={isLoading}
+                isLoading={isSubmitting || isLoading}
+                disabled={isSubmitting || isLoading}
               >
                 Create Account
               </Button>

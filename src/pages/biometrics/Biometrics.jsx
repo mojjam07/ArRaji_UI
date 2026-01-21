@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button, Input, Select, Alert, Badge, Modal } from '../../components';
+import { biometricAPI } from '../../api';
 
 /**
  * Biometrics Scheduling Page
  * Allows users to schedule biometrics appointments in Lagos or Abuja
  * Weekdays only between 8:00 AM and 3:45 PM
+ * Integrated with backend API for real data
  */
 export default function Biometrics() {
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -12,26 +14,12 @@ export default function Biometrics() {
   const [selectedTime, setSelectedTime] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Sample booked appointments
-  const appointments = [
-    {
-      id: 'BIO-001',
-      applicant: 'Ahmed Al-Rashid',
-      location: 'Lagos',
-      date: '2024-01-22',
-      time: '09:00',
-      status: 'confirmed',
-    },
-    {
-      id: 'BIO-002',
-      applicant: 'Sarah Johnson',
-      location: 'Abuja',
-      date: '2024-01-23',
-      time: '10:30',
-      status: 'confirmed',
-    },
-  ];
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [locations, setLocations] = useState([]);
 
   // Generate available time slots (8:00 AM to 3:45 PM, 45-minute intervals)
   const generateTimeSlots = () => {
@@ -61,6 +49,63 @@ export default function Biometrics() {
     return day !== 0 && day !== 6; // Not Sunday or Saturday
   };
 
+  // Fetch data on mount
+  useEffect(() => {
+    fetchAppointments();
+    fetchLocations();
+  }, []);
+
+  const fetchAppointments = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await biometricAPI.getBiometricAppointments();
+      if (response.success && response.data) {
+        setAppointments(response.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch appointments:', err);
+      setError('Failed to load appointments. Using demo data.');
+      // Fallback to demo data
+      setAppointments([
+        {
+          id: 'BIO-001',
+          applicant: 'Ahmed Al-Rashid',
+          location: 'Lagos',
+          date: '2024-01-22',
+          time: '09:00',
+          status: 'confirmed',
+        },
+        {
+          id: 'BIO-002',
+          applicant: 'Sarah Johnson',
+          location: 'Abuja',
+          date: '2024-01-23',
+          time: '10:30',
+          status: 'confirmed',
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchLocations = async () => {
+    try {
+      const response = await biometricAPI.getLocations();
+      if (response.success && response.data) {
+        setLocations(response.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch locations:', err);
+      // Use default locations
+      setLocations([
+        { code: 'lagos', name: 'Lagos', address: 'Plot 128, Ahmadu Bello Way, Victoria Island' },
+        { code: 'abuja', name: 'Abuja', address: 'Plot 42, Independence Avenue, Central Business District' },
+      ]);
+    }
+  };
+
   const handleSchedule = () => {
     if (!selectedLocation || !selectedDate || !selectedTime) {
       alert('Please select location, date, and time');
@@ -69,16 +114,38 @@ export default function Biometrics() {
     setShowConfirmation(true);
   };
 
-  const confirmAppointment = () => {
+  const confirmAppointment = async () => {
     setIsSubmitting(true);
-    setTimeout(() => {
+    setError(null);
+
+    try {
+      const appointmentData = {
+        location: selectedLocation,
+        date: selectedDate,
+        time: selectedTime,
+      };
+
+      const response = await biometricAPI.scheduleAppointment(appointmentData);
+      
+      if (response.success) {
+        setSuccess('Biometrics appointment scheduled successfully! You will receive a confirmation email.');
+        // Refresh appointments list
+        fetchAppointments();
+        setSelectedLocation('');
+        setSelectedDate('');
+        setSelectedTime('');
+      } else {
+        throw new Error(response.message || 'Failed to schedule appointment');
+      }
+    } catch (err) {
+      console.error('Failed to schedule appointment:', err);
+      setError(err.message || 'Failed to schedule appointment. Please try again.');
+      // For demo, still show success
+      alert('Demo: Appointment would be scheduled. API connection required for real scheduling.');
+    } finally {
       setIsSubmitting(false);
       setShowConfirmation(false);
-      alert('Biometrics appointment scheduled successfully! You will receive a confirmation email.');
-      setSelectedLocation('');
-      setSelectedDate('');
-      setSelectedTime('');
-    }, 1500);
+    }
   };
 
   const getLocationBadge = (location) => {
@@ -94,6 +161,20 @@ export default function Biometrics() {
         <h1 className="text-2xl font-bold text-neutral-900">Biometrics Appointment</h1>
         <p className="text-neutral-500 mt-1">Schedule your biometrics appointment for visa processing</p>
       </div>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="warning" title="Notice" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+
+      {/* Success Alert */}
+      {success && (
+        <Alert variant="success" title="Success" onClose={() => setSuccess(null)}>
+          {success}
+        </Alert>
+      )}
 
       {/* Info Alert */}
       <Alert variant="info" title="Important Information">
@@ -261,7 +342,14 @@ export default function Biometrics() {
           <Card>
             <Card.Header title="Your Appointments" subtitle="Upcoming biometrics sessions" />
             <Card.Body className="p-0">
-              {appointments.length > 0 ? (
+              {isLoading ? (
+                <div className="p-6 text-center">
+                  <svg className="h-8 w-8 text-neutral-300 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                </div>
+              ) : appointments.length > 0 ? (
                 <div className="divide-y divide-neutral-100">
                   {appointments.map((apt) => (
                     <div key={apt.id} className="p-4">
@@ -369,7 +457,7 @@ export default function Biometrics() {
               onClick={confirmAppointment}
               loading={isSubmitting}
             >
-              Confirm Booking
+              {isSubmitting ? 'Scheduling...' : 'Confirm Booking'}
             </Button>
           </div>
         </div>

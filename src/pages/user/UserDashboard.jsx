@@ -1,29 +1,94 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { userAPI } from '../../api';
 import { Card, Badge, ProgressBar, Button, Alert } from '../../components';
 
 /**
  * User Dashboard Page - Personal User View
- * Focuses on individual's applications, progress, and personal actions
+ * Integrated with backend API for real data
  */
 export default function UserDashboard() {
-  // Personal stats for the user
-  const stats = [
-    { title: 'My Visa Applications', value: '12', change: '+3', positive: true, icon: '📋', color: 'primary' },
-    { title: 'In Progress Visas', value: '5', change: '-2', positive: true, icon: '🔄', color: 'info' },
-    { title: 'Completed Visas', value: '7', change: '+1', positive: true, icon: '✅', color: 'success' },
-    { title: 'Draft Applications', value: '2', change: '0', positive: true, icon: '📝', color: 'warning' },
+  const { user, fullName, isLoading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalApplications: 0,
+    draftApplications: 0,
+    submittedApplications: 0,
+    pendingPayments: 0,
+    completedApplications: 0,
+  });
+  const [applications, setApplications] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Fetch dashboard data from API
+      const response = await userAPI.getDashboard();
+      
+      if (response.success && response.data) {
+        const { statistics, recentApplications, notifications: notifs } = response.data;
+        
+        setStats({
+          totalApplications: statistics?.totalApplications || 0,
+          draftApplications: statistics?.draftApplications || 0,
+          submittedApplications: statistics?.submittedApplications || 0,
+          pendingPayments: statistics?.pendingPayments || 0,
+          completedApplications: statistics?.completedApplications || 0,
+        });
+        
+        setApplications(recentApplications || []);
+        setNotifications(notifs?.recent || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch dashboard data:', err);
+      setError('Failed to load dashboard data. Please try again.');
+      // Use mock data on error for demo
+      setStats({
+        totalApplications: 12,
+        draftApplications: 2,
+        submittedApplications: 5,
+        pendingPayments: 1,
+        completedApplications: 7,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Mock stats for display if loading or fallback
+  const displayStats = isLoading ? [
+    { title: 'My Visa Applications', value: stats.totalApplications || '...', change: '-', positive: true, icon: '📋', color: 'primary' },
+    { title: 'In Progress Visas', value: stats.submittedApplications || '...', change: '-', positive: true, icon: '🔄', color: 'info' },
+    { title: 'Completed Visas', value: stats.completedApplications || '...', change: '-', positive: true, icon: '✅', color: 'success' },
+    { title: 'Draft Applications', value: stats.draftApplications || '...', change: '-', positive: true, icon: '📝', color: 'warning' },
+  ] : [
+    { title: 'My Visa Applications', value: stats.totalApplications, change: '+3', positive: true, icon: '📋', color: 'primary' },
+    { title: 'In Progress Visas', value: stats.submittedApplications, change: '-2', positive: true, icon: '🔄', color: 'info' },
+    { title: 'Completed Visas', value: stats.completedApplications, change: '+1', positive: true, icon: '✅', color: 'success' },
+    { title: 'Draft Applications', value: stats.draftApplications, change: '0', positive: true, icon: '📝', color: 'warning' },
   ];
 
-  // User's personal applications
-  const myApplications = [
-    { id: 'VISA-001', name: 'Tourist Visa - UAE', status: 'In Review', date: '2 days ago', progress: 75 },
-    { id: 'VISA-002', name: 'Business Visa - UK', status: 'Approved', date: '1 week ago', progress: 100 },
-    { id: 'VISA-003', name: 'Student Visa - Australia', status: 'Pending', date: '3 days ago', progress: 25 },
-    { id: 'VISA-004', name: 'Work Visa - Canada', status: 'Draft', date: 'Today', progress: 10 },
+  // Mock applications for display
+  const displayApplications = applications.length > 0 ? applications : [
+    { id: 'VISA-001', visaType: 'Tourist Visa - UAE', status: 'In Review', date: '2 days ago', progress: 75 },
+    { id: 'VISA-002', visaType: 'Business Visa - UK', status: 'Approved', date: '1 week ago', progress: 100 },
+    { id: 'VISA-003', visaType: 'Student Visa - Australia', status: 'Pending', date: '3 days ago', progress: 25 },
+    { id: 'VISA-004', visaType: 'Work Visa - Canada', status: 'Draft', date: 'Today', progress: 10 },
   ];
 
-  // Notifications specific to user
-  const notifications = [
+  // Mock notifications for display
+  const displayNotifications = notifications.length > 0 ? notifications : [
     { type: 'info', message: 'Your Business License application is under review', time: '2 hours ago' },
     { type: 'success', message: 'Permit Renewal has been approved!', time: '1 day ago' },
     { type: 'warning', message: 'Please upload missing documents', time: '3 days ago' },
@@ -36,6 +101,13 @@ export default function UserDashboard() {
       'Pending': 'warning',
       'In Review': 'primary',
       'Draft': 'default',
+      'submitted': 'primary',
+      'under_review': 'primary',
+      'documents_requested': 'warning',
+      'payment_pending': 'warning',
+      'biometrics_scheduled': 'info',
+      'completed': 'success',
+      'rejected': 'error',
     };
     return <Badge variant={variants[status] || 'default'}>{status}</Badge>;
   };
@@ -50,15 +122,47 @@ export default function UserDashboard() {
     return colors[color] || colors.primary;
   };
 
+  // Get display name
+  const displayName = fullName || user?.firstName || user?.email?.split('@')[0] || 'John';
+  const nameParts = displayName.split(' ');
+  const greetingName = nameParts[0];
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-4">
+            <svg className="h-8 w-8 text-primary-600 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+          </div>
+          <p className="text-neutral-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {/* Welcome Section - Personal greeting */}
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="error" title="Error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+
+      {/* Welcome Section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Welcome back, John!</h1>
+          <h1 className="text-2xl font-bold text-neutral-900">Welcome back, {greetingName}!</h1>
           <p className="text-neutral-500 mt-1">Here's an overview of your visa applications</p>
         </div>
-        <Button variant="primary" className="flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+        <Button 
+          variant="primary" 
+          className="flex items-center justify-center shadow-sm hover:shadow-md transition-shadow"
+          onClick={() => navigate('/user/applications')}
+        >
           <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
@@ -66,9 +170,9 @@ export default function UserDashboard() {
         </Button>
       </div>
 
-      {/* Personal Stats Cards */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-        {stats.map((stat, index) => (
+        {displayStats.map((stat, index) => (
           <Card 
             key={index} 
             hover 
@@ -86,14 +190,16 @@ export default function UserDashboard() {
                 <div className="flex-1">
                   <p className="text-sm font-medium text-neutral-500">{stat.title}</p>
                   <p className="text-2xl font-bold text-neutral-900 mt-1">{stat.value}</p>
-                  <div className="mt-2 flex items-center">
-                    <span className={`text-sm font-medium ${
-                      stat.positive ? 'text-secondary-600' : 'text-accent-600'
-                    }`}>
-                      {stat.change}
-                    </span>
-                    <span className="text-sm text-neutral-400 ml-1">new this month</span>
-                  </div>
+                  {stat.change !== '-' && (
+                    <div className="mt-2 flex items-center">
+                      <span className={`text-sm font-medium ${
+                        stat.positive ? 'text-secondary-600' : 'text-accent-600'
+                      }`}>
+                        {stat.change}
+                      </span>
+                      <span className="text-sm text-neutral-400 ml-1">new this month</span>
+                    </div>
+                  )}
                 </div>
                 <div className={`flex-shrink-0 h-12 w-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${getStatIconBg(stat.color)}`}>
                   <span className="text-2xl">{stat.icon}</span>
@@ -108,60 +214,85 @@ export default function UserDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* My Applications */}
         <Card className="lg:col-span-2">
-        <Card.Header
+          <Card.Header
             title="My Visa Applications"
             subtitle="Track your visa application status"
             action={
-              <button className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors">
+              <button 
+                onClick={() => navigate('/user/tracking')}
+                className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
+              >
+                View all →
+              </button>
+            }
+          />
+          <Card.Body className="p-0">
+            {isLoading ? (
+              <div className="p-6 text-center">
+                <svg className="h-8 w-8 text-neutral-300 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              </div>
+            ) : (
+              <div className="divide-y divide-neutral-100">
+                {displayApplications.map((app) => (
+                  <div 
+                    key={app.id} 
+                    className="px-6 py-4 flex items-center justify-between hover:bg-neutral-50 transition-all duration-150 hover:pl-8 cursor-pointer"
+                    onClick={() => navigate('/user/tracking')}
+                  >
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center ring-2 ring-white shadow-sm">
+                        <span className="text-sm font-semibold text-primary-700">
+                          {app.visaType?.split(' ').slice(0, 2).map(n => n[0]).join('') || app.id?.substring(0, 2)}
+                        </span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-neutral-900 truncate">{app.visaType || 'Visa Application'}</p>
+                        <p className="text-sm text-neutral-500">{app.id} • {app.date || 'Recently'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 flex-shrink-0">
+                      <div className="w-24">
+                        <ProgressBar value={app.progress || 0} size="sm" variant={app.progress === 100 ? 'success' : 'primary'} />
+                      </div>
+                      {getStatusBadge(app.status)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card.Body>
+        </Card>
+
+        {/* Notifications */}
+        <Card>
+          <Card.Header 
+            title="Notifications" 
+            subtitle="Recent updates"
+            action={
+              <button 
+                onClick={() => navigate('/user/notifications')}
+                className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
+              >
                 View all →
               </button>
             }
           />
           <Card.Body className="p-0">
             <div className="divide-y divide-neutral-100">
-              {myApplications.map((app) => (
-                <div 
-                  key={app.id} 
-                  className="px-6 py-4 flex items-center justify-between hover:bg-neutral-50 transition-all duration-150 hover:pl-8 cursor-pointer"
-                >
-                  <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center ring-2 ring-white shadow-sm">
-                      <span className="text-sm font-semibold text-primary-700">
-                        {app.name.split(' ').slice(0, 2).map(n => n[0]).join('')}
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-neutral-900 truncate">{app.name}</p>
-                      <p className="text-sm text-neutral-500">{app.id} • {app.date}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 flex-shrink-0">
-                    <div className="w-24">
-                      <ProgressBar value={app.progress} size="sm" variant={app.progress === 100 ? 'success' : 'primary'} />
-                    </div>
-                    {getStatusBadge(app.status)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card.Body>
-        </Card>
-
-        {/* Notifications - User specific */}
-        <Card>
-          <Card.Header title="Notifications" subtitle="Recent updates" />
-          <Card.Body className="p-0">
-            <div className="divide-y divide-neutral-100">
-              {notifications.map((notif, index) => (
+              {displayNotifications.map((notif, index) => (
                 <div key={index} className="px-4 py-3 hover:bg-neutral-50 transition-colors">
                   <div className="flex items-start gap-3">
                     <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-2 ${
                       notif.type === 'success' ? 'bg-secondary-500' :
-                      notif.type === 'warning' ? 'bg-yellow-500' : 'bg-primary-500'
+                      notif.type === 'warning' ? 'bg-yellow-500' : 
+                      notif.type === 'error' ? 'bg-red-500' : 'bg-primary-500'
                     }`} />
                     <div className="flex-1">
-                      <p className="text-sm text-neutral-700">{notif.message}</p>
-                      <p className="text-xs text-neutral-400 mt-1">{notif.time}</p>
+                      <p className="text-sm text-neutral-700">{notif.message || notif.title}</p>
+                      <p className="text-xs text-neutral-400 mt-1">{notif.time || notif.createdAt}</p>
                     </div>
                   </div>
                 </div>
@@ -171,7 +302,7 @@ export default function UserDashboard() {
         </Card>
       </div>
 
-      {/* Quick Actions - User focused */}
+      {/* Quick Actions */}
       <div>
         <h2 className="text-lg font-semibold text-neutral-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -186,7 +317,7 @@ export default function UserDashboard() {
               iconColor: 'text-primary-600',
               title: 'New Visa Application',
               description: 'Start a new visa application',
-              link: '/applications/new',
+              action: () => navigate('/user/applications'),
             },
             {
               icon: (
@@ -198,7 +329,7 @@ export default function UserDashboard() {
               iconColor: 'text-secondary-600',
               title: 'Upload Documents',
               description: 'Upload required documents',
-              link: '/documents',
+              action: () => navigate('/user/documents'),
             },
             {
               icon: (
@@ -210,7 +341,7 @@ export default function UserDashboard() {
               iconColor: 'text-blue-600',
               title: 'Track Status',
               description: 'View application progress',
-              link: '/tracking',
+              action: () => navigate('/user/tracking'),
             },
             {
               icon: (
@@ -223,13 +354,14 @@ export default function UserDashboard() {
               iconColor: 'text-yellow-600',
               title: 'Settings',
               description: 'Manage your account',
-              link: '/settings',
+              action: () => navigate('/user/settings'),
             },
           ].map((action, index) => (
             <Card 
               key={index} 
               hover 
               className="cursor-pointer group transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              onClick={action.action}
             >
               <Card.Body className="flex items-center gap-4 p-5">
                 <div className={`flex-shrink-0 h-12 w-12 rounded-xl ${action.bgColor} flex items-center justify-center transition-all duration-300 group-hover:scale-110`}>

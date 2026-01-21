@@ -6,12 +6,16 @@ const Button = ({
   size = 'md',
   disabled = false,
   loading = false,
+  isLoading = false,
   fullWidth = false,
   leftIcon = null,
   rightIcon = null,
   className = '',
   ...props
 }) => {
+  // Support both 'loading' and 'isLoading' props
+  const isBtnLoading = loading || isLoading;
+
   const baseStyles = `
     inline-flex items-center justify-center gap-2
     px-4 py-2.5 rounded-lg font-medium
@@ -43,10 +47,10 @@ const Button = ({
         ${sizes[size]}
         ${className}
       `}
-      disabled={disabled || loading}
+      disabled={disabled || isBtnLoading}
       {...props}
     >
-      {loading ? (
+      {isBtnLoading ? (
         <>
           <svg
             className="animate-spin h-4 w-4"

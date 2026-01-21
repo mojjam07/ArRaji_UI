@@ -1,5 +1,6 @@
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
+import PrivateRoute from './components/auth/PrivateRoute';
 import AuthLayout from './components/layout/AuthLayout';
 import Layout from './components/layout/Layout';
 import AdminLayout from './components/layout/AdminLayout';
@@ -26,29 +27,10 @@ import PassportManagement from './pages/admin/PassportManagement';
 /**
  * Application Router Configuration
  * 
- * Public routes (AuthLayout):
- * - /login - Login page
- * - /register - Registration page
- * - /forgot-password - Forgot password page
- * 
- * Protected routes (Main Layout):
- * - /user - User dashboard
- * - /user/applications - Visa application form
- * - /user/documents - Document upload & validation
- * - /user/biometrics - Biometrics scheduling
- * - /user/cost-estimation - Cost review & payment
- * - /user/payment - Payment processing
- * - /user/tracking - Status tracking
- * - /user/notifications - Notifications center
- * - /user/settings - User settings
- * 
- * Admin routes (Admin Layout):
- * - /admin - Admin dashboard (admin only)
- * - /admin/users - User management (admin only)
- * - /admin/review - Application review (admin/officer only)
- * - /admin/passport - Passport & courier tracking (admin only)
- * - /admin/reports - Reporting & analytics (admin only)
- * - /admin/settings - Admin settings (admin only)
+ * Route Protection:
+ * - Public routes: Landing, Login, Register, ForgotPassword (no auth required)
+ * - Protected routes: User dashboard, applications, documents, etc. (auth required)
+ * - Admin routes: Admin dashboard, user management, etc. (admin role required)
  */
 
 const router = createBrowserRouter([
@@ -87,7 +69,11 @@ const router = createBrowserRouter([
   // Protected User Routes (with main layout)
   {
     path: '/user',
-    element: <Layout />,
+    element: (
+      <PrivateRoute>
+        <Layout />
+      </PrivateRoute>
+    ),
     children: [
       {
         index: true,
@@ -128,10 +114,14 @@ const router = createBrowserRouter([
     ],
   },
 
-  // Admin Routes (with AdminLayout)
+  // Admin Routes (with AdminLayout - admin only)
   {
     path: '/admin',
-    element: <AdminLayout />,
+    element: (
+      <PrivateRoute roles={['admin', 'officer']}>
+        <AdminLayout />
+      </PrivateRoute>
+    ),
     children: [
       {
         index: true,

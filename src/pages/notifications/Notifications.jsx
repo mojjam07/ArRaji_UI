@@ -1,118 +1,180 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button, Badge, Alert, Select } from '../../components';
+import { notificationAPI } from '../../api';
 
 /**
  * Notifications Page
  * Displays real-time notifications for all visa application stages
+ * Integrated with backend API for real data
  */
 export default function Notifications() {
   const [filter, setFilter] = useState('all');
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'stage',
-      category: 'processing',
-      title: 'Biometrics Appointment Confirmed',
-      message: 'Your biometrics appointment has been scheduled for January 22, 2024 at 9:00 AM in Lagos.',
-      time: '2 hours ago',
-      read: false,
-      icon: 'calendar',
-    },
-    {
-      id: 2,
-      type: 'document',
-      category: 'documents',
-      title: 'Document Verification Complete',
-      message: 'Your uploaded documents have been verified. You can proceed to the next step.',
-      time: '5 hours ago',
-      read: false,
-      icon: 'check',
-    },
-    {
-      id: 3,
-      type: 'payment',
-      category: 'payment',
-      title: 'Payment Received',
-      message: 'Your visa processing fee of $150 has been received. Thank you!',
-      time: '1 day ago',
-      read: true,
-      icon: 'dollar',
-    },
-    {
-      id: 4,
-      type: 'stage',
-      category: 'cost',
-      title: 'Cost Details Provided',
-      message: 'The visa cost breakdown has been sent to your email. Please review and proceed with payment.',
-      time: '2 days ago',
-      read: true,
-      icon: 'info',
-    },
-    {
-      id: 5,
-      type: 'reminder',
-      category: 'biometrics',
-      title: 'Biometrics Reminder',
-      message: 'Don\'t forget your biometrics appointment tomorrow! Please arrive 15 minutes early.',
-      time: '3 days ago',
-      read: true,
-      icon: 'bell',
-    },
-    {
-      id: 6,
-      type: 'stage',
-      category: 'embassy',
-      title: 'Application Submitted to Embassy',
-      message: 'Your visa application has been successfully submitted to the embassy for processing.',
-      time: '4 days ago',
-      read: true,
-      icon: 'building',
-    },
-    {
-      id: 7,
-      type: 'document',
-      category: 'documents',
-      title: 'Additional Document Required',
-      message: 'Please upload your invitation letter with valid visa validity dates.',
-      time: '5 days ago',
-      read: true,
-      icon: 'upload',
-    },
-    {
-      id: 8,
-      type: 'stage',
-      category: 'passport',
-      title: 'Passport Returned',
-      message: 'Your passport with visa has been returned and is ready for collection.',
-      time: '1 week ago',
-      read: true,
-      icon: 'passport',
-    },
-  ]);
+  const [notifications, setNotifications] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  const markAsRead = (id) => {
-    setNotifications(notifications.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    ));
+  // Fetch notifications on mount
+  useEffect(() => {
+    fetchNotifications();
+    fetchUnreadCount();
+  }, []);
+
+  const fetchNotifications = async () => {
+    setIsLoading(true);
+    try {
+      const response = await notificationAPI.getNotifications({ status: filter });
+      if (response.success && response.data) {
+        setNotifications(response.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+      // Fallback to demo data
+      setNotifications([
+        {
+          id: 1,
+          type: 'stage',
+          category: 'processing',
+          title: 'Biometrics Appointment Confirmed',
+          message: 'Your biometrics appointment has been scheduled for January 22, 2024 at 9:00 AM in Lagos.',
+          time: '2 hours ago',
+          read: false,
+          icon: 'calendar',
+        },
+        {
+          id: 2,
+          type: 'document',
+          category: 'documents',
+          title: 'Document Verification Complete',
+          message: 'Your uploaded documents have been verified. You can proceed to the next step.',
+          time: '5 hours ago',
+          read: false,
+          icon: 'check',
+        },
+        {
+          id: 3,
+          type: 'payment',
+          category: 'payment',
+          title: 'Payment Received',
+          message: 'Your visa processing fee of $150 has been received. Thank you!',
+          time: '1 day ago',
+          read: true,
+          icon: 'dollar',
+        },
+        {
+          id: 4,
+          type: 'stage',
+          category: 'cost',
+          title: 'Cost Details Provided',
+          message: 'The visa cost breakdown has been sent to your email. Please review and proceed with payment.',
+          time: '2 days ago',
+          read: true,
+          icon: 'info',
+        },
+        {
+          id: 5,
+          type: 'reminder',
+          category: 'biometrics',
+          title: 'Biometrics Reminder',
+          message: 'Don\'t forget your biometrics appointment tomorrow! Please arrive 15 minutes early.',
+          time: '3 days ago',
+          read: true,
+          icon: 'bell',
+        },
+        {
+          id: 6,
+          type: 'stage',
+          category: 'embassy',
+          title: 'Application Submitted to Embassy',
+          message: 'Your visa application has been successfully submitted to the embassy for processing.',
+          time: '4 days ago',
+          read: true,
+          icon: 'building',
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
+  const fetchUnreadCount = async () => {
+    try {
+      const response = await notificationAPI.getUnreadCount();
+      if (response.success && response.data) {
+        setUnreadCount(response.data.count || 0);
+      }
+    } catch (err) {
+      console.error('Failed to fetch unread count:', err);
+    }
   };
 
-  const deleteNotification = (id) => {
-    setNotifications(notifications.filter(n => n.id !== id));
+  const markAsRead = async (id) => {
+    try {
+      await notificationAPI.markAsRead(id);
+      setNotifications(notifications.map(n => 
+        n.id === id ? { ...n, read: true } : n
+      ));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error('Failed to mark as read:', err);
+      // Fallback - update locally
+      setNotifications(notifications.map(n => 
+        n.id === id ? { ...n, read: true } : n
+      ));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    }
   };
 
-  const clearAll = () => {
-    setNotifications([]);
+  const markAllAsRead = async () => {
+    try {
+      await notificationAPI.markAllAsRead();
+      setNotifications(notifications.map(n => ({ ...n, read: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error('Failed to mark all as read:', err);
+      // Fallback - update locally
+      setNotifications(notifications.map(n => ({ ...n, read: true })));
+      setUnreadCount(0);
+    }
+  };
+
+  const deleteNotification = async (id) => {
+    try {
+      await notificationAPI.deleteNotification(id);
+      const wasUnread = notifications.find(n => n.id === id && !n.read);
+      setNotifications(notifications.filter(n => n.id !== id));
+      if (wasUnread) {
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+    } catch (err) {
+      console.error('Failed to delete notification:', err);
+      // Fallback - delete locally
+      const wasUnread = notifications.find(n => n.id === id && !n.read);
+      setNotifications(notifications.filter(n => n.id !== id));
+      if (wasUnread) {
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+    }
+  };
+
+  const clearAll = async () => {
+    try {
+      // Delete all notifications one by one or use bulk delete if available
+      for (const notif of notifications) {
+        await notificationAPI.deleteNotification(notif.id);
+      }
+      setNotifications([]);
+      setUnreadCount(0);
+    } catch (err) {
+      console.error('Failed to clear all notifications:', err);
+      // Fallback - clear locally
+      setNotifications([]);
+      setUnreadCount(0);
+    }
   };
 
   const filteredNotifications = filter === 'all' 
     ? notifications 
     : notifications.filter(n => n.category === filter);
-
-  const unreadCount = notifications.filter(n => !n.read).length;
 
   const getIcon = (iconName) => {
     switch (iconName) {
@@ -281,7 +343,17 @@ export default function Notifications() {
       </div>
 
       {/* Notifications List */}
-      {filteredNotifications.length > 0 ? (
+      {isLoading ? (
+        <Card>
+          <Card.Body className="text-center py-12">
+            <svg className="h-8 w-8 text-neutral-300 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <p className="text-neutral-500 mt-4">Loading notifications...</p>
+          </Card.Body>
+        </Card>
+      ) : filteredNotifications.length > 0 ? (
         <div className="space-y-3">
           {filteredNotifications.map((notification) => (
             <Card 

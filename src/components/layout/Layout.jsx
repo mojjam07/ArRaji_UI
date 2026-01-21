@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, isAuthenticated, logout, initials } = useAuth();
+  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // User sidebar items - Updated with visa processing features
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
+  // User sidebar items
   const sidebarItems = [
     {
       id: 'dashboard',
@@ -75,7 +83,6 @@ const Layout = () => {
       id: 'notifications',
       name: 'Notifications',
       href: '/user/notifications',
-      badge: '3',
       icon: (
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -96,8 +103,8 @@ const Layout = () => {
     },
   ];
 
-  // Default logo
-  const defaultLogo = (
+  // Logo
+  const logo = (
     <div className="flex items-center gap-2">
       <div className="h-8 w-8 rounded-lg bg-primary-600 flex items-center justify-center">
         <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -108,11 +115,11 @@ const Layout = () => {
     </div>
   );
 
-  // Default user
-  const defaultUser = {
-    name: 'John Doe',
-    role: 'User',
-  };
+  // Get user info from AuthContext
+  const userName = user?.firstName && user?.lastName 
+    ? `${user.firstName} ${user.lastName}` 
+    : user?.firstName || user?.email || 'User';
+  const userRole = user?.role === 'admin' ? 'Administrator' : user?.role === 'officer' ? 'Officer' : 'User';
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -129,7 +136,7 @@ const Layout = () => {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between h-16 px-4 border-b border-neutral-200">
-            {defaultLogo}
+            {logo}
             <button
               onClick={() => setSidebarOpen(false)}
               className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100"
@@ -147,9 +154,9 @@ const Layout = () => {
                 return <hr key={index} className="my-3 border-neutral-200" />;
               }
               return (
-                <a
+                <Link
                   key={item.id}
-                  href={item.href}
+                  to={item.href}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
                 >
                   <span className="flex-shrink-0 h-5 w-5">{item.icon}</span>
@@ -159,7 +166,7 @@ const Layout = () => {
                       {item.badge}
                     </span>
                   )}
-                </a>
+                </Link>
               );
             })}
           </nav>
@@ -169,14 +176,23 @@ const Layout = () => {
             <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-100 cursor-pointer">
               <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
                 <span className="text-sm font-medium text-primary-700">
-                  {defaultUser.name?.charAt(0).toUpperCase() || 'U'}
+                  {initials || userName.charAt(0).toUpperCase()}
                 </span>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-neutral-900 truncate">{defaultUser.name}</p>
-                <p className="text-xs text-neutral-500 truncate">{defaultUser.role}</p>
+                <p className="text-sm font-medium text-neutral-900 truncate">{userName}</p>
+                <p className="text-xs text-neutral-500 truncate">{userRole}</p>
               </div>
             </div>
+            <button
+              onClick={handleLogout}
+              className="w-full mt-2 flex items-center gap-2 px-3 py-2 text-sm text-neutral-600 hover:text-accent-600 hover:bg-accent-50 rounded-lg transition-colors"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Sign Out
+            </button>
           </div>
         </div>
       </aside>

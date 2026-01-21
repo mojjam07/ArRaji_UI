@@ -1,75 +1,129 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Badge, ProgressBar, Button, Select, Alert } from '../../components';
+import { applicationAPI } from '../../api';
 
 /**
  * Visa Application Status Tracking Page with Timeline View
  * Tracks complete visa processing workflow from booking to passport return
+ * Integrated with backend API for real data
  */
 export default function Tracking() {
   const [selectedApplication, setSelectedApplication] = useState('all');
+  const [applications, setApplications] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedAppDetails, setSelectedAppDetails] = useState(null);
 
-  const applications = [
-    {
-      id: 'VISA-2024-001',
-      type: 'Tourist Visa - UAE',
-      applicant: 'Ahmed Al-Rashid',
-      submittedDate: '2024-01-15',
-      status: 'biometrics_pending',
-      currentStage: 4,
-      stages: [
-        { step: 'Booking Initiated', date: '2024-01-15 09:30', status: 'completed', description: 'Your visa application has been submitted' },
-        { step: 'Documents Received', date: '2024-01-15 10:15', status: 'completed', description: 'All required documents uploaded and verified' },
-        { step: 'Cost Provided', date: '2024-01-16 11:00', status: 'completed', description: 'Visa cost breakdown sent to your email' },
-        { step: 'Payment Completed', date: '2024-01-16 14:30', status: 'completed', description: 'Payment received successfully' },
-        { step: 'Biometrics Scheduled', date: '2024-01-17 08:00', status: 'current', description: 'Awaiting biometrics appointment' },
-        { step: 'Biometrics Completed', date: null, status: 'pending', description: 'Your biometrics will be recorded' },
-        { step: 'Embassy Submission', date: null, status: 'pending', description: 'Application submitted to embassy' },
-        { step: 'Visa Processing', date: null, status: 'pending', description: 'Embassy is processing your visa' },
-        { step: 'Visa Collected', date: null, status: 'pending', description: 'Visa sticker collected from embassy' },
-        { step: 'Passport Returned', date: null, status: 'pending', description: 'Passport returned to client' },
-      ],
-    },
-    {
-      id: 'VISA-2024-002',
-      type: 'Business Visa - UK',
-      applicant: 'Sarah Johnson',
-      submittedDate: '2024-01-10',
-      status: 'embassy_submission',
-      currentStage: 7,
-      stages: [
-        { step: 'Booking Initiated', date: '2024-01-10 11:15', status: 'completed', description: 'Application received' },
-        { step: 'Documents Received', date: '2024-01-10 16:00', status: 'completed', description: 'All documents verified' },
-        { step: 'Cost Provided', date: '2024-01-11 09:00', status: 'completed', description: 'Cost breakdown provided' },
-        { step: 'Payment Completed', date: '2024-01-11 11:30', status: 'completed', description: 'Payment confirmed' },
-        { step: 'Biometrics Scheduled', date: '2024-01-12 10:00', status: 'completed', description: 'Biometrics completed' },
-        { step: 'Biometrics Completed', date: '2024-01-12 11:30', status: 'completed', description: 'Biometrics recorded successfully' },
-        { step: 'Embassy Submission', date: '2024-01-15 09:00', status: 'current', description: 'Submitted to UK Embassy' },
-        { step: 'Visa Processing', date: null, status: 'pending', description: 'Under embassy review' },
-        { step: 'Visa Collected', date: null, status: 'pending', description: 'Awaiting visa collection' },
-        { step: 'Passport Returned', date: null, status: 'pending', description: 'To be returned to client' },
-      ],
-    },
-    {
-      id: 'VISA-2024-003',
-      type: 'Tourist Visa - USA',
-      applicant: 'Mohammed Ali',
-      submittedDate: '2024-01-18',
-      status: 'documents_pending',
-      currentStage: 2,
-      stages: [
-        { step: 'Booking Initiated', date: '2024-01-18 08:45', status: 'completed', description: 'Application started' },
-        { step: 'Documents Received', date: null, status: 'pending', description: 'Waiting for document upload' },
-        { step: 'Cost Provided', date: null, status: 'pending', description: 'Pending after documents' },
-        { step: 'Payment Completed', date: null, status: 'pending', description: 'Awaiting payment' },
-        { step: 'Biometrics Scheduled', date: null, status: 'pending', description: 'To be scheduled' },
-        { step: 'Biometrics Completed', date: null, status: 'pending', description: 'Future stage' },
-        { step: 'Embassy Submission', date: null, status: 'pending', description: 'Future stage' },
-        { step: 'Visa Processing', date: null, status: 'pending', description: 'Future stage' },
-        { step: 'Visa Collected', date: null, status: 'pending', description: 'Future stage' },
-        { step: 'Passport Returned', date: null, status: 'pending', description: 'Final stage' },
-      ],
-    },
-  ];
+  // Fetch applications on mount
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
+  const fetchApplications = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await applicationAPI.getMyApplications();
+      if (response.success && response.data) {
+        setApplications(response.data);
+        // Set the first application as selected by default
+        if (response.data.length > 0) {
+          setSelectedAppDetails(response.data[0]);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch applications:', err);
+      setError('Failed to load applications. Using demo data.');
+      // Fallback to demo data
+      const demoApps = [
+        {
+          id: 'VISA-2024-001',
+          visaType: 'Tourist Visa - UAE',
+          applicant: 'Ahmed Al-Rashid',
+          submittedDate: '2024-01-15',
+          status: 'biometrics_pending',
+          currentStage: 4,
+          stages: [
+            { step: 'Booking Initiated', date: '2024-01-15 09:30', status: 'completed', description: 'Your visa application has been submitted' },
+            { step: 'Documents Received', date: '2024-01-15 10:15', status: 'completed', description: 'All required documents uploaded and verified' },
+            { step: 'Cost Provided', date: '2024-01-16 11:00', status: 'completed', description: 'Visa cost breakdown sent to your email' },
+            { step: 'Payment Completed', date: '2024-01-16 14:30', status: 'completed', description: 'Payment received successfully' },
+            { step: 'Biometrics Scheduled', date: '2024-01-17 08:00', status: 'current', description: 'Awaiting biometrics appointment' },
+            { step: 'Biometrics Completed', date: null, status: 'pending', description: 'Your biometrics will be recorded' },
+            { step: 'Embassy Submission', date: null, status: 'pending', description: 'Application submitted to embassy' },
+            { step: 'Visa Processing', date: null, status: 'pending', description: 'Embassy is processing your visa' },
+            { step: 'Visa Collected', date: null, status: 'pending', description: 'Visa sticker collected from embassy' },
+            { step: 'Passport Returned', date: null, status: 'pending', description: 'Passport returned to client' },
+          ],
+        },
+        {
+          id: 'VISA-2024-002',
+          visaType: 'Business Visa - UK',
+          applicant: 'Sarah Johnson',
+          submittedDate: '2024-01-10',
+          status: 'embassy_submission',
+          currentStage: 7,
+          stages: [
+            { step: 'Booking Initiated', date: '2024-01-10 11:15', status: 'completed', description: 'Application received' },
+            { step: 'Documents Received', date: '2024-01-10 16:00', status: 'completed', description: 'All documents verified' },
+            { step: 'Cost Provided', date: '2024-01-11 09:00', status: 'completed', description: 'Cost breakdown provided' },
+            { step: 'Payment Completed', date: '2024-01-11 11:30', status: 'completed', description: 'Payment confirmed' },
+            { step: 'Biometrics Scheduled', date: '2024-01-12 10:00', status: 'completed', description: 'Biometrics completed' },
+            { step: 'Biometrics Completed', date: '2024-01-12 11:30', status: 'completed', description: 'Biometrics recorded successfully' },
+            { step: 'Embassy Submission', date: '2024-01-15 09:00', status: 'current', description: 'Submitted to UK Embassy' },
+            { step: 'Visa Processing', date: null, status: 'pending', description: 'Under embassy review' },
+            { step: 'Visa Collected', date: null, status: 'pending', description: 'Awaiting visa collection' },
+            { step: 'Passport Returned', date: null, status: 'pending', description: 'To be returned to client' },
+          ],
+        },
+        {
+          id: 'VISA-2024-003',
+          visaType: 'Tourist Visa - USA',
+          applicant: 'Mohammed Ali',
+          submittedDate: '2024-01-18',
+          status: 'documents_pending',
+          currentStage: 2,
+          stages: [
+            { step: 'Booking Initiated', date: '2024-01-18 08:45', status: 'completed', description: 'Application started' },
+            { step: 'Documents Received', date: null, status: 'pending', description: 'Waiting for document upload' },
+            { step: 'Cost Provided', date: null, status: 'pending', description: 'Pending after documents' },
+            { step: 'Payment Completed', date: null, status: 'pending', description: 'Awaiting payment' },
+            { step: 'Biometrics Scheduled', date: null, status: 'pending', description: 'To be scheduled' },
+            { step: 'Biometrics Completed', date: null, status: 'pending', description: 'Future stage' },
+            { step: 'Embassy Submission', date: null, status: 'pending', description: 'Future stage' },
+            { step: 'Visa Processing', date: null, status: 'pending', description: 'Future stage' },
+            { step: 'Visa Collected', date: null, status: 'pending', description: 'Future stage' },
+            { step: 'Passport Returned', date: null, status: 'pending', description: 'Final stage' },
+          ],
+        },
+      ];
+      setApplications(demoApps);
+      if (demoApps.length > 0) {
+        setSelectedAppDetails(demoApps[0]);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchApplicationDetails = async (appId) => {
+    try {
+      const response = await applicationAPI.getApplicationById(appId);
+      if (response.success && response.data) {
+        setSelectedAppDetails(response.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch application details:', err);
+    }
+  };
+
+  const handleSelectApplication = (appId) => {
+    setSelectedApplication(appId);
+    const app = applications.find(a => a.id === appId);
+    if (app) {
+      setSelectedAppDetails(app);
+    }
+  };
 
   const getStatusBadge = (status) => {
     const variants = {
@@ -134,7 +188,7 @@ export default function Tracking() {
 
   const filteredApplications = selectedApplication === 'all'
     ? applications
-    : applications.filter(app => app.status === selectedApplication);
+    : applications.filter(app => app.id === selectedApplication);
 
   return (
     <div className="space-y-6">
@@ -146,72 +200,94 @@ export default function Tracking() {
         </div>
         <Select
           value={selectedApplication}
-          onChange={(e) => setSelectedApplication(e.target.value)}
+          onChange={(e) => handleSelectApplication(e.target.value)}
           options={[
             { value: 'all', label: 'All Applications' },
-            { value: 'documents_pending', label: 'Documents Pending' },
-            { value: 'biometrics_pending', label: 'Awaiting Biometrics' },
-            { value: 'embassy_submission', label: 'At Embassy' },
-            { value: 'passport_returned', label: 'Completed' },
+            ...applications.map(app => ({ value: app.id, label: `${app.visaType} - ${app.id}` })),
           ]}
         />
       </div>
 
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="warning" title="Notice" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+
       {/* Application Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {filteredApplications.map((app) => (
-          <Card key={app.id} hover>
-            <Card.Header
-              title={app.type}
-              subtitle={`ID: ${app.id}`}
-              action={getStatusBadge(app.status)}
-            />
-            <Card.Body>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-neutral-500">Applicant</span>
-                  <span className="font-medium text-neutral-900">{app.applicant}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-neutral-500">Submitted</span>
-                  <span className="font-medium text-neutral-900">{app.submittedDate}</span>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-neutral-500">Progress</span>
-                    <span className="font-medium text-neutral-900">
-                      {app.stages.filter(s => s.status === 'completed').length}/{app.stages.length} stages
-                    </span>
-                  </div>
-                  <ProgressBar
-                    value={getStageProgress(app.stages)}
-                    variant={app.status === 'passport_returned' ? 'success' : 'primary'}
-                  />
-                </div>
-                <div className="pt-2">
-                  <p className="text-sm text-neutral-600">
-                    <span className="font-medium">Current Stage:</span> {
-                      app.stages.find(s => s.status === 'current')?.step || 'N/A'
-                    }
-                  </p>
-                </div>
-              </div>
+        {isLoading ? (
+          <Card className="lg:col-span-3">
+            <Card.Body className="text-center py-12">
+              <svg className="h-8 w-8 text-neutral-300 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              <p className="text-neutral-500 mt-4">Loading applications...</p>
             </Card.Body>
-            <Card.Footer>
-              <Button variant="secondary" className="w-full" onClick={() => setSelectedApplication(app.id)}>
-                View Details
-              </Button>
-            </Card.Footer>
           </Card>
-        ))}
+        ) : filteredApplications.length > 0 ? (
+          filteredApplications.map((app) => (
+            <Card key={app.id} hover>
+              <Card.Header
+                title={app.visaType}
+                subtitle={`ID: ${app.id}`}
+                action={getStatusBadge(app.status)}
+              />
+              <Card.Body>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-neutral-500">Applicant</span>
+                    <span className="font-medium text-neutral-900">{app.applicant}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-neutral-500">Submitted</span>
+                    <span className="font-medium text-neutral-900">{app.submittedDate}</span>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-neutral-500">Progress</span>
+                      <span className="font-medium text-neutral-900">
+                        {app.stages?.filter(s => s.status === 'completed').length || 0}/{app.stages?.length || 0} stages
+                      </span>
+                    </div>
+                    <ProgressBar
+                      value={getStageProgress(app.stages || [])}
+                      variant={app.status === 'passport_returned' ? 'success' : 'primary'}
+                    />
+                  </div>
+                  <div className="pt-2">
+                    <p className="text-sm text-neutral-600">
+                      <span className="font-medium">Current Stage:</span> {
+                        app.stages?.find(s => s.status === 'current')?.step || 'N/A'
+                      }
+                    </p>
+                  </div>
+                </div>
+              </Card.Body>
+              <Card.Footer>
+                <Button variant="secondary" className="w-full" onClick={() => handleSelectApplication(app.id)}>
+                  View Details
+                </Button>
+              </Card.Footer>
+            </Card>
+          ))
+        ) : (
+          <Card className="lg:col-span-3">
+            <Card.Body className="text-center py-12">
+              <p className="text-neutral-500">No applications found</p>
+            </Card.Body>
+          </Card>
+        )}
       </div>
 
       {/* Detailed Timeline View */}
-      {filteredApplications.length > 0 && filteredApplications[0].id && (
+      {selectedAppDetails && (
         <Card>
           <Card.Header
-            title={`Timeline - ${filteredApplications[0].id}`}
-            subtitle={`${filteredApplications[0].type} - ${filteredApplications[0].applicant}`}
+            title={`Timeline - ${selectedAppDetails.id}`}
+            subtitle={`${selectedAppDetails.visaType} - ${selectedAppDetails.applicant}`}
           />
           <Card.Body>
             <div className="relative">
@@ -220,7 +296,7 @@ export default function Tracking() {
               
               {/* Timeline Items */}
               <div className="space-y-2">
-                {filteredApplications[0].stages.map((step, index) => (
+                {(selectedAppDetails.stages || []).map((step, index) => (
                   <div key={index} className="relative flex gap-4">
                     {/* Icon */}
                     <div className="relative z-10">
