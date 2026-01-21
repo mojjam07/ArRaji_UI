@@ -56,14 +56,25 @@ export const AuthProvider = ({ children }) => {
         setUser(response.data.user);
         setIsAuthenticated(true);
       } else {
-        // Token might be invalid or expired
-        logout();
+        // Token might be invalid or expired - clear auth state
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        setUser(null);
+        setIsAuthenticated(false);
       }
     } catch (err) {
       console.error('Auth check failed:', err);
-      // Only logout if it's a 401 error
-      if (err.status === 401) {
-        logout();
+      // Only logout/clear if it's a 401 error
+      // Handle both err.status and err.response?.status for different error formats
+      const errorStatus = err.status || err.response?.status;
+      if (errorStatus === 401) {
+        // Token is invalid or expired - clear auth state
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        setUser(null);
+        setIsAuthenticated(false);
       }
     } finally {
       setIsLoading(false);
