@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button, Input, Select, Checkbox, Alert, Badge } from '../../components';
+import { userAPI } from '../../api';
 
 /**
  * User Settings Page - Notifications & Preferences
+ * Integrated with backend API for real data
  */
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('notifications');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [settings, setSettings] = useState({
     // Notifications
     emailNotifications: true,
@@ -21,18 +27,120 @@ export default function Settings() {
     timezone: 'UTC',
     dateFormat: 'MM/DD/YYYY',
     // Security
-    twoFactorAuth: true,
+    twoFactorAuth: false,
     loginAlerts: true,
   });
-  const [saved, setSaved] = useState(false);
+
+  // Fetch settings on mount
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Fetch all settings in parallel
+      const [notifPrefs, accountSettings, securitySettings] = await Promise.all([
+        userAPI.getNotificationPreferences(),
+        userAPI.getAccountSettings(),
+        userAPI.getSecuritySettings()
+      ]);
+
+      // Merge all settings
+      if (notifPrefs.success && notifPrefs.data) {
+        setSettings(prev => ({ ...prev, ...notifPrefs.data.preferences }));
+      }
+      if (accountSettings.success && accountSettings.data) {
+        setSettings(prev => ({ 
+          ...prev, 
+          language: accountSettings.data.settings?.language || prev.language,
+          timezone: accountSettings.data.settings?.timezone || prev.timezone,
+          dateFormat: accountSettings.data.settings?.dateFormat || prev.dateFormat,
+        }));
+      }
+      if (securitySettings.success && securitySettings.data) {
+        setSettings(prev => ({ 
+          ...prev, 
+          twoFactorAuth: securitySettings.data.settings?.twoFactorAuth || prev.twoFactorAuth,
+          loginAlerts: securitySettings.data.settings?.loginAlerts || prev.loginAlerts,
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch settings:', err);
+      setError('Failed to load settings. Using default values.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleToggle = (field) => {
     setSettings(prev => ({ ...prev, [field]: !prev[field] }));
   };
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  const handleSave = async () => {
+    setIsSaving(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      // Save notification preferences
+      await userAPI.updateNotificationPreferences({
+        emailNotifications: settings.emailNotifications,
+        pushNotifications: settings.pushNotifications,
+        smsNotifications: settings.smsNotifications,
+        applicationUpdates: settings.applicationUpdates,
+        documentStatus: settings.documentStatus,
+        paymentReminders: settings.paymentReminders,
+        weeklyDigest: settings.weeklyDigest,
+        marketingEmails: settings.marketingEmails,
+      });
+
+      // Save account settings
+      await userAPI.updateAccountSettings({
+        language: settings.language,
+        timezone: settings.timezone,
+        dateFormat: settings.dateFormat,
+      });
+
+      // Save security settings
+      await userAPI.updateSecuritySettings({
+        twoFactorAuth: settings.twoFactorAuth,
+        loginAlerts: settings.loginAlerts,
+      });
+
+      setSuccess('Settings saved successfully!');
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      console.error('Failed to save settings:', err);
+      setError('Failed to save settings. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handle2FAToggle = async () => {
+    setIsSaving(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const new2FAState = !settings.twoFactorAuth;
+      
+      await userAPI.updateSecuritySettings({
+        twoFactorAuth: new2FAState,
+        loginAlerts: settings.loginAlerts,
+      });
+
+      setSettings(prev => ({ ...prev, twoFactorAuth: new2FAState }));
+      setSuccess(`Two-factor authentication ${new2FAState ? 'enabled' : 'disabled'} successfully!`);
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      console.error('Failed to toggle 2FA:', err);
+      setError('Failed to update 2FA settings. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const tabs = [
@@ -54,6 +162,27 @@ export default function Settings() {
     )},
   ];
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-neutral-900">Settings</h1>
+          <p className="text-neutral-500 mt-1">Manage your account preferences and notifications</p>
+        </div>
+        <Card>
+          <Card.Body className="text-center py-12">
+            <svg className="h-8 w-8 text-neutral-300 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <p className="text-neutral-500 mt-4">Loading settings...</p>
+          </Card.Body>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -62,9 +191,17 @@ export default function Settings() {
         <p className="text-neutral-500 mt-1">Manage your account preferences and notifications</p>
       </div>
 
-      {saved && (
-        <Alert variant="success" title="Settings Saved">
-          Your preferences have been updated successfully.
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="error" title="Error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+
+      {/* Success Alert */}
+      {success && (
+        <Alert variant="success" title="Success" onClose={() => setSuccess(null)}>
+          {success}
         </Alert>
       )}
 
@@ -275,7 +412,11 @@ export default function Settings() {
                         <p className="text-sm text-neutral-500">Currently {settings.twoFactorAuth ? 'enabled' : 'disabled'}</p>
                       </div>
                     </div>
-                    <Button variant={settings.twoFactorAuth ? 'secondary' : 'primary'}>
+                    <Button
+                      variant={settings.twoFactorAuth ? 'secondary' : 'primary'}
+                      onClick={handle2FAToggle}
+                      loading={isSaving}
+                    >
                       {settings.twoFactorAuth ? 'Disable' : 'Enable'}
                     </Button>
                   </div>
@@ -329,7 +470,7 @@ export default function Settings() {
 
           {/* Save Button */}
           <div className="flex justify-end">
-            <Button variant="primary" onClick={handleSave}>
+            <Button variant="primary" onClick={handleSave} loading={isSaving}>
               Save Changes
             </Button>
           </div>

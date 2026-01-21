@@ -1,13 +1,34 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 
 const Navbar = ({
   logo,
   user,
   onMenuClick,
+  onLogout,
   navigation = [],
 }) => {
+  const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const handleLogout = async () => {
+    setIsProfileOpen(false);
+    if (onLogout) {
+      await onLogout();
+    }
+    navigate('/login');
+  };
+
+  const handleProfileClick = () => {
+    setIsProfileOpen(false);
+    navigate('/user/settings');
+  };
+
+  const handleSettingsClick = () => {
+    setIsProfileOpen(false);
+    navigate('/user/settings');
+  };
 
   return (
     <nav className="bg-white border-b border-neutral-200 sticky top-0 z-40">
@@ -36,11 +57,11 @@ const Navbar = ({
           {/* Center - Navigation (desktop) */}
           <div className="hidden lg:flex items-center gap-1">
             {navigation.map((item) => (
-              <a
+              <button
                 key={item.name}
-                href={item.href}
+                onClick={() => navigate(item.href)}
                 className={`
-                  px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                  px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer
                   ${item.active
                     ? 'bg-primary-50 text-primary-700'
                     : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
@@ -48,14 +69,17 @@ const Navbar = ({
                 `}
               >
                 {item.name}
-              </a>
+              </button>
             ))}
           </div>
 
           {/* Right side */}
           <div className="flex items-center gap-4">
             {/* Notifications */}
-            <button className="relative p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100">
+            <button 
+              onClick={() => navigate('/user/notifications')}
+              className="relative p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 cursor-pointer"
+            >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
@@ -67,7 +91,7 @@ const Navbar = ({
               <div className="relative">
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-100 transition-colors"
+                  className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer"
                 >
                   <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center">
                     {user.avatar ? (
@@ -103,14 +127,23 @@ const Navbar = ({
                         <p className="text-sm font-medium text-neutral-900">{user.name}</p>
                         <p className="text-sm text-neutral-500">{user.email}</p>
                       </div>
-                      <a href="#profile" className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50">
+                      <button
+                        onClick={handleProfileClick}
+                        className="w-full text-left px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
+                      >
                         Your Profile
-                      </a>
-                      <a href="#settings" className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50">
+                      </button>
+                      <button
+                        onClick={handleSettingsClick}
+                        className="w-full text-left px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
+                      >
                         Settings
-                      </a>
+                      </button>
                       <div className="border-t border-neutral-100 mt-1">
-                        <button className="w-full text-left px-4 py-2 text-sm text-accent-600 hover:bg-accent-50">
+                        <button
+                          onClick={handleLogout}
+                          className="w-full text-left px-4 py-2 text-sm text-accent-600 hover:bg-accent-50"
+                        >
                           Sign out
                         </button>
                       </div>
@@ -122,7 +155,7 @@ const Navbar = ({
 
             {/* Login button (when no user) */}
             {!user && (
-              <Button size="sm" variant="primary">
+              <Button size="sm" variant="primary" onClick={() => navigate('/login')}>
                 Sign In
               </Button>
             )}

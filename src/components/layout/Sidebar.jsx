@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = ({
   isOpen,
@@ -8,6 +9,18 @@ const Sidebar = ({
   user,
   activeItem,
 }) => {
+  const navigate = useNavigate();
+
+  const handleNavigation = (href, onClick) => {
+    if (onClick) {
+      onClick();
+    }
+    if (href) {
+      navigate(href);
+    }
+    onClose();
+  };
+
   return (
     <>
       {/* Mobile overlay */}
@@ -34,7 +47,7 @@ const Sidebar = ({
             {logo && <div className="flex-shrink-0">{logo}</div>}
             <button
               onClick={onClose}
-              className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100"
+              className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 cursor-pointer"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -54,12 +67,12 @@ const Sidebar = ({
               const isActive = activeItem === item.id || item.active;
 
               return (
-                <a
+                <button
                   key={item.id}
-                  href={item.href}
+                  onClick={() => handleNavigation(item.href, item.onClick)}
                   className={`
-                    flex items-center gap-3 px-3 py-2.5 rounded-lg
-                    text-sm font-medium transition-colors
+                    w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+                    text-sm font-medium transition-colors cursor-pointer
                     ${isActive
                       ? 'bg-primary-50 text-primary-700'
                       : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
@@ -82,8 +95,8 @@ const Sidebar = ({
                       {item.badge}
                     </span>
                   )}
-                  {!item.badge && <span className="flex-1">{item.name}</span>}
-                </a>
+                  {!item.badge && <span className="flex-1 text-left">{item.name}</span>}
+                </button>
               );
             })}
           </nav>
@@ -91,7 +104,10 @@ const Sidebar = ({
           {/* Footer */}
           {user && (
             <div className="p-4 border-t border-neutral-200">
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-100 cursor-pointer">
+              <button
+                onClick={() => handleNavigation('/user/settings')}
+                className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-100 cursor-pointer"
+              >
                 <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
                   {user.avatar ? (
                     <img
@@ -105,7 +121,7 @@ const Sidebar = ({
                     </span>
                   )}
                 </div>
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 text-left">
                   <p className="text-sm font-medium text-neutral-900 truncate">
                     {user.name}
                   </p>
@@ -113,7 +129,7 @@ const Sidebar = ({
                     {user.role}
                   </p>
                 </div>
-              </div>
+              </button>
             </div>
           )}
         </div>

@@ -222,6 +222,89 @@ export const exportData = async (dataType, params = {}) => {
   return response.data;
 };
 
+/**
+ * Get passport tracking data (admin only)
+ * @param {Object} params - Query parameters
+ * @returns {Promise} - Response with passport data
+ */
+export const getPassportTracking = async (params = {}) => {
+  const response = await api.get(`${ADMIN_ENDPOINT}/passport-tracking`, { params });
+  return response.data;
+};
+
+/**
+ * Update passport status (admin only)
+ * @param {string} id - Passport ID
+ * @param {Object} statusData - Status update data
+ * @returns {Promise} - Response with updated passport
+ */
+export const updatePassportStatus = async (id, statusData) => {
+  const response = await api.put(`${ADMIN_ENDPOINT}/passport/${id}/status`, statusData);
+  return response.data;
+};
+
+/**
+ * Update courier information (admin only)
+ * @param {string} id - Passport ID
+ * @param {Object} courierData - Courier information
+ * @returns {Promise} - Response with updated courier info
+ */
+export const updateCourierInfo = async (id, courierData) => {
+  const response = await api.put(`${ADMIN_ENDPOINT}/passport/${id}/courier`, courierData);
+  return response.data;
+};
+
+/**
+ * Get application by ID for admin review (admin only)
+ * @param {number} id - Application ID
+ * @returns {Promise} - Response with application details
+ */
+export const getApplicationDetail = async (id) => {
+  const response = await api.get(`${ADMIN_ENDPOINT}/application/${id}`);
+  return response.data;
+};
+
+/**
+ * Add processing note to application (admin only)
+ * @param {number} id - Application ID
+ * @param {string} note - Processing note
+ * @returns {Promise} - Response with added note
+ */
+export const addApplicationNote = async (id, note) => {
+  const response = await api.post(`${ADMIN_ENDPOINT}/application/${id}/notes`, { note });
+  return response.data;
+};
+
+/**
+ * Assign application to officer (admin only)
+ * @param {number} id - Application ID
+ * @param {number} officerId - Officer ID
+ * @returns {Promise} - Response with updated application
+ */
+export const assignApplicationOfficer = async (id, officerId) => {
+  const response = await api.put(`${ADMIN_ENDPOINT}/application/${id}/assign`, { officerId });
+  return response.data;
+};
+
+/**
+ * Get system settings (admin only)
+ * @returns {Promise} - Response with system settings
+ */
+export const getSystemSettings = async () => {
+  const response = await api.get(`${ADMIN_ENDPOINT}/system/settings`);
+  return response.data;
+};
+
+/**
+ * Update system settings (admin only)
+ * @param {Object} settings - System settings to update
+ * @returns {Promise} - Response with updated settings
+ */
+export const updateSystemSettings = async (settings) => {
+  const response = await api.put(`${ADMIN_ENDPOINT}/system/settings`, settings);
+  return response.data;
+};
+
 export default {
   getDashboardStats,
   getUsers,
@@ -244,5 +327,13 @@ export default {
   getSystemHealth,
   getAuditLogs,
   exportData,
+  getPassportTracking,
+  updatePassportStatus,
+  updateCourierInfo,
+  getApplicationDetail,
+  addApplicationNote,
+  assignApplicationOfficer,
+  getSystemSettings,
+  updateSystemSettings,
 };
 

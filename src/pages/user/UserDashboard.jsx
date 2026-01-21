@@ -89,9 +89,9 @@ export default function UserDashboard() {
 
   // Mock notifications for display
   const displayNotifications = notifications.length > 0 ? notifications : [
-    { type: 'info', message: 'Your Business License application is under review', time: '2 hours ago' },
-    { type: 'success', message: 'Permit Renewal has been approved!', time: '1 day ago' },
-    { type: 'warning', message: 'Please upload missing documents', time: '3 days ago' },
+    { type: 'info', message: 'Your Tourist Visa - UAE application is under review', time: '2 hours ago' },
+    { type: 'success', message: 'Business Visa - UK has been approved!', time: '1 day ago' },
+    { type: 'warning', message: 'Please upload missing passport documents', time: '3 days ago' },
   ];
 
   const getStatusBadge = (status) => {

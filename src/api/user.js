@@ -133,6 +133,63 @@ export const deleteNotification = async (id) => {
   return response.data;
 };
 
+/**
+ * Get user notification preferences
+ * @returns {Promise} - Response with notification preferences
+ */
+export const getNotificationPreferences = async () => {
+  const response = await api.get(`${USER_ENDPOINT}/settings/notifications`);
+  return response.data;
+};
+
+/**
+ * Update user notification preferences
+ * @param {Object} preferences - Notification preferences to update
+ * @returns {Promise} - Response with updated preferences
+ */
+export const updateNotificationPreferences = async (preferences) => {
+  const response = await api.put(`${USER_ENDPOINT}/settings/notifications`, preferences);
+  return response.data;
+};
+
+/**
+ * Get user account settings
+ * @returns {Promise} - Response with account settings
+ */
+export const getAccountSettings = async () => {
+  const response = await api.get(`${USER_ENDPOINT}/settings/account`);
+  return response.data;
+};
+
+/**
+ * Update user account settings
+ * @param {Object} settings - Account settings to update
+ * @returns {Promise} - Response with updated settings
+ */
+export const updateAccountSettings = async (settings) => {
+  const response = await api.put(`${USER_ENDPOINT}/settings/account`, settings);
+  return response.data;
+};
+
+/**
+ * Get user security settings
+ * @returns {Promise} - Response with security settings
+ */
+export const getSecuritySettings = async () => {
+  const response = await api.get(`${USER_ENDPOINT}/settings/security`);
+  return response.data;
+};
+
+/**
+ * Update user security settings
+ * @param {Object} settings - Security settings to update
+ * @returns {Promise} - Response with updated settings
+ */
+export const updateSecuritySettings = async (settings) => {
+  const response = await api.put(`${USER_ENDPOINT}/settings/security`, settings);
+  return response.data;
+};
+
 export default {
   getProfile,
   updateProfile,
@@ -147,5 +204,11 @@ export default {
   markNotificationRead,
   markAllNotificationsRead,
   deleteNotification,
+  getNotificationPreferences,
+  updateNotificationPreferences,
+  getAccountSettings,
+  updateAccountSettings,
+  getSecuritySettings,
+  updateSecuritySettings,
 };
 

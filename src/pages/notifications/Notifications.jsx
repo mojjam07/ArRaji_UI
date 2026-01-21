@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Badge, Alert, Select } from '../../components';
 import { notificationAPI } from '../../api';
+import { userAPI } from '../../api';
 
 /**
  * Notifications Page
@@ -12,6 +13,19 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [success, setSuccess] = useState(null);
+  const [error, setError] = useState(null);
+  
+  // Preferences state
+  const [preferences, setPreferences] = useState({
+    emailNotifications: true,
+    pushNotifications: true,
+    smsNotifications: false,
+    stageUpdates: true,
+    documentAlerts: true,
+    paymentReminders: true,
+  });
+  const [isSavingPreferences, setIsSavingPreferences] = useState(false);
 
   // Fetch notifications on mount
   useEffect(() => {
@@ -104,6 +118,26 @@ export default function Notifications() {
       }
     } catch (err) {
       console.error('Failed to fetch unread count:', err);
+    }
+  };
+
+  const handleTogglePreference = (key) => {
+    setPreferences(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleSavePreferences = async () => {
+    setIsSavingPreferences(true);
+    setError(null);
+    
+    try {
+      await userAPI.updateNotificationPreferences(preferences);
+      setSuccess('Preferences saved successfully!');
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      console.error('Failed to save preferences:', err);
+      setError('Failed to save preferences. Please try again.');
+    } finally {
+      setIsSavingPreferences(false);
     }
   };
 
@@ -424,32 +458,119 @@ export default function Notifications() {
         <Card.Header title="Notification Preferences" subtitle="Manage how you receive notifications" />
         <Card.Body>
           <div className="space-y-4">
-            {[
-              { label: 'Email Notifications', description: 'Receive updates via email', enabled: true },
-              { label: 'SMS Notifications', description: 'Receive updates via SMS', enabled: false },
-              { label: 'Push Notifications', description: 'Browser push notifications', enabled: true },
-              { label: 'Stage Updates', description: 'Notifications for each processing stage', enabled: true },
-              { label: 'Document Alerts', description: 'Notifications for document verification', enabled: true },
-              { label: 'Payment Reminders', description: 'Notifications for pending payments', enabled: true },
-            ].map((pref, index) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg">
-                <div>
-                  <p className="text-sm font-medium text-neutral-900">{pref.label}</p>
-                  <p className="text-sm text-neutral-500">{pref.description}</p>
-                </div>
-                <button
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    pref.enabled ? 'bg-primary-600' : 'bg-neutral-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      pref.enabled ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
+            <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg">
+              <div>
+                <p className="text-sm font-medium text-neutral-900">Email Notifications</p>
+                <p className="text-sm text-neutral-500">Receive updates via email</p>
               </div>
-            ))}
+              <button
+                onClick={() => handleTogglePreference('emailNotifications')}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  preferences.emailNotifications ? 'bg-primary-600' : 'bg-neutral-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    preferences.emailNotifications ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg">
+              <div>
+                <p className="text-sm font-medium text-neutral-900">SMS Notifications</p>
+                <p className="text-sm text-neutral-500">Receive updates via SMS</p>
+              </div>
+              <button
+                onClick={() => handleTogglePreference('smsNotifications')}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  preferences.smsNotifications ? 'bg-primary-600' : 'bg-neutral-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    preferences.smsNotifications ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg">
+              <div>
+                <p className="text-sm font-medium text-neutral-900">Push Notifications</p>
+                <p className="text-sm text-neutral-500">Browser push notifications</p>
+              </div>
+              <button
+                onClick={() => handleTogglePreference('pushNotifications')}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  preferences.pushNotifications ? 'bg-primary-600' : 'bg-neutral-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    preferences.pushNotifications ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg">
+              <div>
+                <p className="text-sm font-medium text-neutral-900">Stage Updates</p>
+                <p className="text-sm text-neutral-500">Notifications for each processing stage</p>
+              </div>
+              <button
+                onClick={() => handleTogglePreference('stageUpdates')}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  preferences.stageUpdates ? 'bg-primary-600' : 'bg-neutral-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    preferences.stageUpdates ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg">
+              <div>
+                <p className="text-sm font-medium text-neutral-900">Document Alerts</p>
+                <p className="text-sm text-neutral-500">Notifications for document verification</p>
+              </div>
+              <button
+                onClick={() => handleTogglePreference('documentAlerts')}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  preferences.documentAlerts ? 'bg-primary-600' : 'bg-neutral-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    preferences.documentAlerts ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg">
+              <div>
+                <p className="text-sm font-medium text-neutral-900">Payment Reminders</p>
+                <p className="text-sm text-neutral-500">Notifications for pending payments</p>
+              </div>
+              <button
+                onClick={() => handleTogglePreference('paymentReminders')}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  preferences.paymentReminders ? 'bg-primary-600' : 'bg-neutral-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    preferences.paymentReminders ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <Button variant="primary" onClick={handleSavePreferences} loading={isSavingPreferences}>
+              Save Preferences
+            </Button>
           </div>
         </Card.Body>
       </Card>
