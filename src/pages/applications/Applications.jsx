@@ -4,7 +4,7 @@ import { applicationAPI } from '../../api';
 
 /**
  * Visa Application Form Page
- * 6 steps: Personal Info, Passport Details, Biometrics, Documents, Cost, Review
+ * 6 steps: Personal Info, Passport Details, Documents, Biometrics, Cost, Review
  * Integrated with backend API for real data
  */
 export default function Applications() {
@@ -29,17 +29,17 @@ export default function Applications() {
     passportIssuePlace: '',
     passportExpiryDate: '',
     
-    // Step 3: Biometrics Information
-    biometricsLocation: '',
-    biometricsDate: '',
-    biometricsTime: '',
-    expectedTravelDate: '',
-    
-    // Step 4: Documents
+    // Step 3: Documents
     invitationLetter: null,
     passportDataPage: null,
     passportPhoto: null,
     residencePermit: null,
+
+    // Step 4: Biometrics Information
+    biometricsLocation: '',
+    biometricsDate: '',
+    biometricsTime: '',
+    expectedTravelDate: '',
     
     // Step 5: Cost & Payment
     costAgreed: false,
@@ -52,8 +52,8 @@ export default function Applications() {
   const steps = [
     { number: 1, title: 'Personal Information' },
     { number: 2, title: 'Passport Details' },
-    { number: 3, title: 'Biometrics' },
-    { number: 4, title: 'Documents' },
+    { number: 3, title: 'Documents' },
+    { number: 4, title: 'Biometrics' },
     { number: 5, title: 'Cost Review' },
     { number: 6, title: 'Submit' },
   ];
@@ -303,6 +303,59 @@ export default function Applications() {
 
   const renderStep3 = () => (
     <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-neutral-900">Document Upload</h3>
+      <p className="text-sm text-neutral-500 mb-4">Upload all required documents for your visa application</p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Invitation Letter */}
+        <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
+          <svg className="h-10 w-10 text-neutral-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p className="text-sm font-medium text-neutral-700">Invitation Letter</p>
+          <p className="text-xs text-neutral-500 mt-1">Stating visa validity</p>
+          <p className="text-xs text-accent-600 mt-2">Required *</p>
+        </div>
+
+        {/* International Passport Data Page */}
+        <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
+          <svg className="h-10 w-10 text-neutral-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+          </svg>
+          <p className="text-sm font-medium text-neutral-700">Passport Data Page</p>
+          <p className="text-xs text-neutral-500 mt-1">Clear copy of data page</p>
+          <p className="text-xs text-accent-600 mt-2">Required *</p>
+        </div>
+
+        {/* Passport Photograph */}
+        <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
+          <svg className="h-10 w-10 text-neutral-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p className="text-sm font-medium text-neutral-700">Passport Photograph</p>
+          <p className="text-xs text-neutral-500 mt-1">White background</p>
+          <p className="text-xs text-accent-600 mt-2">Required *</p>
+        </div>
+
+        {/* Residence Permit of Host */}
+        <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
+          <svg className="h-10 w-10 text-neutral-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          <p className="text-sm font-medium text-neutral-700">Residence Permit of Host</p>
+          <p className="text-xs text-neutral-500 mt-1">Host's valid residence permit</p>
+          <p className="text-xs text-accent-600 mt-2">Required *</p>
+        </div>
+      </div>
+
+      <Alert variant="info" title="Document Requirements">
+        All documents must be clear and legible. PDF, JPG, PNG formats accepted (Max 10MB each).
+      </Alert>
+    </div>
+  );
+
+  const renderStep4 = () => (
+    <div className="space-y-4">
       <h3 className="text-lg font-semibold text-neutral-900">Biometrics Information</h3>
       <p className="text-sm text-neutral-500 mb-4">Schedule your biometrics appointment</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -354,59 +407,6 @@ export default function Applications() {
       </div>
       <Alert variant="warning" title="Biometrics Schedule">
         Biometrics appointments are only available on weekdays between 8:00 AM and 3:45 PM.
-      </Alert>
-    </div>
-  );
-
-  const renderStep4 = () => (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-neutral-900">Document Upload</h3>
-      <p className="text-sm text-neutral-500 mb-4">Upload all required documents for your visa application</p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Invitation Letter */}
-        <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
-          <svg className="h-10 w-10 text-neutral-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <p className="text-sm font-medium text-neutral-700">Invitation Letter</p>
-          <p className="text-xs text-neutral-500 mt-1">Stating visa validity</p>
-          <p className="text-xs text-accent-600 mt-2">Required *</p>
-        </div>
-
-        {/* International Passport Data Page */}
-        <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
-          <svg className="h-10 w-10 text-neutral-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-          </svg>
-          <p className="text-sm font-medium text-neutral-700">Passport Data Page</p>
-          <p className="text-xs text-neutral-500 mt-1">Clear copy of data page</p>
-          <p className="text-xs text-accent-600 mt-2">Required *</p>
-        </div>
-
-        {/* Passport Photograph */}
-        <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
-          <svg className="h-10 w-10 text-neutral-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <p className="text-sm font-medium text-neutral-700">Passport Photograph</p>
-          <p className="text-xs text-neutral-500 mt-1">White background</p>
-          <p className="text-xs text-accent-600 mt-2">Required *</p>
-        </div>
-
-        {/* Residence Permit of Host */}
-        <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
-          <svg className="h-10 w-10 text-neutral-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </svg>
-          <p className="text-sm font-medium text-neutral-700">Residence Permit of Host</p>
-          <p className="text-xs text-neutral-500 mt-1">Host's valid residence permit</p>
-          <p className="text-xs text-accent-600 mt-2">Required *</p>
-        </div>
-      </div>
-
-      <Alert variant="info" title="Document Requirements">
-        All documents must be clear and legible. PDF, JPG, PNG formats accepted (Max 10MB each).
       </Alert>
     </div>
   );
