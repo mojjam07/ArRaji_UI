@@ -6,6 +6,11 @@ import { adminAPI } from '../../api';
  * Application Review Page (Admin/Officer View)
  * Review and manage visa applications with full processing workflow
  * Integrated with backend API for real data
+ * 
+ * Valid application statuses (must match backend enum):
+ * - draft, submitted, under_review, documents_required
+ * - biometrics_scheduled, biometrics_completed
+ * - approved, rejected, completed, issued
  */
 export default function ApplicationReview() {
   const [activeTab, setActiveTab] = useState('pending');
@@ -14,21 +19,29 @@ export default function ApplicationReview() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [applications, setApplications] = useState({
     pending: [],
     processing: [],
     completed: []
   });
 
+  // Map frontend tabs to backend valid statuses
+  const tabStatusMap = {
+    'pending': 'submitted',  // Pending review = submitted applications
+    'processing': 'under_review',  // In processing = under_review applications
+    'completed': 'completed'  // Completed = completed applications
+  };
+
   // Fetch applications on mount and when tab changes
   useEffect(() => {
     fetchApplications(activeTab);
   }, [activeTab]);
 
-  const fetchApplications = async (status) => {
+  const fetchApplications = async (tab) => {
     setIsLoading(true);
     setError(null);
+    // Use the mapped valid status for the API call
+    const status = tabStatusMap[tab] || tab;
     try {
       const response = await adminAPI.getApplications({ status, limit: 50 });
       if (response.success && response.data) {
@@ -46,23 +59,21 @@ export default function ApplicationReview() {
           currentStage: mapStatusToStage(app.status),
           stages: [
             { step: 'Application Received', date: app.createdAt, status: 'completed', description: 'Application submitted' },
-            { step: 'Documents Review', date: app.documentsVerifiedAt, status: app.status === 'documents_requested' ? 'pending' : (['under_review', 'processing', 'approved', 'completed'].includes(app.status) ? 'completed' : 'pending'), description: 'Document verification' },
-            { step: 'Cost Provided', date: app.costProvidedAt, status: ['cost_provided', 'payment_pending', 'payment_completed', 'biometrics_scheduled', 'biometrics_completed', 'embassy_submitted', 'processing', 'approved', 'completed'].includes(app.status) ? 'completed' : 'pending', description: 'Cost breakdown sent' },
-            { step: 'Payment', date: app.paymentCompletedAt, status: ['payment_completed', 'biometrics_scheduled', 'biometrics_completed', 'embassy_submitted', 'processing', 'approved', 'completed'].includes(app.status) ? 'completed' : 'pending', description: 'Payment received' },
-            { step: 'Biometrics', date: app.biometricsDate, status: ['biometrics_completed', 'embassy_submitted', 'processing', 'approved', 'completed'].includes(app.status) ? 'completed' : (app.biometricsDate ? 'current' : 'pending'), description: 'Biometrics scheduled' },
-            { step: 'Embassy', date: app.embassySubmittedAt, status: ['approved', 'completed'].includes(app.status) ? 'completed' : (app.embassySubmittedAt ? 'current' : 'pending'), description: 'At embassy' },
-            { step: 'Collection', date: app.completedAt, status: app.status === 'completed' ? 'completed' : 'pending', description: 'Visa collected' },
+            { step: 'Documents Review', date: app.documentsVerifiedAt, status: app.status === 'documents_required' ? 'pending' : (['under_review', 'biometrics_scheduled', 'biometrics_completed', 'approved', 'completed', 'issued'].includes(app.status) ? 'completed' : 'pending'), description: 'Document verification' },
+            { step: 'Biometrics', date: app.biometricsDate, status: ['biometrics_completed', 'approved', 'completed', 'issued'].includes(app.status) ? 'completed' : (['biometrics_scheduled'].includes(app.status) && app.biometricsDate ? 'current' : 'pending'), description: 'Biometrics scheduled' },
+            { step: 'Decision', date: app.decisionDate, status: ['approved', 'rejected', 'completed', 'issued'].includes(app.status) ? 'completed' : 'pending', description: 'Embassy decision' },
+            { step: 'Collection', date: app.issueDate, status: ['issued', 'completed'].includes(app.status) ? 'completed' : (app.status === 'issued' ? 'current' : 'pending'), description: 'Visa collected' },
           ],
           documents: (app.documents || []).map(d => d.name || 'Document'),
           biometricsDate: app.biometricsDate,
-          embassyDate: app.embassySubmittedAt,
+          decisionDate: app.decisionDate,
         }));
         
         // Group applications by status for different tabs
         setApplications({
-          pending: apps.filter(a => ['draft', 'submitted', 'documents_requested'].includes(a.currentStage)),
-          processing: apps.filter(a => ['under_review', 'cost_provided', 'payment_pending', 'payment_completed', 'biometrics_scheduled', 'biometrics_completed', 'embassy_submitted', 'processing'].includes(a.currentStage)),
-          completed: apps.filter(a => ['approved', 'rejected', 'completed'].includes(a.currentStage))
+          pending: apps.filter(a => ['application_received'].includes(a.currentStage)),
+          processing: apps.filter(a => ['documents_review', 'biometrics'].includes(a.currentStage)),
+          completed: apps.filter(a => ['collection', 'completed', 'rejected'].includes(a.currentStage))
         });
       }
     } catch (err) {
@@ -147,21 +158,18 @@ export default function ApplicationReview() {
   };
 
   const mapStatusToStage = (status) => {
+    // Map backend valid statuses to frontend stages
     const statusMap = {
       'draft': 'application_received',
       'submitted': 'application_received',
-      'documents_requested': 'application_received',
+      'documents_required': 'documents_review',
       'under_review': 'documents_review',
-      'cost_provided': 'cost_provided',
-      'payment_pending': 'payment',
-      'payment_completed': 'payment',
       'biometrics_scheduled': 'biometrics',
       'biometrics_completed': 'biometrics',
-      'embassy_submitted': 'embassy',
-      'processing': 'embassy',
       'approved': 'collection',
       'rejected': 'rejected',
-      'completed': 'completed'
+      'completed': 'completed',
+      'issued': 'completed'
     };
     return statusMap[status] || 'application_received';
   };
@@ -218,13 +226,13 @@ export default function ApplicationReview() {
   const updateStage = async (id, newStage) => {
     setError(null);
     try {
+      // Map frontend stages to valid backend statuses
       const stageStatusMap = {
         'next': 'under_review',
-        'documents_review': 'cost_provided',
-        'cost_provided': 'payment_pending',
-        'payment': 'biometrics_scheduled',
-        'biometrics': 'embassy_submitted',
-        'embassy': 'completed'
+        'documents_review': 'documents_required',
+        'biometrics': 'biometrics_scheduled',
+        'decision': 'approved',  // Approve to move to decision
+        'collection': 'issued'
       };
       
       const response = await adminAPI.updateApplicationStatus(id, { 

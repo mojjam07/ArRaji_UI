@@ -136,15 +136,7 @@ export default function UserDashboard() {
       setError(errorMessage);
       setConnectionStatus('error');
       
-      // Use mock data on error for demo
-      console.log('📊 Dashboard: Using demo data fallback');
-      setStats({
-        totalApplications: 12,
-        draftApplications: 2,
-        submittedApplications: 5,
-        pendingPayments: 1,
-        issuedApplications: 7,
-      });
+
     } finally {
       setIsLoading(false);
       setIsRetrying(false);
@@ -170,20 +162,11 @@ export default function UserDashboard() {
     { title: 'Draft Applications', value: stats.draftApplications, change: '0', positive: true, icon: '📝', color: 'warning' },
   ];
 
-  // Mock applications for display
-  const displayApplications = applications.length > 0 ? applications : [
-    { id: 'VISA-001', visaType: 'Tourist Visa - UAE', status: 'In Review', date: '2 days ago', progress: 75 },
-    { id: 'VISA-002', visaType: 'Business Visa - UK', status: 'Approved', date: '1 week ago', progress: 100 },
-    { id: 'VISA-003', visaType: 'Student Visa - Australia', status: 'Pending', date: '3 days ago', progress: 25 },
-    { id: 'VISA-004', visaType: 'Work Visa - Canada', status: 'Draft', date: 'Today', progress: 10 },
-  ];
+  // Applications for display
+  const displayApplications = applications;
 
-  // Mock notifications for display
-  const displayNotifications = notifications.length > 0 ? notifications : [
-    { type: 'info', message: 'Your Tourist Visa - UAE application is under review', time: '2 hours ago' },
-    { type: 'success', message: 'Business Visa - UK has been approved!', time: '1 day ago' },
-    { type: 'warning', message: 'Please upload missing passport documents', time: '3 days ago' },
-  ];
+  // Notifications for display
+  const displayNotifications = notifications;
 
   const getStatusBadge = (status) => {
     const variants = {
@@ -373,11 +356,19 @@ export default function UserDashboard() {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
               </div>
+            ) : displayApplications.length === 0 ? (
+              <div className="p-6 text-center">
+                <svg className="h-12 w-12 text-neutral-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p className="text-sm text-neutral-500">No applications found</p>
+                <p className="text-xs text-neutral-400 mt-1">Start your first visa application</p>
+              </div>
             ) : (
               <div className="divide-y divide-neutral-100">
                 {displayApplications.map((app) => (
-                  <div 
-                    key={app.id} 
+                  <div
+                    key={app.id}
                     className="px-6 py-4 flex items-center justify-between hover:bg-neutral-50 transition-all duration-150 hover:pl-8 cursor-pointer"
                     onClick={() => navigate('/user/tracking')}
                   >

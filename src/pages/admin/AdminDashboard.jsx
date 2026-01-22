@@ -89,7 +89,7 @@ export default function AdminDashboard() {
 
       // Fetch pending applications for review queue
       console.log('📊 Admin Dashboard: Fetching pending applications...');
-      const applicationsResponse = await adminAPI.getApplications({ status: 'pending', limit: 10 });
+      const applicationsResponse = await adminAPI.getApplications({ status: 'submitted', limit: 10 });
       
       console.log('📊 Admin Dashboard: Applications API response:', applicationsResponse);
       
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
       
       // Provide more detailed error message
       let errorMessage = 'Failed to load dashboard data.';
-      
+
       if (err.status === 401) {
         errorMessage = 'Your session has expired. Please log in again.';
       } else if (err.status === 403) {
@@ -140,36 +140,9 @@ export default function AdminDashboard() {
       } else if (err.status === 0 || err.message.includes('Network')) {
         errorMessage = 'Cannot connect to server. Please check your internet connection and ensure the backend is running.';
       }
-      
+
       setError(errorMessage);
       setConnectionStatus('error');
-      
-      // Fallback to demo data
-      console.log('📊 Admin Dashboard: Using demo data fallback');
-      setStats([
-        { title: 'Total Applications', value: '1,234', change: '+12%', positive: true, icon: '📋', color: 'primary' },
-        { title: 'Pending Review', value: '89', change: '+5%', positive: false, icon: '⏳', color: 'warning' },
-        { title: 'Active Users', value: '456', change: '+8%', positive: true, icon: '👥', color: 'info' },
-        { title: 'Avg. Processing', value: '2.3 days', change: '-8%', positive: true, icon: '⚡', color: 'success' },
-      ]);
-      setReviewQueue([
-        { id: 'APP-2024-001', applicant: 'Ahmed Al-Rashid', type: 'Business License', priority: 'high', submitted: '2 hours ago' },
-        { id: 'APP-2024-002', applicant: 'Sarah Johnson', type: 'Permit Renewal', priority: 'medium', submitted: '3 hours ago' },
-        { id: 'APP-2024-003', applicant: 'Mohammed Ali', type: 'New Registration', priority: 'low', submitted: '4 hours ago' },
-        { id: 'APP-2024-004', applicant: 'Fatima Hassan', type: 'Document Update', priority: 'high', submitted: '5 hours ago' },
-      ]);
-      setSystemStats([
-        { name: 'Business Licenses', count: 456, percentage: 37, color: 'primary' },
-        { name: 'Permit Renewals', count: 312, percentage: 25, color: 'secondary' },
-        { name: 'New Registrations', count: 278, percentage: 23, color: 'info' },
-        { name: 'Document Updates', count: 188, percentage: 15, color: 'warning' },
-      ]);
-      setSystemHealth([
-        { name: 'Server Uptime', value: '99.9%', status: 'good', color: 'text-secondary-600' },
-        { name: 'Response Time', value: '120ms', status: 'good', color: 'text-secondary-600' },
-        { name: 'Error Rate', value: '0.1%', status: 'good', color: 'text-secondary-600' },
-        { name: 'Storage Used', value: '68%', status: 'warning', color: 'text-yellow-600' },
-      ]);
     } finally {
       setIsLoading(false);
       setIsRetrying(false);

@@ -3,7 +3,7 @@
  * Manages user authentication state across the application
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { authAPI } from '../api';
 
 const AuthContext = createContext(null);
@@ -35,14 +35,31 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Refs to prevent multiple rapid auth checks
+  const authCheckInProgress = useRef(false);
+  const authCheckTimeout = useRef(null);
 
   // Check if user is logged in on mount
   useEffect(() => {
-    checkAuth();
+    // Debounce the initial auth check to prevent rapid calls in Strict Mode
+    const timer = setTimeout(() => {
+      if (!authCheckInProgress.current) {
+        checkAuth();
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   // Check authentication status
   const checkAuth = async () => {
+    // Prevent multiple concurrent auth checks
+    if (authCheckInProgress.current) {
+      console.log('🔐 AuthContext: Auth check already in progress, skipping...');
+      return;
+    }
+    
     const token = localStorage.getItem('authToken');
     
     // Debug: Log token presence and format
@@ -64,6 +81,9 @@ export const AuthProvider = ({ children }) => {
       setIsLoading(false);
       return;
     }
+
+    // Set flag to prevent concurrent calls
+    authCheckInProgress.current = true;
 
     try {
       console.log('🔐 AuthContext: Calling /api/auth/me to verify token...');
@@ -97,7 +117,11 @@ export const AuthProvider = ({ children }) => {
       // Handle both err.status and err.response?.status for different error formats
       const errorStatus = err.status || err.response?.status;
       
-      if (errorStatus === 401) {
+      // Check if it's a rate limit error (429)
+      if (errorStatus === 429) {
+        console.log('🔐 AuthContext: 429 Rate Limited - will retry later');
+        // Don't clear auth state on rate limit - just keep current state
+      } else if (errorStatus === 401) {
         console.log('🔐 AuthContext: 401 Unauthorized - token invalid/expired - clearing auth state');
         // Token is invalid or expired - clear auth state
         clearAuthState();
@@ -105,6 +129,7 @@ export const AuthProvider = ({ children }) => {
       }
       // For other errors, keep the current state (might be network issues)
     } finally {
+      authCheckInProgress.current = false;
       setIsLoading(false);
       console.log('🔐 AuthContext: Auth check complete. isLoading=false, isAuthenticated=', isAuthenticated);
     }
