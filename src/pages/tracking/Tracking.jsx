@@ -24,11 +24,12 @@ export default function Tracking() {
     setError(null);
     try {
       const response = await applicationAPI.getMyApplications();
-      if (response.success && response.data) {
-        setApplications(response.data);
+      if (response.success && response.data && response.data.applications) {
+        const apps = response.data.applications;
+        setApplications(apps);
         // Set the first application as selected by default
-        if (response.data.length > 0) {
-          setSelectedAppDetails(response.data[0]);
+        if (apps.length > 0) {
+          setSelectedAppDetails(apps[0]);
         }
       }
     } catch (err) {

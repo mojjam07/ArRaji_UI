@@ -36,9 +36,11 @@ export default function Notifications() {
   const fetchNotifications = async () => {
     setIsLoading(true);
     try {
-      const response = await notificationAPI.getNotifications({ status: filter });
-      if (response.success && response.data) {
-        setNotifications(response.data);
+      // Only send status param when filter is not 'all', since backend doesn't accept 'all'
+      const params = filter !== 'all' ? { status: filter } : {};
+      const response = await notificationAPI.getNotifications(params);
+      if (response.success && response.data && response.data.notifications) {
+        setNotifications(response.data.notifications);
       }
     } catch (err) {
       console.error('Failed to fetch notifications:', err);

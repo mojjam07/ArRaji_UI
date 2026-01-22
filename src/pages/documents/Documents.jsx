@@ -45,7 +45,11 @@ export default function Documents() {
     try {
       const response = await documentAPI.getDocuments();
       if (response.success && response.data) {
-        setDocuments(response.data);
+        // Backend returns data as { documents: [...] }, so extract the array
+        const docsArray = Array.isArray(response.data) 
+          ? response.data 
+          : (response.data.documents || []);
+        setDocuments(docsArray);
       }
     } catch (err) {
       console.error('Failed to fetch documents:', err);

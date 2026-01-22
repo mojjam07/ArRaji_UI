@@ -6,7 +6,18 @@
 import axios from 'axios';
 
 // API base URL - should match backend server
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+let API_BASE_URL = import.meta.env.VITE_API_URL;
+
+// Validate and normalize API URL
+if (!API_BASE_URL || API_BASE_URL.trim() === '') {
+  // If VITE_API_URL is empty or not set, use relative path (works with proxy)
+  API_BASE_URL = '/api';
+  console.log('📡 API: Using default API path /api');
+} else {
+  // Remove trailing slashes and ensure proper format
+  API_BASE_URL = API_BASE_URL.replace(/\/+$/, '');
+  console.log('📡 API: Using custom API URL:', API_BASE_URL);
+}
 
 // Create axios instance
 const apiClient = axios.create({
