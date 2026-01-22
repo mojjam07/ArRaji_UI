@@ -17,15 +17,50 @@ const apiClient = axios.create({
   },
 });
 
+// Helper function to generate request ID
+function generateRequestId() {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+// Helper function to clear auth state
+const clearAuthState = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+  }
+};
+
+// Helper function to redirect to login
+const redirectToLogin = () => {
+  if (typeof window !== 'undefined') {
+    // Clear auth state first
+    clearAuthState();
+    // Redirect to login page
+    window.location.href = '/login';
+  }
+};
+
 // Request interceptor - Add auth token to requests
 apiClient.interceptors.request.use(
   (config) => {
     // Get token from localStorage with proper validation
-    const token = localStorage.getItem('authToken');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+    
+    // Debug logging for token
+    const tokenExists = !!token;
+    const tokenType = typeof token;
+    const tokenLength = token ? token.length : 0;
+    
+    console.log('📡 API Request:', config.method?.toUpperCase(), config.url);
+    console.log('📡 API: Token exists:', tokenExists, '| Type:', tokenType, '| Length:', tokenLength);
     
     // Only add authorization header if token exists and is a valid string
     if (token && typeof token === 'string' && token.length > 0) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('📡 API: ✅ Authorization header added');
+    } else {
+      console.log('📡 API: ⚠️ No valid token - Authorization header NOT added');
     }
     
     // Add request ID for tracking
@@ -34,6 +69,7 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error('📡 API Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
@@ -41,13 +77,30 @@ apiClient.interceptors.request.use(
 // Response interceptor - Handle errors and token refresh
 apiClient.interceptors.response.use(
   (response) => {
+    // Log successful responses
+    console.log('📡 API Response:', response.config.method?.toUpperCase(), response.config.url, '✅', response.status);
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
     
+    // Log the error for debugging
+    console.error('📡 API Error:', error.config?.method?.toUpperCase(), error.config?.url, '❌', error.response?.status);
+    console.error('📡 API Error details:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data
+    });
+    
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // Don't retry auth endpoints to avoid infinite loops
+      if (originalRequest.url?.includes('/auth/')) {
+        console.log('📡 API: 401 on auth endpoint - redirecting to login');
+        redirectToLogin();
+        return Promise.reject(error);
+      }
+      
       originalRequest._retry = true;
       
       // Try to refresh token
@@ -55,6 +108,7 @@ apiClient.interceptors.response.use(
         const refreshToken = localStorage.getItem('refreshToken');
         
         if (refreshToken) {
+          console.log('📡 API: Attempting to refresh token...');
           const response = await axios.post(`${API_BASE_URL.replace('/api', '')}/api/auth/refresh`, {
             refreshToken,
           });
@@ -63,15 +117,17 @@ apiClient.interceptors.response.use(
           
           // Store new token
           localStorage.setItem('authToken', token);
+          console.log('📡 API: ✅ Token refreshed successfully');
           
           // Retry original request with new token
           originalRequest.headers.Authorization = `Bearer ${token}`;
           return apiClient(originalRequest);
         }
       } catch (refreshError) {
-        // Refresh failed - logout user
-        logoutUser();
-        window.location.href = '/login';
+        console.error('📡 API: Token refresh failed:', refreshError);
+        // Refresh failed - logout user and redirect to login
+        redirectToLogin();
+        return Promise.reject(refreshError);
       }
     }
     
@@ -87,18 +143,6 @@ apiClient.interceptors.response.use(
     });
   }
 );
-
-// Helper function to generate request ID
-function generateRequestId() {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-// Logout user helper
-function logoutUser() {
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('refreshToken');
-  localStorage.removeItem('user');
-}
 
 // API helper functions
 export const api = {

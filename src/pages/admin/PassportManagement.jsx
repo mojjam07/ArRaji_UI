@@ -310,12 +310,12 @@ export default function PassportManagement() {
                   <div className="flex items-start gap-4">
                     <div className="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
                       <span className="text-lg font-medium text-primary-700">
-                        {passport.applicant.name.split(' ').map(n => n[0]).join('')}
+                        {passport.applicant?.name?.split(' ').map(n => n[0]).join('') || 'U'}
                       </span>
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-neutral-900">{passport.applicant.name}</h3>
+                        <h3 className="font-semibold text-neutral-900">{passport.applicant?.name || 'Unknown Applicant'}</h3>
                         {getPriorityBadge(passport.priority)}
                         {getStatusBadge(passport.status)}
                       </div>
@@ -378,9 +378,9 @@ export default function PassportManagement() {
                 {/* Applicant Info */}
                 <div>
                   <h4 className="text-sm font-medium text-neutral-500 mb-1">Applicant</h4>
-                  <p className="font-medium text-neutral-900">{selectedPassport.applicant.name}</p>
-                  <p className="text-sm text-neutral-600">{selectedPassport.applicant.email}</p>
-                  <p className="text-sm text-neutral-600">{selectedPassport.applicant.phone}</p>
+                  <p className="font-medium text-neutral-900">{selectedPassport.applicant?.name || 'Unknown Applicant'}</p>
+                  <p className="text-sm text-neutral-600">{selectedPassport.applicant?.email || 'No email'}</p>
+                  <p className="text-sm text-neutral-600">{selectedPassport.applicant?.phone || 'No phone'}</p>
                 </div>
 
                 {/* Current Status */}

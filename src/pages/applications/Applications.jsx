@@ -67,13 +67,28 @@ export default function Applications() {
   const fetchMyApplications = async () => {
     setError(null);
     try {
+      console.log('📋 Fetching applications...');
       const response = await applicationAPI.getMyApplications();
+      console.log('📋 Applications response:', response);
+      
       if (response.success && response.data) {
-        setMyApplications(response.data);
+        // Handle both array and object with applications property
+        const applications = Array.isArray(response.data) 
+          ? response.data 
+          : response.data.applications || [];
+        setMyApplications(applications);
+        console.log(`✅ Loaded ${applications.length} applications`);
+      } else {
+        throw new Error(response.message || 'Invalid response format');
       }
     } catch (err) {
-      console.error('Failed to fetch applications:', err);
-      setError('Failed to load your applications. Using demo data.');
+      console.error('❌ Failed to fetch applications:', err);
+      console.error('❌ Error details:', {
+        message: err.message,
+        status: err.status,
+        response: err.response?.data
+      });
+      setError(`Failed to load applications: ${err.message}. Using demo data.`);
       // Fallback to demo data
       setMyApplications([
         { id: 'VISA-001', visaType: 'Tourist Visa - UAE', status: 'draft', createdAt: new Date().toISOString() },

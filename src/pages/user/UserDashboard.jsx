@@ -7,34 +7,78 @@ import { Card, Badge, ProgressBar, Button, Alert } from '../../components';
 /**
  * User Dashboard Page - Personal User View
  * Integrated with backend API for real data
+ * With comprehensive error handling and retry logic
  */
 export default function UserDashboard() {
-  const { user, fullName, isLoading: authLoading } = useAuth();
+  const { user, fullName, isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   
   const [isLoading, setIsLoading] = useState(true);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const [stats, setStats] = useState({
     totalApplications: 0,
     draftApplications: 0,
     submittedApplications: 0,
     pendingPayments: 0,
-    completedApplications: 0,
+    issuedApplications: 0,
   });
   const [applications, setApplications] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [error, setError] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('unknown');
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    // Only fetch dashboard data if user is authenticated
+    if (!authLoading) {
+      if (isAuthenticated && user) {
+        console.log('📊 Dashboard: User authenticated, fetching data...');
+        fetchDashboardData();
+      } else {
+        console.log('📊 Dashboard: User not authenticated, skipping fetch');
+        // Set empty stats for unauthenticated state
+        setIsLoading(false);
+        setConnectionStatus('unauthenticated');
+      }
+    } else {
+      console.log('📊 Dashboard: Auth still loading, waiting...');
+    }
+  }, [authLoading, isAuthenticated, user]);
 
-  const fetchDashboardData = async () => {
-    setIsLoading(true);
-    setError(null);
+  const fetchDashboardData = async (retry = false) => {
+    if (retry) {
+      setIsRetrying(true);
+      setRetryCount(prev => prev + 1);
+    } else {
+      setIsLoading(true);
+      setError(null);
+      setConnectionStatus('connecting');
+    }
+
+    const maxRetries = 3;
+    const currentAttempt = retry ? retryCount + 1 : 1;
+
+    console.log(`📊 Dashboard: Fetching data (attempt ${currentAttempt}/${maxRetries})...`);
+
+    try {
+      // Check if API is reachable first with a simple test
+      console.log('📊 Dashboard: Testing API connection...');
+      const testResponse = await fetch('http://localhost:5000/api/test');
+      if (testResponse.ok) {
+        setConnectionStatus('connected');
+        console.log('📊 Dashboard: ✅ API connection successful');
+      }
+    } catch (connError) {
+      console.warn('📊 Dashboard: ⚠️ API connection test failed:', connError.message);
+      setConnectionStatus('disconnected');
+    }
 
     try {
       // Fetch dashboard data from API
+      console.log('📊 Dashboard: Calling userAPI.getDashboard()...');
       const response = await userAPI.getDashboard();
+      
+      console.log('📊 Dashboard: API response received:', response);
       
       if (response.success && response.data) {
         const { statistics, recentApplications, notifications: notifs } = response.data;
@@ -44,26 +88,73 @@ export default function UserDashboard() {
           draftApplications: statistics?.draftApplications || 0,
           submittedApplications: statistics?.submittedApplications || 0,
           pendingPayments: statistics?.pendingPayments || 0,
-          completedApplications: statistics?.completedApplications || 0,
+          issuedApplications: statistics?.issuedApplications || 0,
         });
         
         setApplications(recentApplications || []);
         setNotifications(notifs?.recent || []);
+        
+        console.log('📊 Dashboard: ✅ Dashboard data loaded successfully');
+        setError(null);
+      } else {
+        throw new Error(response.message || 'Invalid response from server');
       }
     } catch (err) {
-      console.error('Failed to fetch dashboard data:', err);
-      setError('Failed to load dashboard data. Please try again.');
+      console.error('📊 Dashboard: ❌ Failed to fetch dashboard data:', err);
+      console.error('📊 Dashboard: Error details:', {
+        message: err.message,
+        status: err.status,
+        response: err.response?.data
+      });
+      
+      // Determine if we should retry
+      const isRetryable = err.status === 0 || err.status >= 500 || err.message.includes('Network');
+      
+      if (isRetryable && currentAttempt < maxRetries) {
+        console.log(`📊 Dashboard: Will retry in 2 seconds... (${currentAttempt}/${maxRetries})`);
+        setTimeout(() => {
+          fetchDashboardData(true);
+        }, 2000);
+        return;
+      }
+      
+      // Provide more detailed error message
+      let errorMessage = 'Failed to load dashboard data.';
+      
+      if (err.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (err.status === 403) {
+        errorMessage = 'You do not have permission to view this data.';
+      } else if (err.status === 404) {
+        errorMessage = 'Dashboard endpoint not found. Please contact support.';
+      } else if (err.status >= 500) {
+        errorMessage = 'Server error. Please try again later or contact support.';
+      } else if (err.status === 0 || err.message.includes('Network')) {
+        errorMessage = 'Cannot connect to server. Please check your internet connection and ensure the backend is running.';
+      }
+      
+      setError(errorMessage);
+      setConnectionStatus('error');
+      
       // Use mock data on error for demo
+      console.log('📊 Dashboard: Using demo data fallback');
       setStats({
         totalApplications: 12,
         draftApplications: 2,
         submittedApplications: 5,
         pendingPayments: 1,
-        completedApplications: 7,
+        issuedApplications: 7,
       });
     } finally {
       setIsLoading(false);
+      setIsRetrying(false);
     }
+  };
+
+  const handleRetry = () => {
+    console.log('📊 Dashboard: Manual retry requested');
+    setRetryCount(0);
+    fetchDashboardData();
   };
 
   // Mock stats for display if loading or fallback
@@ -145,10 +236,58 @@ export default function UserDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Connection Status Indicator */}
+      {connectionStatus === 'disconnected' && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p className="text-sm font-medium text-red-800">Connection Lost</p>
+                <p className="text-sm text-red-600">Cannot connect to the server. Please check your connection.</p>
+              </div>
+            </div>
+            <Button 
+              variant="primary" 
+              size="sm"
+              onClick={handleRetry}
+              disabled={isRetrying}
+            >
+              {isRetrying ? (
+                <span className="flex items-center gap-2">
+                  <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Retrying...
+                </span>
+              ) : (
+                'Retry'
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Error Alert */}
       {error && (
-        <Alert variant="error" title="Error" onClose={() => setError(null)}>
-          {error}
+        <Alert variant="error" title="Dashboard Error" onClose={() => setError(null)}>
+          <div className="space-y-2">
+            <p>{error}</p>
+            {(error.includes('backend') || error.includes('server') || error.includes('expired')) && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleRetry}
+                disabled={isRetrying}
+                className="mt-2"
+              >
+                {isRetrying ? 'Retrying...' : 'Try Again'}
+              </Button>
+            )}
+          </div>
         </Alert>
       )}
 

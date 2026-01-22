@@ -45,40 +45,78 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     const token = localStorage.getItem('authToken');
     
+    // Debug: Log token presence and format
+    console.log('🔐 AuthContext: Checking auth...');
+    console.log('🔐 AuthContext: Token exists:', !!token);
+    console.log('🔐 AuthContext: Token type:', typeof token);
+    console.log('🔐 AuthContext: Token length:', token ? token.length : 0);
+    
     if (!token) {
+      console.log('🔐 AuthContext: No token found - user not authenticated');
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate token format
+    if (typeof token !== 'string' || token.length < 10) {
+      console.log('🔐 AuthContext: Invalid token format - clearing auth state');
+      clearAuthState();
       setIsLoading(false);
       return;
     }
 
     try {
+      console.log('🔐 AuthContext: Calling /api/auth/me to verify token...');
       const response = await authAPI.getCurrentUser();
+      console.log('🔐 AuthContext: Auth check response:', response);
+      
       if (response.success && response.data?.user) {
         setUser(response.data.user);
         setIsAuthenticated(true);
+        console.log('🔐 AuthContext: ✅ User authenticated:', response.data.user.email, 'Role:', response.data.user.role);
+        
+        // Also sync user data in localStorage
+        localStorage.setItem('user', JSON.stringify(response.data.user));
       } else {
         // Token might be invalid or expired - clear auth state
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        setUser(null);
+        console.log('🔐 AuthContext: ❌ Auth check failed - invalid response');
+        console.log('🔐 AuthContext: Response:', response);
+        clearAuthState();
         setIsAuthenticated(false);
       }
     } catch (err) {
-      console.error('Auth check failed:', err);
+      console.error('🔐 AuthContext: ❌ Auth check failed:', err);
+      console.error('🔐 AuthContext: Error details:', {
+        message: err.message,
+        status: err.status,
+        responseStatus: err.response?.status,
+        responseData: err.response?.data
+      });
+      
       // Only logout/clear if it's a 401 error
       // Handle both err.status and err.response?.status for different error formats
       const errorStatus = err.status || err.response?.status;
+      
       if (errorStatus === 401) {
+        console.log('🔐 AuthContext: 401 Unauthorized - token invalid/expired - clearing auth state');
         // Token is invalid or expired - clear auth state
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        setUser(null);
+        clearAuthState();
         setIsAuthenticated(false);
       }
+      // For other errors, keep the current state (might be network issues)
     } finally {
       setIsLoading(false);
+      console.log('🔐 AuthContext: Auth check complete. isLoading=false, isAuthenticated=', isAuthenticated);
     }
+  };
+
+  // Helper to clear auth state
+  const clearAuthState = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsAuthenticated(false);
   };
 
   // Login user

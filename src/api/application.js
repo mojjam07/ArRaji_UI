@@ -122,11 +122,12 @@ export const getCostEstimation = async (visaType, params = {}) => {
 
 /**
  * Get user's applications
+ * Note: The backend /api/applications endpoint already filters by logged-in user
  * @param {Object} params - Query parameters
  * @returns {Promise} - Response with applications
  */
 export const getMyApplications = async (params = {}) => {
-  const response = await api.get(`${APPLICATION_ENDPOINT}/my`, { params });
+  const response = await api.get(APPLICATION_ENDPOINT, { params });
   return response.data;
 };
 

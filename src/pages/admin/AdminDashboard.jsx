@@ -6,6 +6,7 @@ import { adminAPI } from '../../api';
  * Admin Dashboard - System Administration View
  * Focuses on system-wide metrics, application review queue, and administrative actions
  * Integrated with backend API for real data
+ * With comprehensive error handling and retry logic
  */
 export default function AdminDashboard() {
   // State for dashboard data
@@ -14,7 +15,10 @@ export default function AdminDashboard() {
   const [systemStats, setSystemStats] = useState([]);
   const [systemHealth, setSystemHealth] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const [error, setError] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('unknown');
   const [timeRange, setTimeRange] = useState('week');
 
   // Fetch dashboard data on mount and when timeRange changes
@@ -22,12 +26,41 @@ export default function AdminDashboard() {
     fetchDashboardData();
   }, [timeRange]);
 
-  const fetchDashboardData = async () => {
-    setIsLoading(true);
-    setError(null);
+  const fetchDashboardData = async (retry = false) => {
+    if (retry) {
+      setIsRetrying(true);
+      setRetryCount(prev => prev + 1);
+    } else {
+      setIsLoading(true);
+      setError(null);
+      setConnectionStatus('connecting');
+    }
+
+    const maxRetries = 3;
+    const currentAttempt = retry ? retryCount + 1 : 1;
+
+    console.log(`📊 Admin Dashboard: Fetching data (attempt ${currentAttempt}/${maxRetries})...`);
+
+    // Test API connection first
+    try {
+      console.log('📊 Admin Dashboard: Testing API connection...');
+      const testResponse = await fetch('http://localhost:5000/api/test');
+      if (testResponse.ok) {
+        setConnectionStatus('connected');
+        console.log('📊 Admin Dashboard: ✅ API connection successful');
+      }
+    } catch (connError) {
+      console.warn('📊 Admin Dashboard: ⚠️ API connection test failed:', connError.message);
+      setConnectionStatus('disconnected');
+    }
+
     try {
       // Fetch dashboard statistics
+      console.log('📊 Admin Dashboard: Calling adminAPI.getDashboardStats()...');
       const statsResponse = await adminAPI.getDashboardStats();
+      
+      console.log('📊 Admin Dashboard: Stats API response:', statsResponse);
+      
       if (statsResponse.success && statsResponse.data) {
         const data = statsResponse.data;
         setStats([
@@ -55,7 +88,11 @@ export default function AdminDashboard() {
       }
 
       // Fetch pending applications for review queue
+      console.log('📊 Admin Dashboard: Fetching pending applications...');
       const applicationsResponse = await adminAPI.getApplications({ status: 'pending', limit: 10 });
+      
+      console.log('📊 Admin Dashboard: Applications API response:', applicationsResponse);
+      
       if (applicationsResponse.success && applicationsResponse.data) {
         const apps = applicationsResponse.data.applications || [];
         setReviewQueue(apps.map(app => ({
@@ -67,10 +104,48 @@ export default function AdminDashboard() {
           status: app.status,
         })));
       }
+      
+      setError(null);
+      console.log('📊 Admin Dashboard: ✅ Dashboard data loaded successfully');
     } catch (err) {
-      console.error('Failed to fetch dashboard data:', err);
-      setError('Failed to load dashboard data. Using demo data.');
+      console.error('📊 Admin Dashboard: ❌ Failed to fetch dashboard data:', err);
+      console.error('📊 Admin Dashboard: Error details:', {
+        message: err.message,
+        status: err.status,
+        response: err.response?.data
+      });
+      
+      // Determine if we should retry
+      const isRetryable = err.status === 0 || err.status >= 500 || err.message.includes('Network');
+      
+      if (isRetryable && currentAttempt < maxRetries) {
+        console.log(`📊 Admin Dashboard: Will retry in 2 seconds... (${currentAttempt}/${maxRetries})`);
+        setTimeout(() => {
+          fetchDashboardData(true);
+        }, 2000);
+        return;
+      }
+      
+      // Provide more detailed error message
+      let errorMessage = 'Failed to load dashboard data.';
+      
+      if (err.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (err.status === 403) {
+        errorMessage = 'You do not have permission to access admin data.';
+      } else if (err.status === 404) {
+        errorMessage = 'Dashboard endpoint not found. Please contact support.';
+      } else if (err.status >= 500) {
+        errorMessage = 'Server error. Please try again later or contact support.';
+      } else if (err.status === 0 || err.message.includes('Network')) {
+        errorMessage = 'Cannot connect to server. Please check your internet connection and ensure the backend is running.';
+      }
+      
+      setError(errorMessage);
+      setConnectionStatus('error');
+      
       // Fallback to demo data
+      console.log('📊 Admin Dashboard: Using demo data fallback');
       setStats([
         { title: 'Total Applications', value: '1,234', change: '+12%', positive: true, icon: '📋', color: 'primary' },
         { title: 'Pending Review', value: '89', change: '+5%', positive: false, icon: '⏳', color: 'warning' },
@@ -97,7 +172,14 @@ export default function AdminDashboard() {
       ]);
     } finally {
       setIsLoading(false);
+      setIsRetrying(false);
     }
+  };
+
+  const handleRetry = () => {
+    console.log('📊 Admin Dashboard: Manual retry requested');
+    setRetryCount(0);
+    fetchDashboardData();
   };
 
   const getPriorityBadge = (priority) => {
@@ -144,6 +226,41 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Connection Status Indicator */}
+      {connectionStatus === 'disconnected' && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p className="text-sm font-medium text-red-800">Connection Lost</p>
+                <p className="text-sm text-red-600">Cannot connect to the server. Please check your connection.</p>
+              </div>
+            </div>
+            <Button 
+              variant="primary" 
+              size="sm"
+              onClick={handleRetry}
+              disabled={isRetrying}
+            >
+              {isRetrying ? (
+                <span className="flex items-center gap-2">
+                  <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Retrying...
+                </span>
+              ) : (
+                'Retry'
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Header - Admin focused */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -173,8 +290,21 @@ export default function AdminDashboard() {
 
       {/* Error Alert */}
       {error && (
-        <Alert variant="warning" title="Notice" onClose={() => setError(null)}>
-          {error}
+        <Alert variant="warning" title="Dashboard Error" onClose={() => setError(null)}>
+          <div className="space-y-2">
+            <p>{error}</p>
+            {(error.includes('backend') || error.includes('server') || error.includes('expired') || error.includes('connect')) && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleRetry}
+                disabled={isRetrying}
+                className="mt-2"
+              >
+                {isRetrying ? 'Retrying...' : 'Try Again'}
+              </Button>
+            )}
+          </div>
         </Alert>
       )}
 
