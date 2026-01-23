@@ -117,14 +117,10 @@ export default function Login() {
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col lg:flex-row">
         
         {/* Left Side - Info */}
-        <div className="lg:w-5/12 bg-primary-600 p-8 lg:p-12 flex flex-col justify-between text-white">
+        <div className="lg:w-5/12 bg-primary-900 p-8 lg:p-12 flex flex-col justify-between text-white">
           <div>
             <Link to="/" className="inline-flex items-center gap-2 mb-8">
-              <div className="h-10 w-10 rounded-lg bg-white/20 flex items-center justify-center">
-                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
+              <img src="/arraji_logo.png" alt="ArRaji Logo" className="h-10 w-auto bg-neutral-100 rounded-full" />
               <span className="text-xl font-bold">ArRaji</span>
             </Link>
             
@@ -234,7 +230,7 @@ export default function Login() {
                   <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
                     Password
                   </label>
-                  <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700">
+                  <Link to="/forgot-password" className="text-sm text-primary-900 hover:text-primary-700">
                     Forgot password?
                   </Link>
                 </div>

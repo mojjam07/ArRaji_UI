@@ -1,19 +1,60 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, isAuthenticated, logout, initials } = useAuth();
+  const [showLoader, setShowLoader] = useState(false);
+  const [displayLoader, setDisplayLoader] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout, initials } = useAuth();
+
+  // Trigger loader on route change
+  useEffect(() => {
+    setDisplayLoader(true);
+    const showTimer = setTimeout(() => {
+      setShowLoader(true);
+    }, 10);
+    const hideTimer = setTimeout(() => {
+      setShowLoader(false);
+    }, 3000);
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(hideTimer);
+    };
+  }, [location]);
+
+  // Remove from DOM after fade out
+  useEffect(() => {
+    if (!showLoader) {
+      const removeTimer = setTimeout(() => {
+        setDisplayLoader(false);
+      }, 300);
+      return () => clearTimeout(removeTimer);
+    }
+  }, [showLoader]);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     await logout();
+    setIsLoggingOut(false);
+    setShowLogoutConfirm(false);
     navigate('/login');
+  };
+
+  const confirmLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutConfirm(false);
   };
 
   // User sidebar items
@@ -106,11 +147,7 @@ const Layout = () => {
   // Logo
   const logo = (
     <div className="flex items-center gap-2">
-      <div className="h-8 w-8 rounded-lg bg-accent-500 flex items-center justify-center">
-        <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-1.657 0-3-4.03-3-9s1.343-9 3-9m0 18c1.657 0 3-4.03 3-9s-1.343-9-3-9" />
-        </svg>
-      </div>
+      <img src="/arraji_logo.png" alt="ArRaji Logo" className="h-12 w-auto" />
       <span className="text-lg font-bold text-neutral-900">ArRaji</span>
     </div>
   );
@@ -123,6 +160,28 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50">
+      {/* Page Transition Overlay */}
+      {displayLoader && (
+        <div
+          className={`
+            fixed inset-0 z-[9999] flex items-center justify-center bg-white/95 backdrop-blur-sm
+            transition-opacity duration-300 ease-in-out
+            ${showLoader ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+          `}
+        >
+          <div className="flex flex-col items-center">
+            <img
+              src="/arraji_logo.png"
+              alt="ArRaji Logo"
+              className="h-20 w-auto animate-logo-bounce"
+            />
+            <p className="mt-4 text-lg font-medium text-neutral-600 animate-pulse">
+              Loading...
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Sidebar */}
       <aside
         className={`
@@ -185,7 +244,7 @@ const Layout = () => {
               </div>
             </div>
             <button
-              onClick={handleLogout}
+              onClick={confirmLogout}
               className="w-full mt-2 flex items-center gap-2 px-3 py-2 text-sm text-neutral-600 hover:text-accent-600 hover:bg-accent-50 rounded-lg transition-colors"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -221,6 +280,40 @@ const Layout = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm mx-4">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="h-12 w-12 rounded-full bg-accent-100 flex items-center justify-center flex-shrink-0">
+                <svg className="h-6 w-6 text-accent-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-neutral-900">Sign Out</h3>
+                <p className="text-sm text-neutral-600">Are you sure you want to sign out?</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={cancelLogout}
+                className="flex-1 px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-accent-600 rounded-lg hover:bg-accent-700 transition-colors disabled:opacity-50"
+              >
+                {isLoggingOut ? 'Signing out...' : 'Sign Out'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

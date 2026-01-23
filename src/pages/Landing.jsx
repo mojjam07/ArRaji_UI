@@ -23,12 +23,8 @@ export default function Landing() {
                 </svg>
               </button>
 
-              <div className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-primary-100">
-                <svg className="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-1.657 0-3-4.03-3-9s1.343-9 3-9m0 18c1.657 0 3-4.03 3-9s-1.343-9-3-9" />
-                </svg>
-              </div>
-              <span className="ml-2 text-xl font-bold text-neutral-900">ArRaji</span>
+              <img src="/arraji_logo.png" alt="ArRaji Logo" className="h-12 w-auto" />
+              <span className="ml-2 text-xl font-bold text-primary-900">ArRaji</span>
             </div>
 
             {/* Desktop buttons */}
@@ -75,6 +71,7 @@ export default function Landing() {
               Your Gateway to
               <span className="text-primary-600"> Global Travel</span>
             </h1>
+            <img src="/Company_nams.png" alt="Company Name" className="h-8 md:h-10 w-auto mx-auto mb-6" />
             <p className="text-xl text-neutral-600 mb-8 max-w-3xl mx-auto">
               Apply for visas, book tours, and manage your travel documents seamlessly.
               Experience hassle-free travel planning with our comprehensive platform.
@@ -567,11 +564,7 @@ export default function Landing() {
             {/* Company Info */}
             <div>
               <div className="flex items-center mb-4">
-                <div className="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-primary-100">
-                  <svg className="h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-1.657 0-3-4.03-3-9s1.343-9 3-9m0 18c1.657 0 3-4.03 3-9s-1.343-9-3-9" />
-                  </svg>
-                </div>
+                <img src="/arraji_logo.png" alt="ArRaji Logo" className="h-12 w-auto bg-accent-100 rounded-full mr-2" />
                 <span className="ml-2 text-lg font-bold">ArRaji</span>
               </div>
               <p className="text-neutral-400 text-sm">
