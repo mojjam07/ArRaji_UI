@@ -26,8 +26,11 @@ const Button = ({
   `;
 
   const variants = {
-    primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 active:bg-primary-800',
+    /* Primary: Dark Blue from logo (#1e3a8a) */
+    primary: 'bg-primary-900 text-white hover:bg-primary-800 focus:ring-primary-500 active:bg-primary-950',
     secondary: 'bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500 active:bg-secondary-800',
+    /* Accent: Gold/Tan from logo (#d4a574) */
+    accent: 'bg-accent-500 text-white hover:bg-accent-600 focus:ring-accent-400 active:bg-accent-700',
     outline: 'border-2 border-primary-600 text-primary-600 hover:bg-primary-50 focus:ring-primary-500',
     ghost: 'text-primary-600 hover:bg-primary-50 focus:ring-primary-500',
     danger: 'bg-accent-600 text-white hover:bg-accent-700 focus:ring-accent-500 active:bg-accent-800',

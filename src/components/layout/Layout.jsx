@@ -106,7 +106,7 @@ const Layout = () => {
   // Logo
   const logo = (
     <div className="flex items-center gap-2">
-      <div className="h-8 w-8 rounded-lg bg-primary-600 flex items-center justify-center">
+      <div className="h-8 w-8 rounded-lg bg-accent-500 flex items-center justify-center">
         <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-1.657 0-3-4.03-3-9s1.343-9 3-9m0 18c1.657 0 3-4.03 3-9s-1.343-9-3-9" />
         </svg>

@@ -4,9 +4,10 @@
 
 @layer base {
   :root {
-    --color-primary: #2563eb;
+    /* Logo Colors: Dark Blue and Gold/Tan */
+    --color-primary: #1e3a8a; /* Dark Blue - from logo */
     --color-secondary: #16a34a;
-    --color-accent: #dc2626;
+    --color-accent: #d4a574; /* Gold/Tan - from logo */
     --color-neutral: #64748b;
   }
 
