@@ -264,15 +264,18 @@ const Layout = () => {
       {/* Main content wrapper */}
       <div className="lg:pl-64 min-h-screen flex flex-col">
         {/* Top bar with toggle button */}
-        <header className="h-16 bg-white border-b border-neutral-200 flex items-center px-4 lg:px-6">
-          <button
-            onClick={toggleSidebar}
-            className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100"
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+        <header className="h-16 bg-white border-b border-neutral-200 flex items-center px-4 lg:px-6 justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleSidebar}
+              className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+          <img src="/Company_nams.png" alt="Company Name" className="h-8 w-auto" />
         </header>
 
         {/* Page content */}

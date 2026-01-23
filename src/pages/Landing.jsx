@@ -18,7 +18,7 @@ export default function Landing() {
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="md:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 mr-2"
               >
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-6 w-6 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
@@ -27,10 +27,14 @@ export default function Landing() {
               <span className="ml-2 text-xl font-bold text-primary-900">ArRaji</span>
             </div>
 
+            {/* Company name image - center on desktop, right on mobile */}
+            <img src="/Company_nams.png" alt="Company Name" className="hidden md:block h-8 w-auto absolute left-1/2 transform -translate-x-1/2" />
+            <img src="/Company_nams.png" alt="Company Name" className="md:hidden h-8 w-auto" />
+
             {/* Desktop buttons */}
             <div className="hidden md:flex items-center gap-4">
               <Link to="/login">
-                <Button variant="outline">Sign In</Button>
+                <Button variant="accent">Sign In</Button>
               </Link>
               <Link to="/register">
                 <Button variant="primary">Apply for Visa</Button>
@@ -42,7 +46,7 @@ export default function Landing() {
               <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-neutral-200 shadow-lg z-50">
                 <div className="px-4 py-4 space-y-3">
                   <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">Sign In</Button>
+                    <Button variant="accent" className="w-full text-primary-900">Sign In</Button>
                   </Link>
                   <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button variant="primary" className="w-full mt-2">Apply for Visa</Button>
@@ -69,9 +73,9 @@ export default function Landing() {
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-neutral-900 mb-6">
               Your Gateway to
-              <span className="text-primary-600"> Global Travel</span>
+              <span className="text-primary-700"> Global Travel</span>
             </h1>
-            <img src="/Company_nams.png" alt="Company Name" className="h-8 md:h-10 w-auto mx-auto mb-6" />
+            {/* <img src="/Company_nams.png" alt="Company Name" className="h-8 md:h-10 w-auto mx-auto mb-6" /> */}
             <p className="text-xl text-neutral-600 mb-8 max-w-3xl mx-auto">
               Apply for visas, book tours, and manage your travel documents seamlessly.
               Experience hassle-free travel planning with our comprehensive platform.
@@ -564,7 +568,7 @@ export default function Landing() {
             {/* Company Info */}
             <div>
               <div className="flex items-center mb-4">
-                <img src="/arraji_logo.png" alt="ArRaji Logo" className="h-12 w-auto bg-accent-100 rounded-full mr-2" />
+                <img src="/arraji_logo.png" alt="ArRaji Logo" className="h-12 w-auto bg-neutral-100 rounded-full mr-2" />
                 <span className="ml-2 text-lg font-bold">ArRaji</span>
               </div>
               <p className="text-neutral-400 text-sm">
