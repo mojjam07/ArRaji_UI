@@ -73,7 +73,7 @@ export default function Landing() {
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-neutral-900 mb-6">
               Your Gateway to
-              <span className="text-primary-700"> Global Travel</span>
+              <span className="text-primary-800"> Global Travel</span>
             </h1>
             {/* <img src="/Company_nams.png" alt="Company Name" className="h-8 md:h-10 w-auto mx-auto mb-6" /> */}
             <p className="text-xl text-neutral-600 mb-8 max-w-3xl mx-auto">
@@ -116,7 +116,7 @@ export default function Landing() {
             <Card className="text-center hover:shadow-lg transition-shadow">
               <Card.Body className="pt-8 pb-6">
                 <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-4">
-                  <svg className="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-8 w-8 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
@@ -204,7 +204,7 @@ export default function Landing() {
             <Card className="text-center hover:shadow-lg transition-shadow">
               <Card.Body className="pt-8 pb-6">
                 <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-4">
-                  <svg className="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-8 w-8 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                   </svg>
                 </div>
@@ -279,7 +279,7 @@ export default function Landing() {
             {/* Step 1 */}
             <div className="text-center">
               <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-4">
-                <span className="text-xl font-bold text-primary-600">1</span>
+                <span className="text-xl font-bold text-primary-900">1</span>
               </div>
               <h3 className="text-xl font-semibold text-neutral-900 mb-2">Application & Documents</h3>
               <p className="text-neutral-600">
@@ -373,7 +373,7 @@ export default function Landing() {
             <Card className="text-center hover:shadow-lg transition-shadow">
               <Card.Body className="pt-8 pb-6">
                 <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-4">
-                  <svg className="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-8 w-8 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
@@ -418,7 +418,7 @@ export default function Landing() {
             <Card className="text-center hover:shadow-lg transition-shadow">
               <Card.Body className="pt-8 pb-6">
                 <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-4">
-                  <svg className="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-8 w-8 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>

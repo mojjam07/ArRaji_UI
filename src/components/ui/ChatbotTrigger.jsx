@@ -55,11 +55,11 @@ export default function ChatbotTrigger() {
         </div>
       </div>
 
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Chatbot">
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="ArRaji Bot">
         <div className="p-4">
           <p className="text-neutral-600 mb-4">Welcome to the ArRaji Bot! This is a placeholder for the chat interface. Backend integration will be added later.</p>
-          <div className="bg-neutral-100 p-3 rounded-lg">
-            <p className="text-sm text-neutral-500">Chatbot: How can I help you today?</p>
+          <div className="bg-primary-900 p-3 rounded-lg">
+            <p className="text-sm text-accent-200">Chatbot: How can I help you today?</p>
           </div>
         </div>
       </Modal>

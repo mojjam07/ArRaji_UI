@@ -24,7 +24,7 @@ const Input = forwardRef(({
     disabled:bg-neutral-100 disabled:cursor-not-allowed
     ${error
       ? 'border-accent-500 focus:border-accent-500 focus:ring-accent-500/20'
-      : 'border-neutral-300 focus:border-primary-500 focus:ring-primary-500/20'
+      : 'border-neutral-300 focus:border-primary-800 focus:ring-primary-500/20'
     }
     ${leftIcon ? 'pl-10' : ''}
     ${rightIcon ? 'pr-10' : ''}
