@@ -291,7 +291,7 @@ export default function AdminDashboard() {
           >
             {/* Gradient accent bar */}
             <div className={`absolute top-0 left-0 w-1 h-full ${
-              stat.color === 'primary' ? 'bg-primary-500' :
+              stat.color === 'primary' ? 'bg-primary-900' :
               stat.color === 'warning' ? 'bg-yellow-500' :
               stat.color === 'success' ? 'bg-secondary-500' : 'bg-blue-500'
             }`} />
@@ -327,7 +327,7 @@ export default function AdminDashboard() {
             title="Review Queue" 
             subtitle="Applications requiring your attention" 
             action={
-              <button className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors">
+              <button className="text-sm text-primary-900 hover:text-primary-700 font-medium transition-colors">
                 View all →
               </button>
             }
@@ -341,7 +341,7 @@ export default function AdminDashboard() {
                 >
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center ring-2 ring-white shadow-sm">
-                      <span className="text-sm font-semibold text-primary-700">
+                      <span className="text-sm font-semibold text-primary-900">
                         {app.applicant.split(' ').map(n => n[0]).join('')}
                       </span>
                     </div>

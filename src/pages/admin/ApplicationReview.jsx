@@ -338,7 +338,7 @@ export default function ApplicationReview() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <Card.Body className="text-center">
-            <p className="text-3xl font-bold text-primary-600">
+            <p className="text-3xl font-bold text-primary-900">
               {applications.pending.length + applications.processing.length}
             </p>
             <p className="text-sm text-neutral-500">Active Applications</p>
@@ -388,13 +388,13 @@ export default function ApplicationReview() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
                     activeTab === tab.id
-                      ? 'border-primary-600 text-primary-600'
+                      ? 'border-primary-600 text-primary-900'
                       : 'border-transparent text-neutral-500 hover:text-neutral-700'
                   }`}
                 >
                   {tab.label}
                   <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
-                    activeTab === tab.id ? 'bg-primary-100 text-primary-700' : 'bg-neutral-100 text-neutral-600'
+                    activeTab === tab.id ? 'bg-primary-100 text-primary-900' : 'bg-neutral-100 text-neutral-600'
                   }`}>
                     {tab.count}
                   </span>
@@ -413,7 +413,7 @@ export default function ApplicationReview() {
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-4">
                           <div className="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                            <span className="text-lg font-medium text-primary-700">
+                            <span className="text-lg font-medium text-primary-900">
                               {app.applicant.name.split(' ').map(n => n[0]).join('')}
                             </span>
                           </div>
@@ -428,7 +428,7 @@ export default function ApplicationReview() {
                               Submitted: {app.submittedDate}
                             </p>
                             {app.biometricsDate && (
-                              <p className="text-sm text-primary-600 mt-1">
+                              <p className="text-sm text-primary-900 mt-1">
                                 Biometrics: {app.biometricsDate}
                               </p>
                             )}
