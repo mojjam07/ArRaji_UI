@@ -90,14 +90,14 @@ const AdminLayout = () => {
   // Default logo
   const defaultLogo = (
     <div className="flex items-center gap-2">
-      <img src="/arraji_logo.png" alt="ArRaji Logo" className="h-12 w-auto" />
-      <span className="text-lg font-bold text-neutral-900">ArRaji Admin</span>
+      <img src="/arraji_logo_.png" alt="ArRaji Logo" className="h-12 w-auto" />
+      <span className="text-lg font-bold text-primary-900">ArRaji Admin</span>
     </div>
   );
 
   // Default user
   const defaultUser = {
-    name: 'John Doe',
+    name: 'Raji Adeyanju',
     role: 'Administrator',
   };
 
@@ -142,7 +142,7 @@ const AdminLayout = () => {
                   <span className="flex-shrink-0 h-5 w-5">{item.icon}</span>
                   <span className="flex-1">{item.name}</span>
                   {item.badge && (
-                    <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-primary-200 text-primary-800">
+                    <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-primary-200 text-primary-900">
                       {item.badge}
                     </span>
                   )}

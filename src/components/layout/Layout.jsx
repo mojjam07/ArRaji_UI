@@ -147,8 +147,8 @@ const Layout = () => {
   // Logo
   const logo = (
     <div className="flex items-center gap-2">
-      <img src="/arraji_logo.png" alt="ArRaji Logo" className="h-12 w-auto" />
-      <span className="text-lg font-bold text-neutral-900">ArRaji</span>
+      <img src="/arraji_logo_.png" alt="ArRaji Logo" className="h-12 w-auto" />
+      <span className="text-lg font-bold text-primary-900">ArRaji</span>
     </div>
   );
 
