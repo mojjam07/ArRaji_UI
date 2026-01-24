@@ -23,7 +23,7 @@ export default function Landing() {
                 </svg>
               </button>
 
-              <img src="/arraji_logo.png" alt="ArRaji Logo" className="h-12 w-auto" />
+              <img src="/arraji_logo_.png" alt="ArRaji Logo" className="h-12 w-auto" />
               <span className="ml-2 text-xl font-bold text-primary-900">ArRaji</span>
             </div>
 

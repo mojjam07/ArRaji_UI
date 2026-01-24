@@ -25,7 +25,7 @@ const PrivateRoute = ({ children, roles = [] }) => {
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="text-center">
           <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-4">
-            <svg className="h-8 w-8 text-primary-600 animate-spin" fill="none" viewBox="0 0 24 24">
+            <svg className="h-8 w-8 text-primary-900 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle 
                 className="opacity-25" 
                 cx="12" 
