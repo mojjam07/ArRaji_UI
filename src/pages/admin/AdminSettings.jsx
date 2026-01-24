@@ -146,7 +146,7 @@ export default function AdminSettings() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-primary-50 text-primary-900 border-r-2 border-primary-600'
+                      ? 'bg-primary-50 text-primary-900 border-r-2 border-primary-900'
                       : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
                   }`}
                 >

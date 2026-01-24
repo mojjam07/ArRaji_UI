@@ -77,7 +77,7 @@ const AdminLayout = () => {
     { separator: true },
     {
       id: 'back-to-user',
-      name: '← Back to User View',
+      name: 'Back to User View',
       href: '/',
       icon: (
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -121,7 +121,7 @@ const AdminLayout = () => {
               onClick={() => setSidebarOpen(false)}
               className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100"
             >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-5 w-5 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -155,7 +155,7 @@ const AdminLayout = () => {
           <div className="p-4 border-t border-neutral-200">
             <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-100 cursor-pointer">
               <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-sm font-medium text-primary-700">
+                <span className="text-sm font-medium text-primary-900">
                   {defaultUser.name?.charAt(0).toUpperCase() || 'U'}
                 </span>
               </div>

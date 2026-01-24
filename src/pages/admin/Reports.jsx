@@ -407,7 +407,7 @@ export default function Reports() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center">
-                          <span className="text-sm font-medium text-primary-700">
+                          <span className="text-sm font-medium text-primary-900">
                             {officer.name.split(' ')[1]}
                           </span>
                         </div>
@@ -451,7 +451,7 @@ export default function Reports() {
                   </div>
                   <button 
                     onClick={() => handleDownloadReport(report)}
-                    className="text-primary-600 hover:text-primary-700"
+                    className="text-primary-900 hover:text-primary-700"
                   >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -464,7 +464,7 @@ export default function Reports() {
           <Card.Footer>
             <button 
               onClick={() => handleExportData('reports')}
-              className="text-sm text-primary-600 hover:text-primary-700 font-medium w-full text-center"
+              className="text-sm text-primary-900 hover:text-primary-700 font-medium w-full text-center"
             >
               View All Reports →
             </button>

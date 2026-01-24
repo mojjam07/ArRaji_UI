@@ -254,7 +254,7 @@ export default function PassportManagement() {
         </Card>
         <Card>
           <Card.Body className="text-center">
-            <p className="text-3xl font-bold text-primary-600">
+            <p className="text-3xl font-bold text-primary-900">
               {passports.filter(p => p.status === 'in_transit' || p.status === 'with_courier').length}
             </p>
             <p className="text-sm text-neutral-500">In Transit</p>
@@ -303,13 +303,13 @@ export default function PassportManagement() {
             <Card 
               key={passport.id} 
               hover={selectedPassport?.id !== passport.id}
-              className={`${selectedPassport?.id === passport.id ? 'ring-2 ring-primary-500' : ''}`}
+              className={`${selectedPassport?.id === passport.id ? 'ring-2 ring-primary-900' : ''}`}
             >
               <Card.Body>
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
                     <div className="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                      <span className="text-lg font-medium text-primary-700">
+                      <span className="text-lg font-medium text-primary-900">
                         {passport.applicant?.name?.split(' ').map(n => n[0]).join('') || 'U'}
                       </span>
                     </div>
