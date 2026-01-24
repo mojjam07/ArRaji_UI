@@ -234,7 +234,7 @@ const Layout = () => {
           <div className="p-4 border-t border-neutral-200">
             <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-100 cursor-pointer">
               <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-sm font-medium text-primary-700">
+                <span className="text-sm font-medium text-primary-900">
                   {initials || userName.charAt(0).toUpperCase()}
                 </span>
               </div>
@@ -270,7 +270,7 @@ const Layout = () => {
               onClick={toggleSidebar}
               className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100"
             >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-6 w-6 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>

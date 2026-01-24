@@ -197,12 +197,12 @@ export default function Biometrics() {
                     onClick={() => setSelectedLocation('lagos')}
                     className={`p-4 rounded-lg border-2 transition-all ${
                       selectedLocation === 'lagos'
-                        ? 'border-primary-500 bg-primary-50'
+                        ? 'border-primary-900 bg-primary-50'
                         : 'border-neutral-200 hover:border-neutral-300'
                     }`}
                   >
                     <div className="text-center">
-                      <svg className="h-8 w-8 mx-auto mb-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="h-8 w-8 mx-auto mb-2 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -214,12 +214,12 @@ export default function Biometrics() {
                     onClick={() => setSelectedLocation('abuja')}
                     className={`p-4 rounded-lg border-2 transition-all ${
                       selectedLocation === 'abuja'
-                        ? 'border-primary-500 bg-primary-50'
+                        ? 'border-primary-900 bg-primary-50'
                         : 'border-neutral-200 hover:border-neutral-300'
                     }`}
                   >
                     <div className="text-center">
-                      <svg className="h-8 w-8 mx-auto mb-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="h-8 w-8 mx-auto mb-2 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -269,7 +269,7 @@ export default function Biometrics() {
                       onClick={() => setSelectedDate(date)}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         selectedDate === date
-                          ? 'bg-primary-600 text-white'
+                          ? 'bg-primary-900 text-white'
                           : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
                       }`}
                     >
@@ -307,7 +307,7 @@ export default function Biometrics() {
             <Card.Body className="space-y-4">
               <div className="p-4 bg-neutral-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <svg className="h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   </svg>
                   <span className="font-medium text-neutral-900">Lagos Center</span>
@@ -322,7 +322,7 @@ export default function Biometrics() {
               </div>
               <div className="p-4 bg-neutral-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <svg className="h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   </svg>
                   <span className="font-medium text-neutral-900">Abuja Center</span>

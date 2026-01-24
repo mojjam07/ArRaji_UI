@@ -209,7 +209,7 @@ export default function Payment() {
               <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-200">
                 <div className="flex justify-between items-center">
                   <p className="font-semibold text-neutral-900">Total Due</p>
-                  <p className="text-xl font-bold text-primary-600">
+                  <p className="text-xl font-bold text-primary-900">
                     ${pendingPayments.reduce((sum, p) => sum + p.amount, 0).toFixed(2)}
                   </p>
                 </div>
@@ -229,7 +229,7 @@ export default function Payment() {
                     onClick={() => setPaymentMethod(method)}
                     className={`flex-1 py-3 px-4 rounded-lg border-2 transition-colors ${
                       paymentMethod === method
-                        ? 'border-primary-500 bg-primary-50'
+                        ? 'border-primary-900 bg-primary-50'
                         : 'border-neutral-200 hover:border-neutral-300'
                     }`}
                   >
@@ -345,7 +345,7 @@ export default function Payment() {
               </div>
             </Card.Body>
             <Card.Footer>
-              <button className="text-sm text-primary-600 hover:text-primary-700 font-medium w-full text-center">
+              <button className="text-sm text-primary-900 hover:text-primary-700 font-medium w-full text-center">
                 View All Transactions →
               </button>
             </Card.Footer>

@@ -217,7 +217,7 @@ export default function Notifications() {
       case 'calendar':
         return (
           <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
-            <svg className="h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="h-5 w-5 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
@@ -249,7 +249,7 @@ export default function Notifications() {
       case 'building':
         return (
           <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-            <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="h-5 w-5 text-blue-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
           </div>
@@ -333,7 +333,7 @@ export default function Notifications() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <Card.Body className="text-center">
-            <p className="text-3xl font-bold text-primary-600">{notifications.length}</p>
+            <p className="text-3xl font-bold text-primary-900">{notifications.length}</p>
             <p className="text-sm text-neutral-500">Total Notifications</p>
           </Card.Body>
         </Card>
@@ -394,7 +394,7 @@ export default function Notifications() {
           {filteredNotifications.map((notification) => (
             <Card 
               key={notification.id} 
-              className={`${!notification.read ? 'border-l-4 border-l-primary-500' : ''}`}
+              className={`${!notification.read ? 'border-l-4 border-l-primary-900' : ''}`}
             >
               <Card.Body>
                 <div className="flex items-start gap-4">
@@ -408,7 +408,7 @@ export default function Notifications() {
                           </h3>
                           {getCategoryBadge(notification.category)}
                           {!notification.read && (
-                            <span className="h-2 w-2 rounded-full bg-primary-500"></span>
+                            <span className="h-2 w-2 rounded-full bg-primary-900"></span>
                           )}
                         </div>
                         <p className="text-sm text-neutral-600">{notification.message}</p>
@@ -468,7 +468,7 @@ export default function Notifications() {
               <button
                 onClick={() => handleTogglePreference('emailNotifications')}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  preferences.emailNotifications ? 'bg-primary-600' : 'bg-neutral-300'
+                  preferences.emailNotifications ? 'bg-primary-900' : 'bg-neutral-300'
                 }`}
               >
                 <span
@@ -486,7 +486,7 @@ export default function Notifications() {
               <button
                 onClick={() => handleTogglePreference('smsNotifications')}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  preferences.smsNotifications ? 'bg-primary-600' : 'bg-neutral-300'
+                  preferences.smsNotifications ? 'bg-primary-900' : 'bg-neutral-300'
                 }`}
               >
                 <span
@@ -504,7 +504,7 @@ export default function Notifications() {
               <button
                 onClick={() => handleTogglePreference('pushNotifications')}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  preferences.pushNotifications ? 'bg-primary-600' : 'bg-neutral-300'
+                  preferences.pushNotifications ? 'bg-primary-900' : 'bg-neutral-300'
                 }`}
               >
                 <span
@@ -522,7 +522,7 @@ export default function Notifications() {
               <button
                 onClick={() => handleTogglePreference('stageUpdates')}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  preferences.stageUpdates ? 'bg-primary-600' : 'bg-neutral-300'
+                  preferences.stageUpdates ? 'bg-primary-900' : 'bg-neutral-300'
                 }`}
               >
                 <span
@@ -540,7 +540,7 @@ export default function Notifications() {
               <button
                 onClick={() => handleTogglePreference('documentAlerts')}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  preferences.documentAlerts ? 'bg-primary-600' : 'bg-neutral-300'
+                  preferences.documentAlerts ? 'bg-primary-900' : 'bg-neutral-300'
                 }`}
               >
                 <span
@@ -558,7 +558,7 @@ export default function Notifications() {
               <button
                 onClick={() => handleTogglePreference('paymentReminders')}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  preferences.paymentReminders ? 'bg-primary-600' : 'bg-neutral-300'
+                  preferences.paymentReminders ? 'bg-primary-900' : 'bg-neutral-300'
                 }`}
               >
                 <span

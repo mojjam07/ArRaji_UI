@@ -216,7 +216,7 @@ export default function Settings() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-600'
+                      ? 'bg-primary-50 text-primary-900 border-r-2 border-primary-900'
                       : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
                   }`}
                 >
@@ -241,7 +241,7 @@ export default function Settings() {
                       onClick={() => handleToggle('emailNotifications')}
                       className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
                         settings.emailNotifications
-                          ? 'border-primary-500 bg-primary-50'
+                          ? 'border-primary-900 bg-primary-50'
                           : 'border-neutral-200 hover:border-neutral-300'
                       }`}
                     >
@@ -252,7 +252,7 @@ export default function Settings() {
                           </svg>
                           <span className="font-medium">Email</span>
                         </div>
-                        <div className={`w-10 h-6 rounded-full transition-colors ${settings.emailNotifications ? 'bg-primary-600' : 'bg-neutral-300'}`}>
+                        <div className={`w-10 h-6 rounded-full transition-colors ${settings.emailNotifications ? 'bg-primary-900' : 'bg-neutral-300'}`}>
                           <div className={`w-4 h-4 bg-white rounded-full mt-1 transition-transform ${settings.emailNotifications ? 'translate-x-5' : 'translate-x-1'}`} />
                         </div>
                       </div>
@@ -263,7 +263,7 @@ export default function Settings() {
                       onClick={() => handleToggle('pushNotifications')}
                       className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
                         settings.pushNotifications
-                          ? 'border-primary-500 bg-primary-50'
+                          ? 'border-primary-900 bg-primary-50'
                           : 'border-neutral-200 hover:border-neutral-300'
                       }`}
                     >
@@ -274,7 +274,7 @@ export default function Settings() {
                           </svg>
                           <span className="font-medium">Push</span>
                         </div>
-                        <div className={`w-10 h-6 rounded-full transition-colors ${settings.pushNotifications ? 'bg-primary-600' : 'bg-neutral-300'}`}>
+                        <div className={`w-10 h-6 rounded-full transition-colors ${settings.pushNotifications ? 'bg-primary-900' : 'bg-neutral-300'}`}>
                           <div className={`w-4 h-4 bg-white rounded-full mt-1 transition-transform ${settings.pushNotifications ? 'translate-x-5' : 'translate-x-1'}`} />
                         </div>
                       </div>
@@ -285,7 +285,7 @@ export default function Settings() {
                       onClick={() => handleToggle('smsNotifications')}
                       className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
                         settings.smsNotifications
-                          ? 'border-primary-500 bg-primary-50'
+                          ? 'border-primary-900 bg-primary-50'
                           : 'border-neutral-200 hover:border-neutral-300'
                       }`}
                     >
@@ -296,7 +296,7 @@ export default function Settings() {
                           </svg>
                           <span className="font-medium">SMS</span>
                         </div>
-                        <div className={`w-10 h-6 rounded-full transition-colors ${settings.smsNotifications ? 'bg-primary-600' : 'bg-neutral-300'}`}>
+                        <div className={`w-10 h-6 rounded-full transition-colors ${settings.smsNotifications ? 'bg-primary-900' : 'bg-neutral-300'}`}>
                           <div className={`w-4 h-4 bg-white rounded-full mt-1 transition-transform ${settings.smsNotifications ? 'translate-x-5' : 'translate-x-1'}`} />
                         </div>
                       </div>

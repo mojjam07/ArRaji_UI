@@ -169,7 +169,7 @@ export default function Tracking() {
     if (status === 'current') {
       return (
         <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center animate-pulse">
-          <svg className="h-4 w-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-4 w-4 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
@@ -346,7 +346,7 @@ export default function Tracking() {
         </Card>
         <Card>
           <Card.Body className="text-center">
-            <p className="text-3xl font-bold text-primary-600">
+            <p className="text-3xl font-bold text-primary-900">
               {applications.filter(a => ['embassy_submission', 'visa_processing'].includes(a.status)).length}
             </p>
             <p className="text-sm text-neutral-500">At Embassy</p>

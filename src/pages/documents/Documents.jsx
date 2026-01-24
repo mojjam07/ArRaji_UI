@@ -229,7 +229,7 @@ export default function Documents() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <Card.Body className="text-center">
-            <p className="text-3xl font-bold text-primary-600">{documents.length}</p>
+            <p className="text-3xl font-bold text-primary-900">{documents.length}</p>
             <p className="text-sm text-neutral-500">Total Documents</p>
           </Card.Body>
         </Card>
@@ -251,7 +251,7 @@ export default function Documents() {
         </Card>
         <Card>
           <Card.Body className="text-center">
-            <p className="text-3xl font-bold text-primary-600">
+            <p className="text-3xl font-bold text-primary-900">
               {uploadedCount}/{requiredDocuments.length}
             </p>
             <p className="text-sm text-neutral-500">Required Documents</p>
@@ -311,7 +311,7 @@ export default function Documents() {
                 <div key={doc.id} className="px-6 py-4 flex items-center justify-between hover:bg-neutral-50">
                   <div className="flex items-center gap-4">
                     <div className="h-12 w-12 rounded-lg bg-primary-100 flex items-center justify-center">
-                      <svg className="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="h-6 w-6 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                     </div>
@@ -361,7 +361,7 @@ export default function Documents() {
       >
         <div
           className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-            dragActive ? 'border-primary-500 bg-primary-50' : 'border-neutral-300 hover:border-primary-400'
+            dragActive ? 'border-primary-900 bg-primary-50' : 'border-neutral-300 hover:border-primary-400'
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}

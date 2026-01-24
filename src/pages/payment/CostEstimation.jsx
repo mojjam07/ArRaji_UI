@@ -283,7 +283,7 @@ export default function CostEstimation() {
               <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-200">
                 <div className="flex justify-between items-center">
                   <p className="text-lg font-semibold text-neutral-900">Total Amount</p>
-                  <p className="text-xl font-bold text-primary-600">
+                  <p className="text-xl font-bold text-primary-900">
                     ${costData.total.toFixed(2)}
                   </p>
                 </div>
@@ -306,7 +306,7 @@ export default function CostEstimation() {
                     onClick={() => setSelectedPaymentMethod(method.id)}
                     className={`p-4 rounded-lg border-2 transition-all ${
                       selectedPaymentMethod === method.id
-                        ? 'border-primary-500 bg-primary-50'
+                        ? 'border-primary-900 bg-primary-50'
                         : 'border-neutral-200 hover:border-neutral-300'
                     }`}
                   >
@@ -405,7 +405,7 @@ export default function CostEstimation() {
                 ].map((item, index) => (
                   <div key={index} className="flex items-start gap-3">
                     <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                      <span className="text-sm font-medium text-primary-600">{item.step}</span>
+                      <span className="text-sm font-medium text-primary-900">{item.step}</span>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-neutral-900">{item.title}</p>

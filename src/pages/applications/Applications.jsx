@@ -440,7 +440,7 @@ export default function Applications() {
             <div className="border-t border-neutral-200 pt-3 mt-3">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold text-neutral-900">Total Estimated Cost</span>
-                <span className="text-lg font-bold text-primary-600">
+                <span className="text-lg font-bold text-primary-900">
                   {costEstimation ? `$${costEstimation.total}` : 'To be confirmed (24h)'}
                 </span>
               </div>
@@ -566,7 +566,7 @@ export default function Applications() {
                   <div className={`
                     w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
                     ${currentStep >= step.number
-                      ? 'bg-primary-600 text-white'
+                      ? 'bg-primary-900 text-white'
                       : 'bg-neutral-200 text-neutral-600'}
                   `}>
                     {currentStep > step.number ? (
