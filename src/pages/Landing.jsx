@@ -612,7 +612,7 @@ export default function Landing() {
           <div className="border-t border-neutral-800 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="text-neutral-400 text-sm">
-                © 2024 ArRaji. All rights reserved.
+                © {new Date().getFullYear()} ArRaji. All rights reserved.
               </div>
               <div className="flex space-x-6 mt-4 md:mt-0">
                 <a href="https://twitter.com/arraji" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">

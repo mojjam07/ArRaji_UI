@@ -242,7 +242,7 @@ export default function Register() {
                     id="firstName"
                     name="firstName"
                     type="text"
-                    placeholder="Adeyanju"
+                    placeholder="Your First Name"
                     value={formData.firstName}
                     onChange={handleChange}
                     error={errors.firstName}
@@ -257,7 +257,7 @@ export default function Register() {
                     id="lastName"
                     name="lastName"
                     type="text"
-                    placeholder="Raji"
+                    placeholder="Your Surname"
                     value={formData.lastName}
                     onChange={handleChange}
                     error={errors.lastName}
@@ -276,7 +276,7 @@ export default function Register() {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  placeholder="raji.adeyanju@domain.com"
+                  placeholder="yourname@domain.com"
                   value={formData.email}
                   onChange={handleChange}
                   error={errors.email}

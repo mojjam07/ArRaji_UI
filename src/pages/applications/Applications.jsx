@@ -50,7 +50,7 @@ export default function Applications() {
   });
 
   const steps = [
-    { number: 1, title: 'Personal Information' },
+    { number: 1, title: 'Personal Info' },
     { number: 2, title: 'Passport Details' },
     { number: 3, title: 'Documents' },
     { number: 4, title: 'Biometrics' },
@@ -577,12 +577,12 @@ export default function Applications() {
                       step.number
                     )}
                   </div>
-                  <span className={`text-xs mt-2 whitespace-nowrap ${currentStep >= step.number ? 'text-primary-600 font-medium' : 'text-neutral-500'}`}>
+                  <span className={`text-xs mt-2 whitespace-nowrap ${currentStep >= step.number ? 'text-primary-900 font-medium' : 'text-neutral-500'}`}>
                     {step.title}
                   </span>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`flex-1 h-1 mx-2 min-w-[20px] ${currentStep > step.number ? 'bg-primary-600' : 'bg-neutral-200'}`} />
+                  <div className={`flex-1 h-1 mx-2 min-w-[20px] ${currentStep > step.number ? 'bg-primary-900' : 'bg-neutral-200'}`} />
                 )}
               </React.Fragment>
             ))}
