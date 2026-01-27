@@ -1,4 +1,3 @@
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import PrivateRoute from './components/auth/PrivateRoute';
 import AuthLayout from './components/layout/AuthLayout';
@@ -23,6 +22,7 @@ import UserManagement from './pages/admin/UserManagement';
 import Reports from './pages/admin/Reports';
 import AdminSettings from './pages/admin/AdminSettings';
 import PassportManagement from './pages/admin/PassportManagement';
+import DocumentManagement from './pages/admin/DocumentManagement';
 
 /**
  * Application Router Configuration
@@ -95,6 +95,7 @@ const AppRouter = () => (
     >
       <Route index element={<AdminDashboard />} />
       <Route path="review" element={<ApplicationReview />} />
+      <Route path="documents" element={<DocumentManagement />} />
       <Route path="users" element={<UserManagement />} />
       <Route path="passport" element={<PassportManagement />} />
       <Route path="reports" element={<Reports />} />
@@ -123,4 +124,3 @@ const AppRouter = () => (
 );
 
 export default AppRouter;
-

@@ -8,7 +8,6 @@ const AdminLayout = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Admin sidebar items - Updated with visa processing features
   const adminSidebarItems = [
     {
       id: 'admin-dashboard',
@@ -28,6 +27,16 @@ const AdminLayout = () => {
       icon: (
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      ),
+    },
+    {
+      id: 'document-management',
+      name: 'Documents',
+      href: '/admin/documents',
+      icon: (
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
         </svg>
       ),
     },
@@ -87,7 +96,6 @@ const AdminLayout = () => {
     },
   ];
 
-  // Default logo
   const defaultLogo = (
     <div className="flex items-center gap-2">
       <img src="/arraji_logo_.png" alt="ArRaji Logo" className="h-12 w-auto" />
@@ -95,7 +103,6 @@ const AdminLayout = () => {
     </div>
   );
 
-  // Default user
   const defaultUser = {
     name: 'Raji Adeyanju',
     role: 'Administrator',
@@ -103,61 +110,34 @@ const AdminLayout = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* Sidebar */}
-      <aside
-        className={`
-          fixed top-0 left-0 z-40 h-screen
-          w-64 bg-white border-r border-neutral-200
-          transform transition-transform duration-300 ease-in-out
-          lg:translate-x-0
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}
-      >
+      <aside className={`fixed top-0 left-0 z-40 h-screen w-64 bg-white border-r border-neutral-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex flex-col h-full">
-          {/* Header */}
           <div className="flex items-center justify-between h-16 px-4 border-b border-neutral-200">
             {defaultLogo}
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100"
-            >
+            <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100">
               <svg className="h-5 w-5 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
-
-          {/* Navigation */}
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
             {adminSidebarItems.map((item, index) => {
               if (item.separator) {
                 return <hr key={index} className="my-3 border-neutral-200" />;
               }
               return (
-                <a
-                  key={item.id}
-                  href={item.href}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
-                >
+                <a key={item.id} href={item.href} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
                   <span className="flex-shrink-0 h-5 w-5">{item.icon}</span>
                   <span className="flex-1">{item.name}</span>
-                  {item.badge && (
-                    <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-primary-200 text-primary-900">
-                      {item.badge}
-                    </span>
-                  )}
+                  {item.badge && <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-primary-200 text-primary-900">{item.badge}</span>}
                 </a>
               );
             })}
           </nav>
-
-          {/* Footer */}
           <div className="p-4 border-t border-neutral-200">
             <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-100 cursor-pointer">
               <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-sm font-medium text-primary-900">
-                  {defaultUser.name?.charAt(0).toUpperCase() || 'U'}
-                </span>
+                <span className="text-sm font-medium text-primary-900">{defaultUser.name?.charAt(0).toUpperCase() || 'U'}</span>
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-neutral-900 truncate">{defaultUser.name}</p>
@@ -167,21 +147,11 @@ const AdminLayout = () => {
           </div>
         </div>
       </aside>
-
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />
-      )}
-
-      {/* Main content wrapper */}
+      {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />}
       <div className="lg:pl-64 min-h-screen flex flex-col">
-        {/* Top bar with toggle button */}
         <header className="h-16 bg-white border-b border-neutral-200 flex items-center px-4 lg:px-6 justify-between">
           <div className="flex items-center gap-4">
-            <button
-              onClick={toggleSidebar}
-              className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100"
-            >
+            <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
@@ -189,8 +159,6 @@ const AdminLayout = () => {
           </div>
           <img src="/Company_nams.png" alt="Company Name" className="h-8 w-auto" />
         </header>
-
-        {/* Page content */}
         <main className="flex-1 p-6">
           <Outlet />
         </main>
@@ -200,4 +168,3 @@ const AdminLayout = () => {
 };
 
 export default AdminLayout;
-

@@ -22,11 +22,13 @@ export default function UserDashboard() {
     submittedApplications: 0,
     pendingPayments: 0,
     issuedApplications: 0,
+    completedApplications: 0,
   });
   const [applications, setApplications] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [error, setError] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('unknown');
+  const [showCelebration, setShowCelebration] = useState(false);
 
   useEffect(() => {
     // Only fetch dashboard data if user is authenticated
@@ -89,7 +91,13 @@ export default function UserDashboard() {
           submittedApplications: statistics?.submittedApplications || 0,
           pendingPayments: statistics?.pendingPayments || 0,
           issuedApplications: statistics?.issuedApplications || 0,
+          completedApplications: statistics?.completedApplications || 0,
         });
+        
+        // Check if user has any completed applications to show celebration
+        const hasCompleted = (statistics?.completedApplications || 0) > 0 || 
+                           (statistics?.issuedApplications || 0) > 0;
+        setShowCelebration(hasCompleted);
         
         setApplications(recentApplications || []);
         setNotifications(notifs?.recent || []);
@@ -291,6 +299,36 @@ export default function UserDashboard() {
           New Application
         </Button>
       </div>
+
+      {/* Celebration Banner for Completed Applications */}
+      {showCelebration && (
+        <div className="bg-gradient-to-r from-secondary-500 to-secondary-600 rounded-xl p-6 shadow-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0 h-16 w-16 rounded-full bg-white/20 flex items-center justify-center">
+                <svg className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">🎉 Congratulations! Your Visa Application is Complete!</h2>
+                <p className="text-white/90 mt-1">
+                  We are thrilled to inform you that your visa application has been successfully processed. 
+                  Thank you for choosing ArRaji Visa Services. We wish you a pleasant and safe journey!
+                </p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setShowCelebration(false)}
+              className="flex-shrink-0 text-white/80 hover:text-white transition-colors"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">

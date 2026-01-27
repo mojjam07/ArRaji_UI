@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Badge, Alert, Select, ProgressBar } from '../../components';
-import { applicationAPI } from '../../api';
+import { applicationAPI, paymentAPI } from '../../api';
 
 /**
  * Cost Estimation Page
@@ -25,47 +25,52 @@ export default function CostEstimation() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await applicationAPI.getCostEstimation('tourist');
-      if (response.success && response.data) {
-        // Transform API response to expected format
-        const estimation = response.data;
-        setCostData({
-          applicationId: estimation.applicationId || 'VISA-2024-001',
-          applicant: estimation.applicantName || 'Current User',
-          visaType: estimation.visaType || 'Tourist Visa',
-          submittedDate: estimation.submittedDate || new Date().toISOString().split('T')[0],
-          costProvidedDate: new Date().toISOString().split('T')[0],
-          status: estimation.status || 'cost_provided',
-          costs: [
-            { item: 'Visa Processing Fee', amount: estimation.processingFee || 120.00, description: 'Embassy processing fee' },
-            { item: 'Biometrics Fee', amount: estimation.biometricsFee || 50.00, description: 'Biometrics collection' },
-            { item: 'Service Charge', amount: estimation.serviceFee || 30.00, description: 'Processing and handling' },
-            { item: 'Courier Service', amount: estimation.courierFee || 25.00, description: 'Passport return delivery' },
-          ],
-          total: estimation.total || 225.00,
-          paymentDeadline: estimation.paymentDeadline || new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        });
+      // First, get the user's applications to check status
+      const applicationsResponse = await applicationAPI.getApplications();
+      if (applicationsResponse.success && applicationsResponse.data) {
+        // Handle both array and object response
+        const applications = Array.isArray(applicationsResponse.data) 
+          ? applicationsResponse.data 
+          : applicationsResponse.data.applications || [];
+        
+        // Find the most recent application or one that has cost_provided status
+        const application = applications.find(app => app.status === 'cost_provided') ||
+                           applications.find(app => ['submitted', 'under_review', 'documents_required'].includes(app.status));
+
+        if (application && application.status === 'cost_provided' && application.totalCost) {
+          // Cost estimation has been sent by admin, show the costs
+          setCostData({
+            applicationId: application.applicationNumber || 'VISA-2024-001',
+            applicant: application.firstName ? `${application.firstName} ${application.lastName || ''}`.trim() : 'Current User',
+            visaType: application.visaType || 'Tourist Visa',
+            submittedDate: application.createdAt ? new Date(application.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            costProvidedDate: application.costProvidedAt ? new Date(application.costProvidedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            status: application.status,
+            costs: [
+              { item: 'Visa Processing Fee', amount: parseFloat(application.processingFee) || 120.00, description: 'Embassy processing fee' },
+              { item: 'Biometrics Fee', amount: parseFloat(application.biometricsFee) || 50.00, description: 'Biometrics collection' },
+              { item: 'Service Charge', amount: parseFloat(application.serviceFee) || 30.00, description: 'Processing and handling' },
+              { item: 'Courier Service', amount: parseFloat(application.courierFee) || 25.00, description: 'Passport return delivery' },
+            ],
+            total: parseFloat(application.totalCost) || 225.00,
+            paymentDeadline: application.paymentDeadline ? new Date(application.paymentDeadline).toISOString().split('T')[0] : new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          });
+        } else if (application && ['submitted', 'under_review', 'documents_required'].includes(application.status)) {
+          // Application submitted but cost not yet provided
+          setCostData(null);
+          setError('Your application is currently under review. The cost breakdown will be provided within 24 hours.');
+        } else {
+          // No application found or no submitted application
+          setCostData(null);
+          setError('No submitted application found. Please submit your visa application first.');
+        }
+      } else {
+        throw new Error('Failed to fetch applications');
       }
     } catch (err) {
       console.error('Failed to fetch cost estimation:', err);
-      setError('Failed to load cost estimation. Using demo data.');
-      // Fallback to demo data
-      setCostData({
-        applicationId: 'VISA-2024-001',
-        applicant: 'Ahmed Al-Rashid',
-        visaType: 'Tourist Visa - UAE',
-        submittedDate: '2024-01-15',
-        costProvidedDate: '2024-01-16',
-        status: 'cost_provided',
-        costs: [
-          { item: 'Visa Processing Fee', amount: 120.00, description: 'Embassy processing fee' },
-          { item: 'Biometrics Fee', amount: 50.00, description: 'Biometrics collection' },
-          { item: 'Service Charge', amount: 30.00, description: 'Processing and handling' },
-          { item: 'Courier Service', amount: 25.00, description: 'Passport return delivery' },
-        ],
-        total: 225.00,
-        paymentDeadline: '2024-01-18',
-      });
+      setError('Failed to load cost estimation. Please try again later.');
+      setCostData(null);
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +99,7 @@ export default function CostEstimation() {
         description: `Payment for ${costData.visaType}`,
       };
 
-      const response = await applicationAPI.createPayment(paymentData);
+      const response = await paymentAPI.createPayment(paymentData);
       
       if (response.success) {
         // Simulate payment processing
@@ -141,36 +146,59 @@ export default function CostEstimation() {
     );
   }
 
-  // Error alert
-  {error && (
-    <Alert variant="warning" title="Notice" onClose={() => setError(null)}>
-      {error}
-    </Alert>
-  )}
+  // Show error/pending state when cost is not yet available
+  if (error || !costData) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-neutral-900">Cost Estimation</h1>
+            <p className="text-neutral-500 mt-1">Review and pay your visa processing fees</p>
+          </div>
+          <Badge variant="warning" size="md">
+            Awaiting Cost Details
+          </Badge>
+        </div>
 
-  // Use demo data if costData is still null
-  let displayCostData = costData;
-  if (!displayCostData) {
-    displayCostData = {
-      applicationId: 'VISA-2024-001',
-      applicant: 'Ahmed Al-Rashid',
-      visaType: 'Tourist Visa - UAE',
-      submittedDate: '2024-01-15',
-      costProvidedDate: '2024-01-16',
-      status: 'cost_provided',
-      costs: [
-        { item: 'Visa Processing Fee', amount: 120.00, description: 'Embassy processing fee' },
-        { item: 'Biometrics Fee', amount: 50.00, description: 'Biometrics collection' },
-        { item: 'Service Charge', amount: 30.00, description: 'Processing and handling' },
-        { item: 'Courier Service', amount: 25.00, description: 'Passport return delivery' },
-      ],
-      total: 225.00,
-      paymentDeadline: '2024-01-18',
-    };
+        {/* Error/Notice Alert */}
+        {error && (
+          <Alert variant="warning" title="Information">
+            {error}
+          </Alert>
+        )}
+
+        <Card>
+          <Card.Body className="text-center py-12">
+            <svg className="h-16 w-16 text-neutral-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2">
+              {error ? 'Application Under Review' : 'Cost Estimation Pending'}
+            </h2>
+            <p className="text-neutral-500 mb-6 max-w-md mx-auto">
+              {error || 'Your cost breakdown will be provided within 24 hours after an admin reviews your application.'}
+            </p>
+            
+            <Alert variant="info" title="24-Hour Cost Guarantee">
+              Our team reviews all submitted applications and provides cost breakdowns within 24 hours. You will receive a notification once your cost is ready.
+            </Alert>
+
+            <div className="mt-6 flex justify-center gap-4">
+              <Button variant="secondary" onClick={fetchCostEstimation}>
+                Refresh Status
+              </Button>
+              <Button variant="primary" onClick={() => window.location.href = '/notifications'}>
+                Check Notifications
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
+      </div>
+    );
   }
 
   const daysUntilDeadline = Math.ceil(
-    (new Date(displayCostData.paymentDeadline) - new Date()) / (1000 * 60 * 60 * 24)
+    (new Date(costData.paymentDeadline) - new Date()) / (1000 * 60 * 60 * 24)
   );
 
   if (paymentComplete) {
@@ -186,7 +214,7 @@ export default function CostEstimation() {
               </div>
               <h2 className="text-2xl font-bold text-neutral-900 mb-2">Payment Successful!</h2>
               <p className="text-neutral-500 mb-6">
-                Your payment of ${displayCostData.total.toFixed(2)} has been processed.
+                Your payment of ${costData.total.toFixed(2)} has been processed.
               </p>
               <div className="bg-neutral-50 rounded-lg p-4 mb-6 text-left">
                 <p className="text-sm text-neutral-600">
@@ -196,7 +224,7 @@ export default function CostEstimation() {
                   <span className="font-medium">Date:</span> {new Date().toLocaleDateString()}
                 </p>
                 <p className="text-sm text-neutral-600">
-                  <span className="font-medium">Amount:</span> ${displayCostData.total.toFixed(2)}
+                  <span className="font-medium">Amount:</span> ${costData.total.toFixed(2)}
                 </p>
               </div>
               <Alert variant="success" title="Next Steps">
@@ -240,7 +268,7 @@ export default function CostEstimation() {
         <div className="lg:col-span-2 space-y-6">
           {/* Application Summary */}
           <Card>
-            <Card.Header title="Application Details" subtitle={`Reference: ${displayCostData.applicationId}`} />
+            <Card.Header title="Application Details" subtitle={`Reference: ${costData.applicationId}`} />
             <Card.Body>
               <div className="grid grid-cols-2 gap-4">
                 <div>

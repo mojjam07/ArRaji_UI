@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Input, Select, Checkbox, Alert, ProgressBar, Badge } from '../../components';
+import { Card, Button, Input, Select, Checkbox, Alert, ProgressBar, Badge, DocumentUpload } from '../../components';
 import { applicationAPI } from '../../api';
 
 /**
@@ -13,8 +13,19 @@ export default function Applications() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [myApplications, setMyApplications] = useState([]);
-  const [costEstimation, setCostEstimation] = useState(null);
+  
+  // Document upload state
+  const [uploadedDocuments, setUploadedDocuments] = useState({
+    invitationLetter: null,
+    passportDataPage: null,
+    passportPhoto: null,
+    residencePermit: null,
+  });
+
   const [formData, setFormData] = useState({
+    // Visa Type (required for submission)
+    visaType: 'tourist',
+    
     // Step 1: Personal Information
     firstName: '',
     middleName: '',
@@ -29,21 +40,21 @@ export default function Applications() {
     passportIssuePlace: '',
     passportExpiryDate: '',
     
-    // Step 3: Documents
+    // Step 3: Documents (kept for reference)
     invitationLetter: null,
     passportDataPage: null,
     passportPhoto: null,
     residencePermit: null,
 
-    // Step 4: Biometrics Information
+    // Step 4: Cost & Payment
+    costAgreed: false,
+    paymentMethod: 'card',
+    
+    // Step 5: Biometrics Information
     biometricsLocation: '',
     biometricsDate: '',
     biometricsTime: '',
     expectedTravelDate: '',
-    
-    // Step 5: Cost & Payment
-    costAgreed: false,
-    paymentMethod: 'card',
     
     // Step 6: Review
     agreed: false,
@@ -53,15 +64,16 @@ export default function Applications() {
     { number: 1, title: 'Personal Info' },
     { number: 2, title: 'Passport Details' },
     { number: 3, title: 'Documents' },
-    { number: 4, title: 'Biometrics' },
-    { number: 5, title: 'Cost Review' },
+    { number: 4, title: 'Cost Review' },
+    { number: 5, title: 'Biometrics' },
     { number: 6, title: 'Submit' },
   ];
 
   // Fetch data on mount
   useEffect(() => {
     fetchMyApplications();
-    fetchCostEstimation('tourist');
+    // Only fetch cost estimation if user has draft applications (not yet submitted)
+    // Cost estimation is provided by admin after submission, not fetched automatically
   }, []);
 
   const fetchMyApplications = async () => {
@@ -97,27 +109,37 @@ export default function Applications() {
     }
   };
 
-  const fetchCostEstimation = async (visaType) => {
-    try {
-      const response = await applicationAPI.getCostEstimation(visaType);
-      if (response.success && response.data) {
-        setCostEstimation(response.data);
-      }
-    } catch (err) {
-      console.error('Failed to fetch cost estimation:', err);
-      // Fallback mock data
-      setCostEstimation({
-        processingFee: 150,
-        biometricsFee: 50,
-        courierFee: 25,
-        total: 225,
-      });
-    }
-  };
-
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  // Document upload handlers
+  const handleDocumentUpload = (type) => (documentData) => {
+    setUploadedDocuments(prev => ({
+      ...prev,
+      [type]: documentData,
+    }));
+    // Also update formData for backward compatibility
+    setFormData(prev => ({
+      ...prev,
+      [type]: documentData,
+    }));
+  };
+
+  const handleDocumentRemove = (type) => () => {
+    setUploadedDocuments(prev => ({
+      ...prev,
+      [type]: null,
+    }));
+    // Also update formData for backward compatibility
+    setFormData(prev => ({
+      ...prev,
+      [type]: null,
+    }));
+  };
+
+  // Check if all required documents are uploaded
+  const allDocumentsUploaded = Object.values(uploadedDocuments).every(doc => doc !== null);
 
   const nextStep = () => {
     if (currentStep < 6) setCurrentStep(prev => prev + 1);
@@ -129,7 +151,7 @@ export default function Applications() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.agreed || !formData.costAgreed) {
       alert('Please agree to the terms and conditions.');
       return;
@@ -139,71 +161,89 @@ export default function Applications() {
     setError(null);
 
     try {
+      // Flatten the form data to match backend expected structure
       const applicationData = {
-        personalInfo: {
-          firstName: formData.firstName,
-          middleName: formData.middleName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          dateOfBirth: formData.dateOfBirth,
-        },
-        passportDetails: {
-          passportNumber: formData.passportNumber,
-          passportIssueDate: formData.passportIssueDate,
-          passportIssuePlace: formData.passportIssuePlace,
-          passportExpiryDate: formData.passportExpiryDate,
-        },
-        biometricsInfo: {
-          location: formData.biometricsLocation,
-          date: formData.biometricsDate,
-          time: formData.biometricsTime,
-          expectedTravelDate: formData.expectedTravelDate,
-        },
+        // Required: visaType
+        visaType: formData.visaType,
+        
+        // Personal info fields
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        dateOfBirth: formData.dateOfBirth,
+        email: formData.email,
+        phone: formData.phone,
+        
+        // Passport details
+        passportNumber: formData.passportNumber,
+        passportIssueDate: formData.passportIssueDate,
+        passportIssuePlace: formData.passportIssuePlace,
+        passportExpiryDate: formData.passportExpiryDate,
+        
+        // Biometrics info
+        biometricsLocation: formData.biometricsLocation,
+        biometricsDate: formData.biometricsDate,
+        biometricsTime: formData.biometricsTime,
+        expectedTravelDate: formData.expectedTravelDate,
+        
+        // Additional optional fields
+        purposeOfTravel: formData.purposeOfTravel || '',
+        intendedDurationOfStay: formData.intendedDurationOfStay || 30,
+        destinationCountry: formData.destinationCountry || '',
       };
 
-      const response = await applicationAPI.createApplication(applicationData);
-      
-      if (response.success) {
-        setSuccess(true);
-        alert(`Visa application submitted successfully! Application ID: ${response.data?.id || 'VISA-NEW'}. You will receive a cost estimate within 24 hours.`);
-        
-        // Refresh applications list
-        fetchMyApplications();
-        
-        // Reset form
-        setFormData({
-          firstName: '',
-          middleName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          dateOfBirth: '',
-          passportNumber: '',
-          passportIssueDate: '',
-          passportIssuePlace: '',
-          passportExpiryDate: '',
-          biometricsLocation: '',
-          biometricsDate: '',
-          biometricsTime: '',
-          expectedTravelDate: '',
-          invitationLetter: null,
-          passportDataPage: null,
-          passportPhoto: null,
-          residencePermit: null,
-          costAgreed: false,
-          paymentMethod: 'card',
-          agreed: false,
-        });
-        setCurrentStep(1);
+      console.log('Submitting application data:', applicationData);
+
+      // Create the application (draft status)
+      const createResponse = await applicationAPI.createApplication(applicationData);
+
+      if (createResponse.success && createResponse.data?.application?.id) {
+        const applicationId = createResponse.data.application.id;
+
+        // Submit the application for admin review
+        const submitResponse = await applicationAPI.submitApplication(applicationId);
+
+        if (submitResponse.success) {
+          setSuccess(true);
+          alert(`Visa application submitted successfully for admin review! Application ID: ${applicationId}. You will receive a cost estimate within 24 hours.`);
+
+          // Refresh applications list
+          fetchMyApplications();
+
+          // Reset form
+          setFormData({
+            visaType: 'tourist',
+            firstName: '',
+            middleName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            dateOfBirth: '',
+            passportNumber: '',
+            passportIssueDate: '',
+            passportIssuePlace: '',
+            passportExpiryDate: '',
+            biometricsLocation: '',
+            biometricsDate: '',
+            biometricsTime: '',
+            expectedTravelDate: '',
+            invitationLetter: null,
+            passportDataPage: null,
+            passportPhoto: null,
+            residencePermit: null,
+            costAgreed: false,
+            paymentMethod: 'card',
+            agreed: false,
+          });
+          setCurrentStep(1);
+        } else {
+          throw new Error(submitResponse.message || 'Failed to submit application for review');
+        }
       } else {
-        throw new Error(response.message || 'Failed to submit application');
+        throw new Error(createResponse.message || 'Failed to create application');
       }
     } catch (err) {
       console.error('Failed to submit application:', err);
       setError(err.message || 'Failed to submit application. Please try again.');
-      // For demo, still show success message
-      alert('Demo: Application would be submitted. API connection required for real submission.');
     } finally {
       setIsSubmitting(false);
     }
@@ -211,8 +251,43 @@ export default function Applications() {
 
   const renderStep1 = () => (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-neutral-900">Personal Information</h3>
-      <p className="text-sm text-neutral-500 mb-4">Enter your full name as it appears in your passport</p>
+      <h3 className="text-lg font-semibold text-neutral-900">Visa & Personal Information</h3>
+      <p className="text-sm text-neutral-500 mb-4">Select your visa type and enter your full name as it appears in your passport</p>
+      
+      {/* Visa Type Selection */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-neutral-700 mb-2">
+          Visa Type <span className="text-accent-600">*</span>
+        </label>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { value: 'tourist', label: 'Tourist', icon: '🏖️' },
+            { value: 'business', label: 'Business', icon: '💼' },
+            { value: 'student', label: 'Student', icon: '📚' },
+            { value: 'work', label: 'Work', icon: '👷' },
+            { value: 'transit', label: 'Transit', icon: '✈️' },
+            { value: 'family', label: 'Family', icon: '👨‍👩‍👧' },
+            { value: 'diplomatic', label: 'Diplomatic', icon: '🏛️' },
+          ].map((visa) => (
+            <button
+              key={visa.value}
+              type="button"
+              onClick={() => {
+                handleInputChange('visaType', visa.value);
+              }}
+              className={`p-3 rounded-lg border-2 text-left transition-all ${
+                formData.visaType === visa.value
+                  ? 'border-primary-900 bg-primary-50'
+                  : 'border-neutral-200 hover:border-primary-400'
+              }`}
+            >
+              <span className="text-xl">{visa.icon}</span>
+              <p className="text-sm font-medium text-neutral-900 mt-1">{visa.label}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Input
           label="First Name"
@@ -308,53 +383,144 @@ export default function Applications() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Invitation Letter */}
-        <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
-          <svg className="h-10 w-10 text-neutral-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <p className="text-sm font-medium text-neutral-700">Invitation Letter</p>
-          <p className="text-xs text-neutral-500 mt-1">Stating visa validity</p>
-          <p className="text-xs text-accent-600 mt-2">Required *</p>
-        </div>
+        <DocumentUpload
+          type="invitation_letter"
+          label="Invitation Letter"
+          description="Stating visa validity"
+          required={true}
+          icon="document"
+          accept=".pdf,.jpg,.jpeg,.png"
+          maxSize={10 * 1024 * 1024}
+          uploadedFile={uploadedDocuments.invitationLetter}
+          onUpload={handleDocumentUpload('invitationLetter')}
+          onRemove={handleDocumentRemove('invitationLetter')}
+        />
 
         {/* International Passport Data Page */}
-        <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
-          <svg className="h-10 w-10 text-neutral-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-          </svg>
-          <p className="text-sm font-medium text-neutral-700">Passport Data Page</p>
-          <p className="text-xs text-neutral-500 mt-1">Clear copy of data page</p>
-          <p className="text-xs text-accent-600 mt-2">Required *</p>
-        </div>
+        <DocumentUpload
+          type="passport_data_page"
+          label="Passport Data Page"
+          description="Clear copy of data page"
+          required={true}
+          icon="passport"
+          accept=".pdf,.jpg,.jpeg,.png"
+          maxSize={10 * 1024 * 1024}
+          uploadedFile={uploadedDocuments.passportDataPage}
+          onUpload={handleDocumentUpload('passportDataPage')}
+          onRemove={handleDocumentRemove('passportDataPage')}
+        />
 
         {/* Passport Photograph */}
-        <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
-          <svg className="h-10 w-10 text-neutral-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <p className="text-sm font-medium text-neutral-700">Passport Photograph</p>
-          <p className="text-xs text-neutral-500 mt-1">White background</p>
-          <p className="text-xs text-accent-600 mt-2">Required *</p>
-        </div>
+        <DocumentUpload
+          type="passport_photo"
+          label="Passport Photograph"
+          description="White background"
+          required={true}
+          icon="photo"
+          accept=".jpg,.jpeg,.png"
+          maxSize={5 * 1024 * 1024}
+          uploadedFile={uploadedDocuments.passportPhoto}
+          onUpload={handleDocumentUpload('passportPhoto')}
+          onRemove={handleDocumentRemove('passportPhoto')}
+        />
 
         {/* Residence Permit of Host */}
-        <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
-          <svg className="h-10 w-10 text-neutral-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </svg>
-          <p className="text-sm font-medium text-neutral-700">Residence Permit of Host</p>
-          <p className="text-xs text-neutral-500 mt-1">Host's valid residence permit</p>
-          <p className="text-xs text-accent-600 mt-2">Required *</p>
+        <DocumentUpload
+          type="residence_permit"
+          label="Residence Permit of Host"
+          description="Host's valid residence permit"
+          required={true}
+          icon="building"
+          accept=".pdf,.jpg,.jpeg,.png"
+          maxSize={10 * 1024 * 1024}
+          uploadedFile={uploadedDocuments.residencePermit}
+          onUpload={handleDocumentUpload('residencePermit')}
+          onRemove={handleDocumentRemove('residencePermit')}
+        />
+      </div>
+
+      {/* Document Status Summary */}
+      <div className="mt-4 p-4 bg-neutral-50 rounded-lg">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-neutral-700">
+            Documents Uploaded: {Object.values(uploadedDocuments).filter(d => d !== null).length}/4
+          </span>
+          {allDocumentsUploaded ? (
+            <span className="text-sm text-secondary-600 font-medium flex items-center">
+              <svg className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              All documents ready
+            </span>
+          ) : (
+            <span className="text-sm text-accent-600 font-medium">
+              {4 - Object.values(uploadedDocuments).filter(d => d !== null).length} documents remaining
+            </span>
+          )}
+        </div>
+        <div className="mt-2 w-full bg-neutral-200 rounded-full h-2">
+          <div 
+            className="bg-secondary-500 h-2 rounded-full transition-all duration-300"
+            style={{ 
+              width: `${(Object.values(uploadedDocuments).filter(d => d !== null).length / 4) * 100}%` 
+            }}
+          />
         </div>
       </div>
 
       <Alert variant="info" title="Document Requirements">
-        All documents must be clear and legible. PDF, JPG, PNG formats accepted (Max 10MB each).
+        All documents must be clear and legible. PDF, JPG, PNG formats accepted. Passport photos must have a white background.
       </Alert>
     </div>
   );
 
   const renderStep4 = () => (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-neutral-900">Cost Review</h3>
+      
+      <Card>
+        <Card.Header title="Visa Application Costs" subtitle="Cost will be provided after document review" />
+        <Card.Body>
+          <div className="text-center py-8">
+            <svg className="h-12 w-12 text-neutral-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-lg font-medium text-neutral-900 mb-2">Cost Estimation Pending</p>
+            <p className="text-sm text-neutral-500 mb-4">
+              After you submit your application and documents, an admin will review your application and provide the cost breakdown within 24 hours.
+            </p>
+            <div className="bg-primary-50 rounded-lg p-4 text-left">
+              <p className="text-sm text-primary-900">
+                <span className="font-medium">What happens next:</span>
+              </p>
+              <ol className="text-sm text-primary-800 mt-2 list-decimal list-inside">
+                <li>Your application is submitted for review</li>
+                <li>Admin reviews your uploaded documents</li>
+                <li>Cost breakdown is sent to your email</li>
+                <li>Complete payment to proceed</li>
+              </ol>
+            </div>
+          </div>
+        </Card.Body>
+      </Card>
+
+      <Alert variant="info" title="24-Hour Cost Guarantee">
+        Our team will review your application and documents within 24 hours and provide a detailed cost breakdown. You will receive a notification once the cost is ready.
+      </Alert>
+
+      <Alert variant="warning" title="Payment Required">
+        Payment must be completed before you can schedule your biometrics appointment.
+      </Alert>
+
+      <Checkbox
+        checked={formData.costAgreed}
+        onChange={(e) => handleInputChange('costAgreed', e.target.checked)}
+        label="I understand the visa application process and agree to proceed. I understand I will receive the cost breakdown after submission and must complete payment before biometrics scheduling."
+      />
+    </div>
+  );
+
+  const renderStep5 = () => (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-neutral-900">Biometrics Information</h3>
       <p className="text-sm text-neutral-500 mb-4">Schedule your biometrics appointment</p>
@@ -406,60 +572,8 @@ export default function Applications() {
         />
       </div>
       <Alert variant="warning" title="Biometrics Schedule">
-        Biometrics appointments are only available on weekdays between 8:00 AM and 3:45 PM.
+        Biometrics appointments are only available on weekdays between 8:00 AM and 3:45 PM. Payment must be completed before scheduling.
       </Alert>
-    </div>
-  );
-
-  const renderStep5 = () => (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-neutral-900">Cost Review</h3>
-      
-      <Card>
-        <Card.Header title="Estimated Visa Costs" subtitle={costEstimation ? 'Based on selected visa type' : 'Will be provided within 24 hours'} />
-        <Card.Body>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center p-3 bg-neutral-50 rounded-lg">
-              <span className="text-neutral-600">Visa Processing Fee</span>
-              <span className="font-semibold">
-                {costEstimation ? `$${costEstimation.processingFee}` : 'Pending (24h)'}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-neutral-50 rounded-lg">
-              <span className="text-neutral-600">Biometrics Fee</span>
-              <span className="font-semibold">
-                {costEstimation ? `$${costEstimation.biometricsFee}` : 'Pending (24h)'}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-neutral-50 rounded-lg">
-              <span className="text-neutral-600">Courier Service (if applicable)</span>
-              <span className="font-semibold">
-                {costEstimation ? `$${costEstimation.courierFee}` : 'Pending (24h)'}
-              </span>
-            </div>
-            <div className="border-t border-neutral-200 pt-3 mt-3">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold text-neutral-900">Total Estimated Cost</span>
-                <span className="text-lg font-bold text-primary-900">
-                  {costEstimation ? `$${costEstimation.total}` : 'To be confirmed (24h)'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </Card.Body>
-      </Card>
-
-      <Alert variant="info" title="24-Hour Cost Guarantee">
-        {costEstimation 
-          ? 'This is the estimated cost for your visa application. Final costs may vary slightly.'
-          : 'You will receive a detailed cost breakdown within 24 hours of submitting your application. Payment will be required before processing begins.'}
-      </Alert>
-
-      <Checkbox
-        checked={formData.costAgreed}
-        onChange={(e) => handleInputChange('costAgreed', e.target.checked)}
-        label="I understand the costs and agree to proceed with the application."
-      />
     </div>
   );
 

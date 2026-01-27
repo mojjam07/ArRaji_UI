@@ -46,8 +46,10 @@ export default function ApplicationReview() {
       const response = await adminAPI.getApplications({ status, limit: 50 });
       if (response.success && response.data) {
         // Map the API response to our expected format
+        // IMPORTANT: Use app.id (UUID) for API calls, app.applicationNumber for display
         const apps = (response.data.applications || []).map(app => ({
-          id: app.applicationNumber || `VISA-${app.id}`,
+          id: app.id,  // UUID - used for API calls (updateApplicationStatus, etc.)
+          displayId: app.applicationNumber || `VISA-${app.id.substring(0, 8)}`,  // Human-readable ID for display
           applicant: { 
             name: app.user ? `${app.user.firstName} ${app.user.lastName}` : 'Unknown',
             email: app.user?.email || 'Unknown',
@@ -83,7 +85,8 @@ export default function ApplicationReview() {
       setApplications({
         pending: [
           {
-            id: 'VISA-2024-001',
+            id: '550e8400-e29b-41d4-a716-446655440001',
+            displayId: 'VISA-2024-001',
             applicant: { name: 'Ahmed Al-Rashid', email: 'ahmed@example.com', phone: '+971 50 123 4567' },
             visaType: 'Tourist Visa - UAE',
             submittedDate: '2024-01-18',
@@ -93,7 +96,8 @@ export default function ApplicationReview() {
             documents: ['Passport Data Page.pdf', 'Invitation Letter.pdf', 'Passport Photo.jpg', 'Residence Permit.pdf'],
           },
           {
-            id: 'VISA-2024-002',
+            id: '550e8400-e29b-41d4-a716-446655440002',
+            displayId: 'VISA-2024-002',
             applicant: { name: 'Sarah Johnson', email: 'sarah@example.com', phone: '+971 55 987 6543' },
             visaType: 'Business Visa - UK',
             submittedDate: '2024-01-17',
@@ -103,7 +107,8 @@ export default function ApplicationReview() {
             documents: ['Passport Data Page.pdf', 'Invitation Letter.pdf', 'Passport Photo.jpg'],
           },
           {
-            id: 'VISA-2024-003',
+            id: '550e8400-e29b-41d4-a716-446655440003',
+            displayId: 'VISA-2024-003',
             applicant: { name: 'Mohammed Ali', email: 'mohammed@example.com', phone: '+971 52 456 7890' },
             visaType: 'Tourist Visa - USA',
             submittedDate: '2024-01-16',
@@ -115,7 +120,8 @@ export default function ApplicationReview() {
         ],
         processing: [
           {
-            id: 'VISA-2023-156',
+            id: '550e8400-e29b-41d4-a716-446655440004',
+            displayId: 'VISA-2023-156',
             applicant: { name: 'Fatima Hassan', email: 'fatima@example.com', phone: '+971 58 321 0987' },
             visaType: 'Work Visa - Canada',
             submittedDate: '2024-01-15',
@@ -127,7 +133,8 @@ export default function ApplicationReview() {
             embassyDate: '2024-01-25',
           },
           {
-            id: 'VISA-2023-155',
+            id: '550e8400-e29b-41d4-a716-446655440005',
+            displayId: 'VISA-2023-155',
             applicant: { name: 'John Smith', email: 'john@example.com', phone: '+971 54 789 0123' },
             visaType: 'Student Visa - Australia',
             submittedDate: '2024-01-14',
@@ -140,7 +147,8 @@ export default function ApplicationReview() {
         ],
         completed: [
           {
-            id: 'VISA-2023-150',
+            id: '550e8400-e29b-41d4-a716-446655440006',
+            displayId: 'VISA-2023-150',
             applicant: { name: 'Emily Davis', email: 'emily@example.com', phone: '+971 56 111 2222' },
             visaType: 'Tourist Visa - UAE',
             submittedDate: '2024-01-10',
@@ -183,7 +191,7 @@ export default function ApplicationReview() {
       });
       
       if (response.success) {
-        setSuccess(`Application ${id} approved successfully!`);
+        setSuccess(`Application ${id.substring(0, 8)} approved successfully!`);
         fetchApplications(activeTab);
         setSelectedApplication(null);
         setReviewNote('');
@@ -210,7 +218,7 @@ export default function ApplicationReview() {
       });
       
       if (response.success) {
-        setSuccess(`Application ${id} rejected.`);
+        setSuccess(`Application ${id.substring(0, 8)} rejected.`);
         fetchApplications(activeTab);
         setSelectedApplication(null);
         setReviewNote('');
@@ -241,7 +249,7 @@ export default function ApplicationReview() {
       });
       
       if (response.success) {
-        setSuccess(`Application ${id} stage updated!`);
+        setSuccess(`Application ${id.substring(0, 8)} stage updated!`);
         fetchApplications(activeTab);
       } else {
         throw new Error(response.message || 'Failed to update stage');
@@ -249,6 +257,29 @@ export default function ApplicationReview() {
     } catch (err) {
       console.error('Failed to update stage:', err);
       setError('Failed to update stage. Please try again.');
+    }
+  };
+
+  const handleSendCostEstimation = async (id) => {
+    setError(null);
+    try {
+      const response = await adminAPI.sendCostEstimation(id, {
+        processingFee: 120.00,
+        biometricsFee: 50.00,
+        serviceFee: 30.00,
+        courierFee: 25.00,
+        total: 225.00
+      });
+      
+      if (response.success) {
+        setSuccess(`Cost estimation sent to applicant!`);
+        fetchApplications(activeTab);
+      } else {
+        throw new Error(response.message || 'Failed to send cost estimation');
+      }
+    } catch (err) {
+      console.error('Failed to send cost estimation:', err);
+      setError('Failed to send cost estimation. Please try again.');
     }
   };
 
@@ -423,7 +454,7 @@ export default function ApplicationReview() {
                               {getPriorityBadge(app.priority)}
                               {getStageBadge(app.currentStage)}
                             </div>
-                            <p className="text-sm text-neutral-500">{app.visaType} • {app.id}</p>
+                            <p className="text-sm text-neutral-500">{app.visaType} • {app.displayId}</p>
                             <p className="text-sm text-neutral-500 mt-1">
                               Submitted: {app.submittedDate}
                             </p>
@@ -483,7 +514,7 @@ export default function ApplicationReview() {
                 <Card className="sticky top-6">
                   <Card.Header
                     title="Application Details"
-                    subtitle={selectedApplication.id}
+                    subtitle={selectedApplication.displayId}
                     action={
                       <button
                         onClick={() => setSelectedApplication(null)}
@@ -599,6 +630,16 @@ export default function ApplicationReview() {
                         onClick={() => updateStage(selectedApplication.id, 'next')}
                       >
                         Next Stage
+                      </Button>
+                    )}
+                    {selectedApplication.currentStage === 'documents_review' && (
+                      <Button
+                        variant="success"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => handleSendCostEstimation(selectedApplication.id)}
+                      >
+                        Send Cost Estimation
                       </Button>
                     )}
                   </Card.Footer>

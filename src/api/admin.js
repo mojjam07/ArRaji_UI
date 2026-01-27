@@ -305,6 +305,27 @@ export const updateSystemSettings = async (settings) => {
   return response.data;
 };
 
+/**
+ * Send cost estimation to user (admin only)
+ * @param {string} id - Application ID
+ * @param {Object} costData - Cost estimation data
+ * @returns {Promise} - Response with updated application
+ */
+export const sendCostEstimation = async (id, costData) => {
+  const response = await api.post(`${ADMIN_ENDPOINT}/application/${id}/send-cost-estimation`, costData);
+  return response.data;
+};
+
+/**
+ * Get all documents (admin only)
+ * @param {Object} params - Query parameters (page, limit, status, documentType, applicationId, userId)
+ * @returns {Promise} - Response with documents and pagination
+ */
+export const getAllDocuments = async (params = {}) => {
+  const response = await api.get(`${ADMIN_ENDPOINT}/documents`, { params });
+  return response.data;
+};
+
 export default {
   getDashboardStats,
   getUsers,
@@ -335,5 +356,6 @@ export default {
   assignApplicationOfficer,
   getSystemSettings,
   updateSystemSettings,
+  sendCostEstimation,
+  getAllDocuments,
 };
-

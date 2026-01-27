@@ -6,6 +6,7 @@ import { biometricAPI } from '../../api';
  * Biometrics Scheduling Page
  * Allows users to schedule biometrics appointments in Lagos or Abuja
  * Weekdays only between 8:00 AM and 3:45 PM
+ * Payment must be completed before scheduling biometrics
  * Integrated with backend API for real data
  */
 export default function Biometrics() {
@@ -15,11 +16,11 @@ export default function Biometrics() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingPayment, setIsCheckingPayment] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [appointments, setAppointments] = useState([]);
-  const [availableSlots, setAvailableSlots] = useState([]);
-  const [locations, setLocations] = useState([]);
+  const [hasCompletedPayment, setHasCompletedPayment] = useState(false);
 
   // Generate available time slots (8:00 AM to 3:45 PM, 45-minute intervals)
   const generateTimeSlots = () => {
@@ -52,8 +53,31 @@ export default function Biometrics() {
   // Fetch data on mount
   useEffect(() => {
     fetchAppointments();
-    fetchLocations();
+    checkPaymentStatus();
   }, []);
+
+  const checkPaymentStatus = async () => {
+    setIsCheckingPayment(true);
+    try {
+      // Check if user has any completed payments
+      // In a real app, this would check the backend for payment records
+      // For demo, we simulate checking the payment status
+      const storedPaymentStatus = localStorage.getItem('paymentCompleted');
+      if (storedPaymentStatus === 'true') {
+        setHasCompletedPayment(true);
+      } else {
+        // Check if there are any applications with payment completed status
+        // This would typically be an API call
+        setHasCompletedPayment(false);
+      }
+    } catch (err) {
+      console.error('Failed to check payment status:', err);
+      // Allow access in demo mode if check fails
+      setHasCompletedPayment(true);
+    } finally {
+      setIsCheckingPayment(false);
+    }
+  };
 
   const fetchAppointments = async () => {
     setIsLoading(true);
@@ -87,22 +111,6 @@ export default function Biometrics() {
       ]);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const fetchLocations = async () => {
-    try {
-      const response = await biometricAPI.getLocations();
-      if (response.success && response.data) {
-        setLocations(response.data);
-      }
-    } catch (err) {
-      console.error('Failed to fetch locations:', err);
-      // Use default locations
-      setLocations([
-        { code: 'lagos', name: 'Lagos', address: 'Plot 128, Ahmadu Bello Way, Victoria Island' },
-        { code: 'abuja', name: 'Abuja', address: 'Plot 42, Independence Avenue, Central Business District' },
-      ]);
     }
   };
 
@@ -154,6 +162,116 @@ export default function Biometrics() {
 
   const timeSlots = generateTimeSlots();
 
+  // Show loading state while checking payment
+  if (isCheckingPayment) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-neutral-900">Biometrics Appointment</h1>
+          <p className="text-neutral-500 mt-1">Schedule your biometrics appointment for visa processing</p>
+        </div>
+        <Card>
+          <Card.Body className="text-center py-12">
+            <svg className="h-8 w-8 text-neutral-300 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <p className="text-neutral-500 mt-4">Verifying payment status...</p>
+          </Card.Body>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show payment required message if payment not completed
+  if (!hasCompletedPayment) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-neutral-900">Biometrics Appointment</h1>
+          <p className="text-neutral-500 mt-1">Schedule your biometrics appointment for visa processing</p>
+        </div>
+
+        {/* Payment Required Alert */}
+        <Alert variant="warning" title="Payment Required">
+          You must complete the payment before scheduling your biometrics appointment. Please go to the Cost Estimation page to review and pay your visa fees.
+        </Alert>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Information Card */}
+          <div className="lg:col-span-2">
+            <Card>
+              <Card.Header title="Payment Required for Biometrics" subtitle="Complete payment first" />
+              <Card.Body className="space-y-4">
+                <p className="text-neutral-600">
+                  To schedule your biometrics appointment, you must first complete the payment for your visa application. 
+                  The payment process includes:
+                </p>
+                <ul className="list-disc list-inside space-y-2 text-neutral-600">
+                  <li>Review the cost breakdown for your visa application</li>
+                  <li>Complete payment using your preferred payment method</li>
+                  <li>Receive payment confirmation</li>
+                  <li>Then schedule your biometrics appointment</li>
+                </ul>
+                <div className="pt-4">
+                  <Button variant="primary" onClick={() => window.location.href = '/user/cost-estimation'}>
+                    Go to Cost Estimation & Payment
+                  </Button>
+                </div>
+              </Card.Body>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Biometrics Info */}
+            <Card>
+              <Card.Header title="Biometrics Information" subtitle="What you need to know" />
+              <Card.Body>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2 text-sm text-neutral-600">
+                    <svg className="h-5 w-5 text-primary-900 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Available Mon-Sat, 8:00 AM - 3:45 PM</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-neutral-600">
+                    <svg className="h-5 w-5 text-primary-900 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    </svg>
+                    <span>Two locations: Lagos & Abuja</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-neutral-600">
+                    <svg className="h-5 w-5 text-primary-900 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Arrive 15 minutes early</span>
+                  </li>
+                </ul>
+              </Card.Body>
+            </Card>
+
+            {/* Locations */}
+            <Card>
+              <Card.Header title="Our Centers" subtitle="Visit either location" />
+              <Card.Body className="space-y-3">
+                <div className="p-3 bg-neutral-50 rounded-lg">
+                  <p className="font-medium text-neutral-900">Lagos Center</p>
+                  <p className="text-sm text-neutral-600">Victoria Island</p>
+                </div>
+                <div className="p-3 bg-neutral-50 rounded-lg">
+                  <p className="font-medium text-neutral-900">Abuja Center</p>
+                  <p className="text-sm text-neutral-600">Central Business District</p>
+                </div>
+              </Card.Body>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -175,6 +293,11 @@ export default function Biometrics() {
           {success}
         </Alert>
       )}
+
+      {/* Payment Completed Alert */}
+      <Alert variant="success" title="Payment Completed">
+        Your payment has been confirmed. You may now schedule your biometrics appointment.
+      </Alert>
 
       {/* Info Alert */}
       <Alert variant="info" title="Important Information">
