@@ -33,75 +33,8 @@ export default function PassportManagement() {
       }
     } catch (err) {
       console.error('Failed to fetch passport data:', err);
-      setError('Failed to load passport data. Using demo data.');
-      // Fallback to demo data
-      setPassports([
-        {
-          id: 'PP-001',
-          applicationId: 'VISA-2024-001',
-          applicant: { name: 'Ahmed Al-Rashid', phone: '+971 50 123 4567', email: 'ahmed@example.com' },
-          currentLocation: 'with_courier',
-          locationHistory: [
-            { status: 'application_received', location: 'Client', date: '2024-01-15 09:30', note: 'Application received' },
-            { status: 'documents_collected', location: 'Office', date: '2024-01-15 14:00', note: 'Documents verified' },
-            { status: 'with_courier', location: 'Lagos to Abuja', date: '2024-01-16 10:00', note: 'Courier picked up for embassy submission' },
-          ],
-          courier: { name: 'DHL Express', tracking: 'DHL123456789', eta: '2024-01-17' },
-          embassy: { name: 'UAE Embassy Abuja', submittedDate: null, collectedDate: null },
-          status: 'in_transit',
-          priority: 'high',
-          lastUpdated: '2024-01-16 10:30',
-        },
-        {
-          id: 'PP-002',
-          applicationId: 'VISA-2024-002',
-          applicant: { name: 'Sarah Johnson', phone: '+971 55 987 6543', email: 'sarah@example.com' },
-          currentLocation: 'at_embassy',
-          locationHistory: [
-            { status: 'application_received', location: 'Client', date: '2024-01-10 11:15', note: 'Application received' },
-            { status: 'documents_collected', location: 'Office', date: '2024-01-10 16:00', note: 'Documents verified' },
-            { status: 'courier_to_embassy', location: 'Abuja Office', date: '2024-01-12 08:00', note: 'With courier to embassy' },
-            { status: 'at_embassy', location: 'UK Embassy Abuja', date: '2024-01-12 14:00', note: 'Submitted to embassy' },
-          ],
-          courier: { name: 'FedEx', tracking: 'FX987654321', eta: null },
-          embassy: { name: 'UK Embassy Abuja', submittedDate: '2024-01-12', collectedDate: null },
-          status: 'at_embassy',
-          priority: 'medium',
-          lastUpdated: '2024-01-12 14:00',
-        },
-        {
-          id: 'PP-003',
-          applicationId: 'VISA-2024-003',
-          applicant: { name: 'Mohammed Ali', phone: '+971 52 456 7890', email: 'mohammed@example.com' },
-          currentLocation: 'with_client',
-          locationHistory: [
-            { status: 'application_received', location: 'Client', date: '2024-01-18 08:45', note: 'Application started' },
-          ],
-          courier: null,
-          embassy: null,
-          status: 'pending',
-          priority: 'low',
-          lastUpdated: '2024-01-18 08:45',
-        },
-        {
-          id: 'PP-004',
-          applicationId: 'VISA-2023-156',
-          applicant: { name: 'Fatima Hassan', phone: '+971 58 321 0987', email: 'fatima@example.com' },
-          currentLocation: 'returned_to_client',
-          locationHistory: [
-            { status: 'application_received', location: 'Client', date: '2024-01-10 09:00', note: 'Application received' },
-            { status: 'at_embassy', location: 'Embassy', date: '2024-01-12 10:00', note: 'Submitted' },
-            { status: 'visa_collected', location: 'Embassy', date: '2024-01-15 14:00', note: 'Visa collected' },
-            { status: 'with_courier', location: 'Courier', date: '2024-01-15 16:00', note: 'Return courier' },
-            { status: 'returned_to_client', location: 'Client', date: '2024-01-16 11:00', note: 'Delivered to client' },
-          ],
-          courier: { name: 'DHL Express', tracking: 'DHL111222333', eta: null },
-          embassy: { name: 'USA Embassy Abuja', submittedDate: '2024-01-12', collectedDate: '2024-01-15' },
-          status: 'completed',
-          priority: 'low',
-          lastUpdated: '2024-01-16 11:00',
-        },
-      ]);
+      setError('Failed to load passport data. Please check your connection and try again.');
+      setPassports([]);
     } finally {
       setIsLoading(false);
     }

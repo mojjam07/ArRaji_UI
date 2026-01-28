@@ -112,46 +112,12 @@ export default function Reports() {
       }
     } catch (err) {
       console.error('Failed to fetch report data:', err);
-      setError('Failed to load report data. Using demo data.');
-      
-      // Fallback to demo data
-      setMetrics({
-        totalApplications: { value: '1,234', change: '+12%', trend: 'up' },
-        approvalRate: { value: '85%', change: '+3%', trend: 'up' },
-        avgProcessingTime: { value: '2.3 days', change: '-8%', trend: 'down' },
-        userSatisfaction: { value: '4.5/5', change: '+0.2', trend: 'up' },
-      });
-
-      setApplicationsByMonth([
-        { month: 'Aug', applications: 89, approved: 76 },
-        { month: 'Sep', applications: 102, approved: 88 },
-        { month: 'Oct', applications: 118, approved: 102 },
-        { month: 'Nov', applications: 134, approved: 115 },
-        { month: 'Dec', applications: 145, approved: 128 },
-        { month: 'Jan', applications: 156, approved: 142 },
-      ]);
-
-      setRejectionReasons([
-        { reason: 'Incomplete Documentation', count: 45, percentage: 35 },
-        { reason: 'Invalid Information', count: 32, percentage: 25 },
-        { reason: 'Expired Documents', count: 28, percentage: 22 },
-        { reason: 'Payment Not Received', count: 18, percentage: 14 },
-        { reason: 'Other', count: 5, percentage: 4 },
-      ]);
-
-      setTopPerformers([
-        { name: 'Officer A', reviewed: 156, avgTime: '1.8 days', rating: 4.8 },
-        { name: 'Officer B', reviewed: 142, avgTime: '2.1 days', rating: 4.6 },
-        { name: 'Officer C', reviewed: 128, avgTime: '2.3 days', rating: 4.5 },
-        { name: 'Officer D', reviewed: 115, avgTime: '2.5 days', rating: 4.4 },
-      ]);
-
-      setRecentReports([
-        { name: 'Monthly Summary - January 2024', type: 'Summary', date: '2024-01-18', size: '2.4 MB', id: 1 },
-        { name: 'Application Analysis Q4 2023', type: 'Analysis', date: '2024-01-10', size: '5.1 MB', id: 2 },
-        { name: 'User Activity Report', type: 'Activity', date: '2024-01-05', size: '1.8 MB', id: 3 },
-        { name: 'Processing Time Statistics', type: 'Statistics', date: '2024-01-01', size: '1.2 MB', id: 4 },
-      ]);
+      setError('Failed to load report data. Please check your connection and try again.');
+      setMetrics({});
+      setApplicationsByMonth([]);
+      setRejectionReasons([]);
+      setTopPerformers([]);
+      setRecentReports([]);
     } finally {
       setIsLoading(false);
     }

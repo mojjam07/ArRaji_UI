@@ -59,61 +59,8 @@ export default function DocumentManagement() {
       }
     } catch (err) {
       console.error('Failed to fetch documents:', err);
-      setError('Failed to load documents. Using demo data.');
-      
-      // Fallback to demo data
-      setDocuments([
-        {
-          id: 'doc-001',
-          fileName: 'Passport_Data_Page.pdf',
-          documentType: 'passport_copy',
-          status: 'approved',
-          user: { firstName: 'Ahmed', lastName: 'Al-Rashid', email: 'ahmed@example.com' },
-          application: { id: 'app-001', visaType: 'Tourist Visa - UAE' },
-          createdAt: '2024-01-18T10:30:00Z',
-          fileSize: 1024000
-        },
-        {
-          id: 'doc-002',
-          fileName: 'Invitation_Letter.pdf',
-          documentType: 'invitation_letter',
-          status: 'pending',
-          user: { firstName: 'Sarah', lastName: 'Johnson', email: 'sarah@example.com' },
-          application: { id: 'app-002', visaType: 'Business Visa - UK' },
-          createdAt: '2024-01-17T14:20:00Z',
-          fileSize: 2048000
-        },
-        {
-          id: 'doc-003',
-          fileName: 'Passport_Photo.jpg',
-          documentType: 'passport_photo',
-          status: 'approved',
-          user: { firstName: 'Mohammed', lastName: 'Ali', email: 'mohammed@example.com' },
-          application: { id: 'app-003', visaType: 'Tourist Visa - USA' },
-          createdAt: '2024-01-16T09:15:00Z',
-          fileSize: 512000
-        },
-        {
-          id: 'doc-004',
-          fileName: 'Bank_Statement.pdf',
-          documentType: 'bank_statement',
-          status: 'rejected',
-          user: { firstName: 'Fatima', lastName: 'Hassan', email: 'fatima@example.com' },
-          application: { id: 'app-004', visaType: 'Work Visa - Canada' },
-          createdAt: '2024-01-15T16:45:00Z',
-          fileSize: 3072000
-        },
-        {
-          id: 'doc-005',
-          fileName: 'Travel_Insurance.pdf',
-          documentType: 'travel_insurance',
-          status: 'pending',
-          user: { firstName: 'John', lastName: 'Smith', email: 'john@example.com' },
-          application: { id: 'app-005', visaType: 'Student Visa - Australia' },
-          createdAt: '2024-01-14T11:00:00Z',
-          fileSize: 1536000
-        }
-      ]);
+      setError('Failed to load documents. Please check your connection and try again.');
+      setDocuments([]);
     } finally {
       setIsLoading(false);
     }
@@ -364,24 +311,6 @@ export default function DocumentManagement() {
                             >
                               View
                             </Button>
-                            {doc.status === 'pending' && (
-                              <>
-                                <Button
-                                  variant="success"
-                                  size="sm"
-                                  onClick={() => handleStatusUpdate(doc.id, 'approved')}
-                                >
-                                  Approve
-                                </Button>
-                                <Button
-                                  variant="error"
-                                  size="sm"
-                                  onClick={() => handleStatusUpdate(doc.id, 'rejected')}
-                                >
-                                  Reject
-                                </Button>
-                              </>
-                            )}
                           </div>
                         </td>
                       </tr>
@@ -433,73 +362,118 @@ export default function DocumentManagement() {
         </div>
       )}
 
-      {/* Document Details Modal */}
+      {/* Document Preview Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Document Details"
-        size="lg"
+        title="Document Preview"
+        size="xl"
       >
         {selectedDocument && (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-neutral-500">File Name</label>
-                <p className="text-neutral-900">{selectedDocument.fileName}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-neutral-500">Document Type</label>
-                <p className="text-neutral-900">{getDocumentTypeLabel(selectedDocument.documentType)}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-neutral-500">Status</label>
-                <div className="mt-1">{getStatusBadge(selectedDocument.status)}</div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-neutral-500">File Size</label>
-                <p className="text-neutral-900">{formatFileSize(selectedDocument.fileSize)}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-neutral-500">Uploaded By</label>
-                <p className="text-neutral-900">{selectedDocument.user?.firstName} {selectedDocument.user?.lastName}</p>
-                <p className="text-sm text-neutral-500">{selectedDocument.user?.email}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-neutral-500">Application</label>
-                <p className="text-neutral-900">{selectedDocument.application?.visaType}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-neutral-500">Upload Date</label>
-                <p className="text-neutral-900">{formatDate(selectedDocument.createdAt)}</p>
-              </div>
-              {selectedDocument.description && (
-                <div className="col-span-2">
-                  <label className="text-sm font-medium text-neutral-500">Description</label>
-                  <p className="text-neutral-900">{selectedDocument.description}</p>
+            {/* Document Preview */}
+            <div className="bg-neutral-100 rounded-lg p-4 flex items-center justify-center min-h-[400px] max-h-[600px] overflow-auto">
+              {selectedDocument.mimeType?.startsWith('image/') ? (
+                <img
+                  src={`/uploads/${selectedDocument.filePath}`}
+                  alt={selectedDocument.fileName}
+                  className="max-w-full max-h-[550px] object-contain rounded-lg shadow-sm"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="%23666"%3E%3Cpath stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /%3E%3C/svg%3E';
+                  }}
+                />
+              ) : selectedDocument.mimeType === 'application/pdf' ? (
+                <div className="text-center">
+                  <svg className="h-24 w-24 text-neutral-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  <p className="text-neutral-600 mb-4">PDF Document</p>
+                  <a
+                    href={`/uploads/${selectedDocument.filePath}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  >
+                    <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Open PDF in New Tab
+                  </a>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <svg className="h-24 w-24 text-neutral-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p className="text-neutral-600 mb-4">{selectedDocument.mimeType || 'Document'}</p>
+                  <a
+                    href={`/uploads/${selectedDocument.filePath}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  >
+                    <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Download Document
+                  </a>
                 </div>
               )}
             </div>
-            
-            <div className="flex justify-end gap-2 pt-4 border-t">
-              <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
-                Close
-              </Button>
-              {selectedDocument.status === 'pending' && (
-                <>
-                  <Button variant="success" onClick={() => {
-                    handleStatusUpdate(selectedDocument.id, 'approved');
-                    setIsModalOpen(false);
-                  }}>
-                    Approve
-                  </Button>
-                  <Button variant="error" onClick={() => {
-                    handleStatusUpdate(selectedDocument.id, 'rejected');
-                    setIsModalOpen(false);
-                  }}>
-                    Reject
-                  </Button>
-                </>
-              )}
+
+            {/* Document Info Bar */}
+            <div className="flex items-center justify-between bg-neutral-50 px-4 py-3 rounded-lg">
+              <div className="flex items-center gap-4">
+                <div>
+                  <p className="text-sm font-medium text-neutral-900">{selectedDocument.fileName}</p>
+                  <p className="text-xs text-neutral-500">
+                    {getDocumentTypeLabel(selectedDocument.documentType)} • {formatFileSize(selectedDocument.fileSize)}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {getStatusBadge(selectedDocument.status)}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-between items-center pt-4 border-t">
+              <div className="text-sm text-neutral-500">
+                Uploaded by {selectedDocument.user?.firstName} {selectedDocument.user?.lastName} on {formatDate(selectedDocument.createdAt)}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
+                  Close
+                </Button>
+                <a
+                  href={`/uploads/${selectedDocument.filePath}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors"
+                >
+                  <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download
+                </a>
+                {selectedDocument.status === 'pending' && (
+                  <>
+                    <Button variant="success" onClick={() => {
+                      handleStatusUpdate(selectedDocument.id, 'approved');
+                      setIsModalOpen(false);
+                    }}>
+                      Approve
+                    </Button>
+                    <Button variant="error" onClick={() => {
+                      handleStatusUpdate(selectedDocument.id, 'rejected');
+                      setIsModalOpen(false);
+                    }}>
+                      Reject
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}

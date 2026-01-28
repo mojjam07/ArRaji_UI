@@ -32,17 +32,9 @@ export default function UserManagement() {
       }
     } catch (err) {
       console.error('Failed to fetch users:', err);
-      setError('Failed to load users. Using demo data.');
-      // Fallback demo data
-      setUsers([
-        { id: 1, name: 'Ahmed Al-Rashid', email: 'ahmed@example.com', role: 'user', status: 'active', applications: 3, lastActive: '2024-01-18', joinedDate: '2023-06-15' },
-        { id: 2, name: 'Sarah Johnson', email: 'sarah@example.com', role: 'user', status: 'active', applications: 5, lastActive: '2024-01-17', joinedDate: '2023-03-22' },
-        { id: 3, name: 'Mohammed Ali', email: 'mohammed@example.com', role: 'officer', status: 'active', applications: 0, lastActive: '2024-01-18', joinedDate: '2023-01-10' },
-        { id: 4, name: 'Fatima Hassan', email: 'fatima@example.com', role: 'user', status: 'inactive', applications: 2, lastActive: '2024-01-10', joinedDate: '2023-08-05' },
-        { id: 5, name: 'John Smith', email: 'john@example.com', role: 'admin', status: 'active', applications: 0, lastActive: '2024-01-18', joinedDate: '2022-12-01' },
-        { id: 6, name: 'Emily Davis', email: 'emily@example.com', role: 'user', status: 'pending', applications: 1, lastActive: '2024-01-16', joinedDate: '2024-01-02' },
-      ]);
-      setTotalPages(1); // Demo mode: single page
+      setError('Failed to load users. Please check your connection and try again.');
+      setUsers([]);
+      setTotalPages(0);
     } finally {
       setIsLoading(false);
     }

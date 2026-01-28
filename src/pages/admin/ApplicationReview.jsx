@@ -80,89 +80,14 @@ export default function ApplicationReview() {
       }
     } catch (err) {
       console.error('Failed to fetch applications:', err);
-      setError('Failed to load applications. Using demo data.');
-      // Fallback to demo data
+      setError('Failed to load applications. Please check your connection and try again.');
       setApplications({
-        pending: [
-          {
-            id: '550e8400-e29b-41d4-a716-446655440001',
-            displayId: 'VISA-2024-001',
-            applicant: { name: 'Ahmed Al-Rashid', email: 'ahmed@example.com', phone: '+971 50 123 4567' },
-            visaType: 'Tourist Visa - UAE',
-            submittedDate: '2024-01-18',
-            priority: 'high',
-            currentStage: 'documents_review',
-            stages: ['Application Received', 'Documents Review', 'Cost Provided', 'Payment', 'Biometrics', 'Embassy', 'Collection'],
-            documents: ['Passport Data Page.pdf', 'Invitation Letter.pdf', 'Passport Photo.jpg', 'Residence Permit.pdf'],
-          },
-          {
-            id: '550e8400-e29b-41d4-a716-446655440002',
-            displayId: 'VISA-2024-002',
-            applicant: { name: 'Sarah Johnson', email: 'sarah@example.com', phone: '+971 55 987 6543' },
-            visaType: 'Business Visa - UK',
-            submittedDate: '2024-01-17',
-            priority: 'medium',
-            currentStage: 'cost_provided',
-            stages: ['Application Received', 'Documents Review', 'Cost Provided', 'Payment', 'Biometrics', 'Embassy', 'Collection'],
-            documents: ['Passport Data Page.pdf', 'Invitation Letter.pdf', 'Passport Photo.jpg'],
-          },
-          {
-            id: '550e8400-e29b-41d4-a716-446655440003',
-            displayId: 'VISA-2024-003',
-            applicant: { name: 'Mohammed Ali', email: 'mohammed@example.com', phone: '+971 52 456 7890' },
-            visaType: 'Tourist Visa - USA',
-            submittedDate: '2024-01-16',
-            priority: 'low',
-            currentStage: 'application_received',
-            stages: ['Application Received', 'Documents Review', 'Cost Provided', 'Payment', 'Biometrics', 'Embassy', 'Collection'],
-            documents: ['Passport Data Page.pdf'],
-          },
-        ],
-        processing: [
-          {
-            id: '550e8400-e29b-41d4-a716-446655440004',
-            displayId: 'VISA-2023-156',
-            applicant: { name: 'Fatima Hassan', email: 'fatima@example.com', phone: '+971 58 321 0987' },
-            visaType: 'Work Visa - Canada',
-            submittedDate: '2024-01-15',
-            priority: 'high',
-            currentStage: 'biometrics',
-            stages: ['Application Received', 'Documents Review', 'Cost Provided', 'Payment', 'Biometrics', 'Embassy', 'Collection'],
-            documents: ['All Documents.pdf'],
-            biometricsDate: '2024-01-20',
-            embassyDate: '2024-01-25',
-          },
-          {
-            id: '550e8400-e29b-41d4-a716-446655440005',
-            displayId: 'VISA-2023-155',
-            applicant: { name: 'John Smith', email: 'john@example.com', phone: '+971 54 789 0123' },
-            visaType: 'Student Visa - Australia',
-            submittedDate: '2024-01-14',
-            priority: 'medium',
-            currentStage: 'embassy',
-            stages: ['Application Received', 'Documents Review', 'Cost Provided', 'Payment', 'Biometrics', 'Embassy', 'Collection'],
-            documents: ['All Documents.pdf'],
-            embassyDate: '2024-01-18',
-          },
-        ],
-        completed: [
-          {
-            id: '550e8400-e29b-41d4-a716-446655440006',
-            displayId: 'VISA-2023-150',
-            applicant: { name: 'Emily Davis', email: 'emily@example.com', phone: '+971 56 111 2222' },
-            visaType: 'Tourist Visa - UAE',
-            submittedDate: '2024-01-10',
-            priority: 'low',
-            currentStage: 'completed',
-            stages: ['Application Received', 'Documents Review', 'Cost Provided', 'Payment', 'Biometrics', 'Embassy', 'Collection'],
-            documents: ['All Documents.pdf'],
-            completedDate: '2024-01-16',
-          },
-        ],
+        pending: [],
+        processing: [],
+        completed: []
       });
-    } finally {
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   const mapStatusToStage = (status) => {
