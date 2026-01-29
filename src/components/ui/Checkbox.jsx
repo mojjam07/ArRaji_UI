@@ -3,6 +3,7 @@ import React, { forwardRef } from 'react';
 const Checkbox = forwardRef(({
   label,
   error,
+  required,
   className = '',
   ...props
 }, ref) => {
@@ -43,6 +44,7 @@ const Checkbox = forwardRef(({
             `}
           >
             {label}
+            {required && <span className="text-accent-600 ml-1">*</span>}
           </label>
           {props.helperText && (
             <p className="text-neutral-500 mt-0.5">{props.helperText}</p>

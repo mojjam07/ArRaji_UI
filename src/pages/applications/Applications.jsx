@@ -79,9 +79,7 @@ export default function Applications() {
   const fetchMyApplications = async () => {
     setError(null);
     try {
-      console.log('📋 Fetching applications...');
       const response = await applicationAPI.getMyApplications();
-      console.log('📋 Applications response:', response);
       
       if (response.success && response.data) {
         // Handle both array and object with applications property
@@ -89,13 +87,12 @@ export default function Applications() {
           ? response.data 
           : response.data.applications || [];
         setMyApplications(applications);
-        console.log(`✅ Loaded ${applications.length} applications`);
       } else {
         throw new Error(response.message || 'Invalid response format');
       }
     } catch (err) {
-      console.error('❌ Failed to fetch applications:', err);
-      console.error('❌ Error details:', {
+      console.error('Failed to fetch applications:', err);
+      console.error('Error details:', {
         message: err.message,
         status: err.status,
         response: err.response?.data
@@ -516,6 +513,7 @@ export default function Applications() {
         checked={formData.costAgreed}
         onChange={(e) => handleInputChange('costAgreed', e.target.checked)}
         label="I understand the visa application process and agree to proceed. I understand I will receive the cost breakdown after submission and must complete payment before biometrics scheduling."
+        required
       />
     </div>
   );

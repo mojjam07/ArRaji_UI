@@ -18,7 +18,11 @@ export default function DocumentManagement() {
     total: 0,
     limit: 10
   });
-  
+
+  // Loading states for status updates
+  const [updatingDocId, setUpdatingDocId] = useState(null);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+
   // Filters
   const [filters, setFilters] = useState({
     status: '',
@@ -68,15 +72,32 @@ export default function DocumentManagement() {
 
   const handleStatusUpdate = async (docId, newStatus) => {
     setError(null);
+    setUpdatingDocId(docId);
+    setUpdatingStatus(newStatus);
+
     try {
-      const response = await adminAPI.updateApplicationStatus(docId, { status: newStatus });
-      if (response.success) {
+      const response = await adminAPI.updateDocumentStatus(docId, { status: newStatus });
+
+      if (response && response.success) {
         setSuccess(`Document status updated to ${newStatus}`);
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccess(null), 3000);
+        // Refresh documents list
         fetchDocuments();
+      } else {
+        setError(response?.message || 'Failed to update document status. Please try again.');
       }
     } catch (err) {
-      console.error('Failed to update document status:', err);
-      setError('Failed to update document status');
+      console.error('Error updating document status:', err);
+      console.error('Error details:', {
+        message: err.message,
+        status: err.status,
+        data: err.data
+      });
+      setError(err.message || 'Failed to update document status. Please check your connection and try again.');
+    } finally {
+      setUpdatingDocId(null);
+      setUpdatingStatus(null);
     }
   };
 
@@ -443,7 +464,7 @@ export default function DocumentManagement() {
                 Uploaded by {selectedDocument.user?.firstName} {selectedDocument.user?.lastName} on {formatDate(selectedDocument.createdAt)}
               </div>
               <div className="flex gap-2">
-                <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
+                <Button variant="secondary" onClick={() => setIsModalOpen(false)} disabled={updatingDocId === selectedDocument.id}>
                   Close
                 </Button>
                 <a
@@ -459,17 +480,45 @@ export default function DocumentManagement() {
                 </a>
                 {selectedDocument.status === 'pending' && (
                   <>
-                    <Button variant="success" onClick={() => {
-                      handleStatusUpdate(selectedDocument.id, 'approved');
-                      setIsModalOpen(false);
-                    }}>
-                      Approve
+                    <Button
+                      variant="success"
+                      onClick={() => {
+                        handleStatusUpdate(selectedDocument.id, 'approved');
+                        setIsModalOpen(false);
+                      }}
+                      disabled={updatingDocId === selectedDocument.id}
+                    >
+                      {updatingDocId === selectedDocument.id && updatingStatus === 'approved' ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Approving...
+                        </>
+                      ) : (
+                        'Approve'
+                      )}
                     </Button>
-                    <Button variant="error" onClick={() => {
-                      handleStatusUpdate(selectedDocument.id, 'rejected');
-                      setIsModalOpen(false);
-                    }}>
-                      Reject
+                    <Button
+                      variant="error"
+                      onClick={() => {
+                        handleStatusUpdate(selectedDocument.id, 'rejected');
+                        setIsModalOpen(false);
+                      }}
+                      disabled={updatingDocId === selectedDocument.id}
+                    >
+                      {updatingDocId === selectedDocument.id && updatingStatus === 'rejected' ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Rejecting...
+                        </>
+                      ) : (
+                        'Reject'
+                      )}
                     </Button>
                   </>
                 )}

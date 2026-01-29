@@ -326,6 +326,17 @@ export const getAllDocuments = async (params = {}) => {
   return response.data;
 };
 
+/**
+ * Update document status (approve/reject)
+ * @param {string} id - Document ID
+ * @param {Object} statusData - Status data (status, rejectionReason)
+ * @returns {Promise} - Response with updated document
+ */
+export const updateDocumentStatus = async (id, statusData) => {
+  const response = await api.put(`${ADMIN_ENDPOINT}/documents/${id}/status`, statusData);
+  return response.data;
+};
+
 export default {
   getDashboardStats,
   getUsers,
@@ -358,4 +369,5 @@ export default {
   updateSystemSettings,
   sendCostEstimation,
   getAllDocuments,
+  updateDocumentStatus,
 };

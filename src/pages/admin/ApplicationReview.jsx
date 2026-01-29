@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, Input, Select, Alert, ProgressBar } from '../../components';
+import { Card, Button, Badge, Input, Select, Alert, ProgressBar, Modal } from '../../components';
 import { adminAPI } from '../../api';
 
 /**
@@ -19,6 +19,14 @@ export default function ApplicationReview() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [isCostModalOpen, setIsCostModalOpen] = useState(false);
+  const [costData, setCostData] = useState({
+    processingFee: 120.00,
+    biometricsFee: 50.00,
+    serviceFee: 30.00,
+    courierFee: 25.00,
+    total: 225.00
+  });
   const [applications, setApplications] = useState({
     pending: [],
     processing: [],
@@ -110,11 +118,11 @@ export default function ApplicationReview() {
   const handleApprove = async (id) => {
     setError(null);
     try {
-      const response = await adminAPI.updateApplicationStatus(id, { 
+      const response = await adminAPI.updateApplicationStatus(id, {
         status: 'approved',
-        notes: reviewNote 
+        notes: reviewNote
       });
-      
+
       if (response.success) {
         setSuccess(`Application ${id.substring(0, 8)} approved successfully!`);
         fetchApplications(activeTab);
@@ -125,7 +133,17 @@ export default function ApplicationReview() {
       }
     } catch (err) {
       console.error('Failed to approve application:', err);
-      setError('Failed to approve application. Please try again.');
+      // Check if application not found error
+      if (err.response?.data?.message?.includes('not found') || err.message?.includes('not found')) {
+        setError('Application not found. It may have been deleted. Refreshing applications list...');
+        // Refresh the applications list and clear selected application
+        setTimeout(() => {
+          fetchApplications(activeTab);
+          setSelectedApplication(null);
+        }, 2000);
+      } else {
+        setError('Failed to approve application. Please try again.');
+      }
     }
   };
 
@@ -134,14 +152,14 @@ export default function ApplicationReview() {
       setError('Please provide a rejection reason');
       return;
     }
-    
+
     setError(null);
     try {
-      const response = await adminAPI.updateApplicationStatus(id, { 
+      const response = await adminAPI.updateApplicationStatus(id, {
         status: 'rejected',
-        notes: reviewNote 
+        notes: reviewNote
       });
-      
+
       if (response.success) {
         setSuccess(`Application ${id.substring(0, 8)} rejected.`);
         fetchApplications(activeTab);
@@ -152,7 +170,17 @@ export default function ApplicationReview() {
       }
     } catch (err) {
       console.error('Failed to reject application:', err);
-      setError('Failed to reject application. Please try again.');
+      // Check if application not found error
+      if (err.response?.data?.message?.includes('not found') || err.message?.includes('not found')) {
+        setError('Application not found. It may have been deleted. Refreshing applications list...');
+        // Refresh the applications list and clear selected application
+        setTimeout(() => {
+          fetchApplications(activeTab);
+          setSelectedApplication(null);
+        }, 2000);
+      } else {
+        setError('Failed to reject application. Please try again.');
+      }
     }
   };
 
@@ -167,12 +195,12 @@ export default function ApplicationReview() {
         'decision': 'approved',  // Approve to move to decision
         'collection': 'issued'
       };
-      
-      const response = await adminAPI.updateApplicationStatus(id, { 
+
+      const response = await adminAPI.updateApplicationStatus(id, {
         status: stageStatusMap[newStage] || newStage,
         notes: reviewNote || `Stage updated to ${newStage}`
       });
-      
+
       if (response.success) {
         setSuccess(`Application ${id.substring(0, 8)} stage updated!`);
         fetchApplications(activeTab);
@@ -181,31 +209,59 @@ export default function ApplicationReview() {
       }
     } catch (err) {
       console.error('Failed to update stage:', err);
-      setError('Failed to update stage. Please try again.');
+      // Check if application not found error
+      if (err.response?.data?.message?.includes('not found') || err.message?.includes('not found')) {
+        setError('Application not found. It may have been deleted. Refreshing applications list...');
+        // Refresh the applications list and clear selected application
+        setTimeout(() => {
+          fetchApplications(activeTab);
+          setSelectedApplication(null);
+        }, 2000);
+      } else {
+        setError('Failed to update stage. Please try again.');
+      }
     }
   };
 
-  const handleSendCostEstimation = async (id) => {
+  const handleSendCostEstimation = () => {
+    setIsCostModalOpen(true);
+  };
+
+  const handleSubmitCostEstimation = async () => {
+    if (!selectedApplication) return;
+
     setError(null);
     try {
-      const response = await adminAPI.sendCostEstimation(id, {
-        processingFee: 120.00,
-        biometricsFee: 50.00,
-        serviceFee: 30.00,
-        courierFee: 25.00,
-        total: 225.00
-      });
-      
+      const response = await adminAPI.sendCostEstimation(selectedApplication.id, costData);
+
       if (response.success) {
         setSuccess(`Cost estimation sent to applicant!`);
+        setIsCostModalOpen(false);
         fetchApplications(activeTab);
       } else {
         throw new Error(response.message || 'Failed to send cost estimation');
       }
     } catch (err) {
       console.error('Failed to send cost estimation:', err);
-      setError('Failed to send cost estimation. Please try again.');
+      // Check if application not found error
+      if (err.response?.data?.message?.includes('not found') || err.message?.includes('not found')) {
+        setError('Application not found. It may have been deleted. Refreshing applications list...');
+        // Refresh the applications list and clear selected application
+        setTimeout(() => {
+          fetchApplications(activeTab);
+          setSelectedApplication(null);
+        }, 2000);
+      } else {
+        setError('Failed to send cost estimation. Please try again.');
+      }
     }
+  };
+
+  const handleCostDataChange = (field, value) => {
+    const updatedCostData = { ...costData, [field]: parseFloat(value) || 0 };
+    // Auto-calculate total
+    updatedCostData.total = updatedCostData.processingFee + updatedCostData.biometricsFee + updatedCostData.serviceFee + updatedCostData.courierFee;
+    setCostData(updatedCostData);
   };
 
   const getPriorityBadge = (priority) => {
@@ -583,6 +639,71 @@ export default function ApplicationReview() {
           </div>
         </>
       )}
+
+      {/* Cost Estimation Modal */}
+      <Modal
+        isOpen={isCostModalOpen}
+        onClose={() => setIsCostModalOpen(false)}
+        title="Send Cost Estimation"
+        size="md"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-neutral-600">
+            Enter the cost breakdown for the visa processing fees. The total will be calculated automatically.
+          </p>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Processing Fee ($)"
+              type="number"
+              step="0.01"
+              value={costData.processingFee}
+              onChange={(e) => handleCostDataChange('processingFee', e.target.value)}
+              required
+            />
+            <Input
+              label="Biometrics Fee ($)"
+              type="number"
+              step="0.01"
+              value={costData.biometricsFee}
+              onChange={(e) => handleCostDataChange('biometricsFee', e.target.value)}
+              required
+            />
+            <Input
+              label="Service Fee ($)"
+              type="number"
+              step="0.01"
+              value={costData.serviceFee}
+              onChange={(e) => handleCostDataChange('serviceFee', e.target.value)}
+              required
+            />
+            <Input
+              label="Courier Fee ($)"
+              type="number"
+              step="0.01"
+              value={costData.courierFee}
+              onChange={(e) => handleCostDataChange('courierFee', e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="bg-neutral-50 p-4 rounded-lg">
+            <div className="flex justify-between items-center">
+              <span className="text-lg font-semibold text-neutral-900">Total Amount:</span>
+              <span className="text-xl font-bold text-primary-900">${costData.total.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+
+        <Modal.Actions>
+          <Button variant="secondary" onClick={() => setIsCostModalOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleSubmitCostEstimation}>
+            Send Cost Estimation
+          </Button>
+        </Modal.Actions>
+      </Modal>
     </div>
   );
 }

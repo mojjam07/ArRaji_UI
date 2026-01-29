@@ -54,15 +54,10 @@ export default function Login() {
     setShowAlert({ type: '', message: '' });
 
     try {
-      console.log('🔐 Frontend: Attempting login...');
-      console.log('📧 Frontend: Email:', formData.email);
-      
       const result = await login({
         email: formData.email,
         password: formData.password,
       });
-
-      console.log('📊 Frontend: Login result:', result);
 
       if (result.success) {
         setShowAlert({ 
@@ -79,14 +74,13 @@ export default function Login() {
           }
         }, 1000);
       } else {
-        console.error('❌ Frontend: Login failed:', result.error);
         setShowAlert({ 
           type: 'error', 
           message: result.error || 'Login failed. Please check your credentials and try again.' 
         });
       }
     } catch (error) {
-      console.error('❌ Frontend: Unexpected login error:', error);
+      console.error('Login: Unexpected error:', error);
       
       // Handle different error types
       let errorMessage = 'An unexpected error occurred. Please try again.';

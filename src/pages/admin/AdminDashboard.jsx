@@ -39,27 +39,19 @@ export default function AdminDashboard() {
     const maxRetries = 3;
     const currentAttempt = retry ? retryCount + 1 : 1;
 
-    console.log(`📊 Admin Dashboard: Fetching data (attempt ${currentAttempt}/${maxRetries})...`);
-
     // Test API connection first
     try {
-      console.log('📊 Admin Dashboard: Testing API connection...');
       const testResponse = await fetch('http://localhost:5000/api/test');
       if (testResponse.ok) {
         setConnectionStatus('connected');
-        console.log('📊 Admin Dashboard: ✅ API connection successful');
       }
-    } catch (connError) {
-      console.warn('📊 Admin Dashboard: ⚠️ API connection test failed:', connError.message);
+    } catch {
       setConnectionStatus('disconnected');
     }
 
     try {
       // Fetch dashboard statistics
-      console.log('📊 Admin Dashboard: Calling adminAPI.getDashboardStats()...');
       const statsResponse = await adminAPI.getDashboardStats();
-      
-      console.log('📊 Admin Dashboard: Stats API response:', statsResponse);
       
       if (statsResponse.success && statsResponse.data) {
         const data = statsResponse.data;
@@ -88,10 +80,7 @@ export default function AdminDashboard() {
       }
 
       // Fetch pending applications for review queue
-      console.log('📊 Admin Dashboard: Fetching pending applications...');
       const applicationsResponse = await adminAPI.getApplications({ status: 'submitted', limit: 10 });
-      
-      console.log('📊 Admin Dashboard: Applications API response:', applicationsResponse);
       
       if (applicationsResponse.success && applicationsResponse.data) {
         const apps = applicationsResponse.data.applications || [];
@@ -106,10 +95,9 @@ export default function AdminDashboard() {
       }
       
       setError(null);
-      console.log('📊 Admin Dashboard: ✅ Dashboard data loaded successfully');
     } catch (err) {
-      console.error('📊 Admin Dashboard: ❌ Failed to fetch dashboard data:', err);
-      console.error('📊 Admin Dashboard: Error details:', {
+      console.error('Admin Dashboard: Failed to fetch dashboard data:', err);
+      console.error('Admin Dashboard: Error details:', {
         message: err.message,
         status: err.status,
         response: err.response?.data
@@ -119,7 +107,6 @@ export default function AdminDashboard() {
       const isRetryable = err.status === 0 || err.status >= 500 || err.message.includes('Network');
       
       if (isRetryable && currentAttempt < maxRetries) {
-        console.log(`📊 Admin Dashboard: Will retry in 2 seconds... (${currentAttempt}/${maxRetries})`);
         setTimeout(() => {
           fetchDashboardData(true);
         }, 2000);
@@ -150,7 +137,6 @@ export default function AdminDashboard() {
   };
 
   const handleRetry = () => {
-    console.log('📊 Admin Dashboard: Manual retry requested');
     setRetryCount(0);
     fetchDashboardData();
   };

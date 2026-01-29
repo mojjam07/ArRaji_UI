@@ -34,16 +34,12 @@ export default function UserDashboard() {
     // Only fetch dashboard data if user is authenticated
     if (!authLoading) {
       if (isAuthenticated && user) {
-        console.log('📊 Dashboard: User authenticated, fetching data...');
         fetchDashboardData();
       } else {
-        console.log('📊 Dashboard: User not authenticated, skipping fetch');
         // Set empty stats for unauthenticated state
         setIsLoading(false);
         setConnectionStatus('unauthenticated');
       }
-    } else {
-      console.log('📊 Dashboard: Auth still loading, waiting...');
     }
   }, [authLoading, isAuthenticated, user]);
 
@@ -60,27 +56,19 @@ export default function UserDashboard() {
     const maxRetries = 3;
     const currentAttempt = retry ? retryCount + 1 : 1;
 
-    console.log(`📊 Dashboard: Fetching data (attempt ${currentAttempt}/${maxRetries})...`);
-
     try {
       // Check if API is reachable first with a simple test
-      console.log('📊 Dashboard: Testing API connection...');
       const testResponse = await fetch('http://localhost:5000/api/test');
       if (testResponse.ok) {
         setConnectionStatus('connected');
-        console.log('📊 Dashboard: ✅ API connection successful');
       }
-    } catch (connError) {
-      console.warn('📊 Dashboard: ⚠️ API connection test failed:', connError.message);
+    } catch {
       setConnectionStatus('disconnected');
     }
 
     try {
       // Fetch dashboard data from API
-      console.log('📊 Dashboard: Calling userAPI.getDashboard()...');
       const response = await userAPI.getDashboard();
-      
-      console.log('📊 Dashboard: API response received:', response);
       
       if (response.success && response.data) {
         const { statistics, recentApplications, notifications: notifs } = response.data;
@@ -102,14 +90,13 @@ export default function UserDashboard() {
         setApplications(recentApplications || []);
         setNotifications(notifs?.recent || []);
         
-        console.log('📊 Dashboard: ✅ Dashboard data loaded successfully');
         setError(null);
       } else {
         throw new Error(response.message || 'Invalid response from server');
       }
     } catch (err) {
-      console.error('📊 Dashboard: ❌ Failed to fetch dashboard data:', err);
-      console.error('📊 Dashboard: Error details:', {
+      console.error('User Dashboard: Failed to fetch dashboard data:', err);
+      console.error('User Dashboard: Error details:', {
         message: err.message,
         status: err.status,
         response: err.response?.data
@@ -119,7 +106,6 @@ export default function UserDashboard() {
       const isRetryable = err.status === 0 || err.status >= 500 || err.message.includes('Network');
       
       if (isRetryable && currentAttempt < maxRetries) {
-        console.log(`📊 Dashboard: Will retry in 2 seconds... (${currentAttempt}/${maxRetries})`);
         setTimeout(() => {
           fetchDashboardData(true);
         }, 2000);
@@ -152,7 +138,6 @@ export default function UserDashboard() {
   };
 
   const handleRetry = () => {
-    console.log('📊 Dashboard: Manual retry requested');
     setRetryCount(0);
     fetchDashboardData();
   };
