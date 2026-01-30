@@ -14,7 +14,6 @@ export default function Login() {
   });
   const [errors, setErrors] = useState({});
   const [rememberMe, setRememberMe] = useState(false);
-  const [enable2FA, setEnable2FA] = useState(false);
   const [showAlert, setShowAlert] = useState({ type: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -238,6 +237,7 @@ export default function Login() {
                   onChange={handleChange}
                   error={errors.password}
                   disabled={isSubmitting}
+                  showPasswordToggle
                 />
               </div>
 

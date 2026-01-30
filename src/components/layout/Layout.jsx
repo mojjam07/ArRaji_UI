@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
-  const [displayLoader, setDisplayLoader] = useState(false);
+  const [displayLoader, setDisplayLoader] = useState(true);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const location = useLocation();
@@ -14,7 +14,6 @@ const Layout = () => {
 
   // Trigger loader on route change
   useEffect(() => {
-    setDisplayLoader(true);
     const showTimer = setTimeout(() => {
       setShowLoader(true);
     }, 10);

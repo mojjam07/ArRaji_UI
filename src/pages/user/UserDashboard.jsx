@@ -41,6 +41,7 @@ export default function UserDashboard() {
         setConnectionStatus('unauthenticated');
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, isAuthenticated, user]);
 
   const fetchDashboardData = async (retry = false) => {

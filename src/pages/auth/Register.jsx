@@ -114,7 +114,7 @@ export default function Register() {
           message: result.error || 'Registration failed. Please try again.' 
         });
       }
-    } catch (error) {
+    } catch {
       setShowAlert({ 
         type: 'error', 
         message: 'An unexpected error occurred. Please try again.' 
@@ -316,6 +316,7 @@ export default function Register() {
                   onChange={handleChange}
                   error={errors.password}
                   disabled={isSubmitting}
+                  showPasswordToggle
                 />
                 
                 {/* Password Strength Bar */}
@@ -356,6 +357,7 @@ export default function Register() {
                   onChange={handleChange}
                   error={errors.confirmPassword}
                   disabled={isSubmitting}
+                  showPasswordToggle
                 />
               </div>
 

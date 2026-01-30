@@ -43,6 +43,7 @@ export default function ApplicationReview() {
   // Fetch applications on mount and when tab changes
   useEffect(() => {
     fetchApplications(activeTab);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const fetchApplications = async (tab) => {

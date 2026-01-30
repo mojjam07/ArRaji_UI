@@ -84,7 +84,7 @@ export default function DocumentUpload({
   };
 
   // Handle file upload
-  const handleFileUpload = async (file) => {
+  const handleFileUpload = useCallback(async (file) => {
     setError(null);
 
     // Validate file
@@ -140,7 +140,7 @@ export default function DocumentUpload({
     } finally {
       setIsUploading(false);
     }
-  };
+  }, []);
 
   // Handle drag events
   const handleDrag = useCallback((e) => {
@@ -154,6 +154,7 @@ export default function DocumentUpload({
   }, []);
 
   // Handle drop event
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleDrop = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();

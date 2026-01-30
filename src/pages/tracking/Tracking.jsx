@@ -107,16 +107,7 @@ export default function Tracking() {
     }
   };
 
-  const fetchApplicationDetails = async (appId) => {
-    try {
-      const response = await applicationAPI.getApplicationById(appId);
-      if (response.success && response.data) {
-        setSelectedAppDetails(response.data);
-      }
-    } catch (err) {
-      console.error('Failed to fetch application details:', err);
-    }
-  };
+
 
   const handleSelectApplication = (appId) => {
     setSelectedApplication(appId);

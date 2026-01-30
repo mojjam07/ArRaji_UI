@@ -190,6 +190,29 @@ export default function Documents() {
     documents.find(d => d.type === doc.type && d.status === 'verified')
   ).length;
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-neutral-900">Documents</h1>
+            <p className="text-neutral-500 mt-1">Upload and manage your visa application documents</p>
+          </div>
+        </div>
+        <Card>
+          <Card.Body className="text-center py-12">
+            <svg className="h-8 w-8 text-neutral-300 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <p className="text-neutral-500 mt-4">Loading documents...</p>
+          </Card.Body>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}

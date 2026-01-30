@@ -2,29 +2,13 @@
  * Authentication Context
  * Manages user authentication state across the application
  */
+/* eslint-disable react-refresh/only-export-components */
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { authAPI } from '../api';
+import { USER_ROLES } from '../constants/userRoles';
 
 const AuthContext = createContext(null);
-
-// User roles
-export const USER_ROLES = {
-  ADMIN: 'admin',
-  OFFICER: 'officer',
-  USER: 'user',
-};
-
-// Initial user state
-const initialUser = {
-  id: null,
-  email: null,
-  firstName: null,
-  lastName: null,
-  role: null,
-  phoneNumber: null,
-  isActive: true,
-};
 
 /**
  * AuthProvider component that wraps the application
@@ -38,7 +22,6 @@ export const AuthProvider = ({ children }) => {
   
   // Refs to prevent multiple rapid auth checks
   const authCheckInProgress = useRef(false);
-  const authCheckTimeout = useRef(null);
 
   // Check if user is logged in on mount
   useEffect(() => {
@@ -50,10 +33,11 @@ export const AuthProvider = ({ children }) => {
     }, 100);
     
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Check authentication status
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     // Prevent multiple concurrent auth checks
     if (authCheckInProgress.current) {
       console.log('🔐 AuthContext: Auth check already in progress, skipping...');
@@ -133,7 +117,7 @@ export const AuthProvider = ({ children }) => {
       setIsLoading(false);
       console.log('🔐 AuthContext: Auth check complete. isLoading=false, isAuthenticated=', isAuthenticated);
     }
-  };
+  }, []);
 
   // Helper to clear auth state
   const clearAuthState = () => {
@@ -219,7 +203,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('authToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
-      
+
       setUser(null);
       setIsAuthenticated(false);
       setError(null);
@@ -391,5 +375,5 @@ export const useAuth = () => {
   return context;
 };
 
-export default AuthContext;
+
 

@@ -25,6 +25,7 @@ export default function Reports() {
   // Fetch report data on mount and when dateRange changes
   useEffect(() => {
     fetchReportData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange]);
 
   const fetchReportData = async () => {

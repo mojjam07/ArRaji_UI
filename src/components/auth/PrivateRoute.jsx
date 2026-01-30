@@ -16,7 +16,7 @@ import { useAuth } from '../../context/AuthContext';
  * @param {string[]} props.roles - Allowed roles (optional)
  */
 const PrivateRoute = ({ children, roles = [] }) => {
-  const { isAuthenticated, isLoading, user, hasRole } = useAuth();
+  const { isAuthenticated, isLoading, hasRole } = useAuth();
   const location = useLocation();
 
   // Show loading state

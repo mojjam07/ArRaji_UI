@@ -37,6 +37,7 @@ export default function DocumentManagement() {
   // Fetch documents on mount and when filters change
   useEffect(() => {
     fetchDocuments();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, filters.status, filters.documentType]);
 
   const fetchDocuments = async () => {

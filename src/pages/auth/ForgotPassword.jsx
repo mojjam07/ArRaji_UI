@@ -8,8 +8,8 @@ export default function ForgotPassword() {
   const [step, setStep] = useState('email'); // 'email' | 'success'
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+
   const [isLoading, setIsLoading] = useState(false);
-  const [success, setSuccess] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,14 +25,12 @@ export default function ForgotPassword() {
     }
     
     setError('');
-    setSuccess('');
     setIsLoading(true);
     
     try {
       const response = await authAPI.forgotPassword({ email });
       
       if (response.success) {
-        setSuccess('Password reset link sent to your email!');
         setStep('success');
       } else {
         setError(response.message || 'Failed to send password reset link');
@@ -40,7 +38,6 @@ export default function ForgotPassword() {
     } catch (err) {
       console.error('Forgot password error:', err);
       // For demo purposes, still show success
-      setSuccess('Demo: Password reset link would be sent to ' + email);
       setStep('success');
     } finally {
       setIsLoading(false);
@@ -55,13 +52,13 @@ export default function ForgotPassword() {
       const response = await authAPI.forgotPassword({ email });
       
       if (response.success) {
-        setSuccess('Reset link resent successfully!');
+        // Success handled by step change
       } else {
         setError(response.message || 'Failed to resend reset link');
       }
     } catch (err) {
       console.error('Resend error:', err);
-      setSuccess('Demo: Reset link resent!');
+      // Demo: Reset link resent
     } finally {
       setIsLoading(false);
     }

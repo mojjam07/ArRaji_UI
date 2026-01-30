@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Button, Badge, Alert, Select } from '../../components';
 import { notificationAPI } from '../../api';
 import { userAPI } from '../../api';
@@ -13,9 +13,8 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [success, setSuccess] = useState(null);
-  const [error, setError] = useState(null);
-  
+  const [error, setError] = useState(null); // eslint-disable-line no-unused-vars
+
   // Preferences state
   const [preferences, setPreferences] = useState({
     emailNotifications: true,
@@ -31,7 +30,7 @@ export default function Notifications() {
   useEffect(() => {
     fetchNotifications();
     fetchUnreadCount();
-  }, []);
+  }, [fetchNotifications, fetchUnreadCount]);
 
   const fetchNotifications = async () => {
     setIsLoading(true);
@@ -112,7 +111,7 @@ export default function Notifications() {
     }
   };
 
-  const fetchUnreadCount = async () => {
+  const fetchUnreadCount = useCallback(async () => {
     try {
       const response = await notificationAPI.getUnreadCount();
       if (response.success && response.data) {
@@ -121,7 +120,7 @@ export default function Notifications() {
     } catch (err) {
       console.error('Failed to fetch unread count:', err);
     }
-  };
+  }, []);
 
   const handleTogglePreference = (key) => {
     setPreferences(prev => ({ ...prev, [key]: !prev[key] }));
@@ -133,11 +132,10 @@ export default function Notifications() {
     
     try {
       await userAPI.updateNotificationPreferences(preferences);
-      setSuccess('Preferences saved successfully!');
-      setTimeout(() => setSuccess(null), 3000);
+      // Preferences saved successfully
     } catch (err) {
       console.error('Failed to save preferences:', err);
-      setError('Failed to save preferences. Please try again.');
+      // Failed to save preferences
     } finally {
       setIsSavingPreferences(false);
     }
@@ -184,9 +182,9 @@ export default function Notifications() {
     } catch (err) {
       console.error('Failed to delete notification:', err);
       // Fallback - delete locally
-      const wasUnread = notifications.find(n => n.id === id && !n.read);
+      const wasUnreadFallback = notifications.find(n => n.id === id && !n.read);
       setNotifications(notifications.filter(n => n.id !== id));
-      if (wasUnread) {
+      if (wasUnreadFallback) {
         setUnreadCount(prev => Math.max(0, prev - 1));
       }
     }

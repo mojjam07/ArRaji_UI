@@ -8,14 +8,11 @@ import { useLocation } from 'react-router-dom';
 const PageTransition = () => {
   const location = useLocation();
   const [showLoader, setShowLoader] = useState(false);
-  const [displayLoader, setDisplayLoader] = useState(false);
+  const [displayLoader, setDisplayLoader] = useState(true);
   const timeoutRef = useRef(null);
 
   // Trigger loader on route change
   useEffect(() => {
-    // Show loader immediately
-    setDisplayLoader(true);
-    
     // Small delay to trigger animation
     const showTimer = setTimeout(() => {
       setShowLoader(true);

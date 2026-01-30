@@ -17,6 +17,7 @@ export default function UserManagement() {
   // Fetch users on mount
   useEffect(() => {
     fetchUsers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUsers = async () => {

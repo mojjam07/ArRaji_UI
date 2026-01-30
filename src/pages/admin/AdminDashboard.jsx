@@ -24,6 +24,7 @@ export default function AdminDashboard() {
   // Fetch dashboard data on mount and when timeRange changes
   useEffect(() => {
     fetchDashboardData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeRange]);
 
   const fetchDashboardData = async (retry = false) => {
