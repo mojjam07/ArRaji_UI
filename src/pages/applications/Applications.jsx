@@ -188,8 +188,6 @@ export default function Applications() {
         destinationCountry: formData.destinationCountry || '',
       };
 
-      console.log('Submitting application data:', applicationData);
-
       // Create the application (draft status)
       const createResponse = await applicationAPI.createApplication(applicationData);
 
