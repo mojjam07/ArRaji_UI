@@ -485,6 +485,7 @@ export default function Landing() {
                   <img src="https://flagcdn.com/w320/us.png" alt="USA" className="h-16 w-24 object-cover rounded shadow-md" />
                   <img src="https://flagcdn.com/w320/gb.png" alt="UK" className="h-16 w-24 object-cover rounded shadow-md" />
                   <img src="https://flagcdn.com/w320/ca.png" alt="Canada" className="h-16 w-24 object-cover rounded shadow-md" />
+                  <img src="https://flagcdn.com/w320/es.png" alt="Spain" className="h-16 w-24 object-cover rounded shadow-md" />
                 </div>
               </div>
               <Card.Body className="text-center">
@@ -505,7 +506,9 @@ export default function Landing() {
             <Card className="hover:shadow-lg transition-shadow">
               <div className="h-48 bg-gradient-to-r from-green-500 to-green-600 rounded-t-xl flex gap-4 items-center justify-center p-4">
                 <img src="https://flagcdn.com/w320/ae.png" alt="UAE" className="h-16 w-24 object-cover rounded shadow-md" />
-                <img src="https://flagcdn.com/w320/sa.png" alt="UAE" className="h-16 w-24 object-cover rounded shadow-md" />
+                <img src="https://flagcdn.com/w320/sa.png" alt="Saudi Arabia" className="h-16 w-24 object-cover rounded shadow-md" />
+                <img src="https://flagcdn.com/w320/qa.png" alt="Qatar" className="h-16 w-24 object-cover rounded shadow-md" />
+                <img src="https://flagcdn.com/w320/kw.png" alt="Kuwait" className="h-16 w-24 object-cover rounded shadow-md" />                
               </div>
               <Card.Body className="text-center">
                 <h4 className="text-lg font-semibold text-neutral-900 mb-2">UAE & Saudi Arabia</h4>
@@ -527,6 +530,8 @@ export default function Landing() {
                 <div className="flex gap-4 justify-center items-center">
                   <img src="https://flagcdn.com/w320/au.png" alt="Australia" className="h-16 w-24 object-cover rounded shadow-md" />
                   <img src="https://flagcdn.com/w320/jp.png" alt="Japan" className="h-16 w-24 object-cover rounded shadow-md" />
+                  <img src="https://flagcdn.com/w320/sg.png" alt="Singapore" className="h-16 w-24 object-cover rounded shadow-md" />
+                  <img src="https://flagcdn.com/w320/kr.png" alt="South Korea" className="h-16 w-24 object-cover rounded shadow-md" />
                 </div>
               </div>
               <Card.Body className="text-center">
