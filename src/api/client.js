@@ -10,9 +10,18 @@ let API_BASE_URL = import.meta.env.VITE_API_URL;
 
 // Validate and normalize API URL
 if (!API_BASE_URL || API_BASE_URL.trim() === '') {
-  // If VITE_API_URL is empty or not set, use relative path (works with proxy)
-  API_BASE_URL = '/api';
-  console.log('📡 API: Using default API path /api');
+  // Check if we're in production (Vercel)
+  const isProduction = import.meta.env.PROD || (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app'));
+  
+  if (isProduction) {
+    // In production, use the Render backend URL directly
+    API_BASE_URL = 'https://arraji-backend-api.onrender.com/api';
+    console.log('📡 API: Using production backend URL:', API_BASE_URL);
+  } else {
+    // If VITE_API_URL is empty or not set, use relative path (works with proxy)
+    API_BASE_URL = '/api';
+    console.log('📡 API: Using default API path /api');
+  }
 } else {
   // Remove trailing slashes and ensure proper format
   API_BASE_URL = API_BASE_URL.replace(/\/+$/, '');

@@ -5,6 +5,10 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "https://arraji-backend-api.onrender.com/api/$1"
+    },
+    {
       "source": "/:path*",
       "destination": "/index.html"
     }
