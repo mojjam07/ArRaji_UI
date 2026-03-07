@@ -3,6 +3,19 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://arraji-backend-api.onrender.com/api/$1"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
