@@ -54,7 +54,7 @@ const PageTransition = () => {
       <div className="flex flex-col items-center">
         {/* Logo with bounce animation */}
         <img
-          src="/arraji_logo.png"
+          src="/logo_brand.png"
           alt="ArRaji Logo"
           className="h-20 w-auto animate-logo-bounce"
         />
