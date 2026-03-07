@@ -83,7 +83,7 @@ export const getApplications = async (params = {}) => {
  * @returns {Promise} - Response with application
  */
 export const getApplicationById = async (id) => {
-  const response = await api.get(`${ADMIN_ENDPOINT}/applications/${id}`);
+  const response = await api.get(`${ADMIN_ENDPOINT}/application/${id}`);
   return response.data;
 };
 
