@@ -10,6 +10,7 @@ export { default as Badge } from './ui/Badge';
 export { default as ProgressBar } from './ui/ProgressBar';
 export { default as ChatbotTrigger } from './ui/ChatbotTrigger';
 export { default as DocumentUpload } from './ui/DocumentUpload';
+export { default as ErrorBoundary } from './ui/ErrorBoundary';
 
 // Layout Components
 export { default as Layout } from './layout/Layout';

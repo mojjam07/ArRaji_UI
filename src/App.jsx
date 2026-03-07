@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ScrollToTop from './components/ui/ScrollToTop';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 import AppRouter from './router';
 
 /**
@@ -10,12 +11,14 @@ import AppRouter from './router';
  */
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <ScrollToTop />
-        <AppRouter />
-      </BrowserRouter>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
+          <ScrollToTop />
+          <AppRouter />
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -26,13 +26,8 @@ export default function Notifications() {
   });
   const [isSavingPreferences, setIsSavingPreferences] = useState(false);
 
-  // Fetch notifications on mount
-  useEffect(() => {
-    fetchNotifications();
-    fetchUnreadCount();
-  }, [fetchNotifications, fetchUnreadCount]);
-
-  const fetchNotifications = async () => {
+  // Define fetchNotifications before useEffect
+  const fetchNotifications = useCallback(async () => {
     setIsLoading(true);
     try {
       // Only send status param when filter is not 'all', since backend doesn't accept 'all'
@@ -109,18 +104,25 @@ export default function Notifications() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filter]);
 
+  // Define fetchUnreadCount before useEffect
   const fetchUnreadCount = useCallback(async () => {
     try {
       const response = await notificationAPI.getUnreadCount();
       if (response.success && response.data) {
-        setUnreadCount(response.data.count || 0);
+        setUnreadCount(response.data.unreadCount || 0);
       }
     } catch (err) {
       console.error('Failed to fetch unread count:', err);
     }
   }, []);
+
+  // Fetch notifications on mount
+  useEffect(() => {
+    fetchNotifications();
+    fetchUnreadCount();
+  }, [fetchNotifications, fetchUnreadCount]);
 
   const handleTogglePreference = (key) => {
     setPreferences(prev => ({ ...prev, [key]: !prev[key] }));
