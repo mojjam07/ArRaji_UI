@@ -40,9 +40,15 @@ export default function AdminDashboard() {
     const maxRetries = 3;
     const currentAttempt = retry ? retryCount + 1 : 1;
 
+    // Determine the correct API URL based on environment
+    const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+    const API_BASE_URL = isProduction 
+      ? 'https://arraji-backend-api.onrender.com/api'
+      : 'http://localhost:5000/api';
+
     // Test API connection first
     try {
-      const testResponse = await fetch('http://localhost:5000/api/test');
+      const testResponse = await fetch(`${API_BASE_URL}/test`);
       if (testResponse.ok) {
         setConnectionStatus('connected');
       }
