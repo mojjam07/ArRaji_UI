@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const Layout = () => {
@@ -212,10 +212,13 @@ const Layout = () => {
                 return <hr key={index} className="my-3 border-neutral-200" />;
               }
               return (
-                <Link
+                <NavLink
                   key={item.id}
                   to={item.href}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
+                  className={({ isActive }) =>
+                              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                              ${isActive ? 'bg-neutral-100 text-neutral-900' : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'}`
+                            }
                 >
                   <span className="flex-shrink-0 h-5 w-5">{item.icon}</span>
                   <span className="flex-1">{item.name}</span>
@@ -224,7 +227,7 @@ const Layout = () => {
                       {item.badge}
                     </span>
                   )}
-                </Link>
+                </NavLink>
               );
             })}
           </nav>

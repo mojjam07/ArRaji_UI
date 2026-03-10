@@ -9,9 +9,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -21,100 +19,20 @@ const AdminLayout = () => {
     navigate('/login');
   };
 
-  const confirmLogout = () => {
-    setShowLogoutConfirm(true);
-  };
-
-  const cancelLogout = () => {
-    setShowLogoutConfirm(false);
-  };
+  const confirmLogout = () => setShowLogoutConfirm(true);
+  const cancelLogout = () => setShowLogoutConfirm(false);
 
   const adminSidebarItems = [
-    {
-      id: 'admin-dashboard',
-      name: 'Dashboard',
-      href: '/admin',
-      icon: (
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-        </svg>
-      ),
-    },
-    {
-      id: 'application-review',
-      name: 'Application Review',
-      href: '/admin/review',
-      badge: '12',
-      icon: (
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-    },
-    {
-      id: 'document-management',
-      name: 'Documents',
-      href: '/admin/documents',
-      icon: (
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-        </svg>
-      ),
-    },
-    {
-      id: 'passport-management',
-      name: 'Passport Tracking',
-      href: '/admin/passport',
-      badge: '5',
-      icon: (
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-        </svg>
-      ),
-    },
-    {
-      id: 'user-management',
-      name: 'User Management',
-      href: '/admin/users',
-      icon: (
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-      ),
-    },
+    { id: 'admin-dashboard', name: 'Dashboard', href: '/admin', icon: <DashboardIcon /> },
+    { id: 'application-review', name: 'Application Review', href: '/admin/review', badge: '12', icon: <ReviewIcon /> },
+    { id: 'document-management', name: 'Documents', href: '/admin/documents', icon: <DocumentIcon /> },
+    { id: 'passport-management', name: 'Passport Tracking', href: '/admin/passport', badge: '5', icon: <PassportIcon /> },
+    { id: 'user-management', name: 'User Management', href: '/admin/users', icon: <UserIcon /> },
     { separator: true },
-    {
-      id: 'reports',
-      name: 'Reports & Analytics',
-      href: '/admin/reports',
-      icon: (
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
-    },
-    {
-      id: 'settings',
-      name: 'Settings',
-      href: '/admin/settings',
-      icon: (
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      ),
-    },
+    { id: 'reports', name: 'Reports & Analytics', href: '/admin/reports', icon: <ReportsIcon /> },
+    { id: 'settings', name: 'Settings', href: '/admin/settings', icon: <SettingsIcon /> },
     { separator: true },
-    {
-      id: 'back-to-user',
-      name: 'Back to User View',
-      href: '/',
-      icon: (
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
-        </svg>
-      ),
-    },
+    { id: 'back-to-user', name: 'Back to User View', href: '/', icon: <BackIcon /> },
   ];
 
   const defaultLogo = (
@@ -124,33 +42,32 @@ const AdminLayout = () => {
     </div>
   );
 
-  const defaultUser = {
-    name: 'Raji Adeyanju',
-    role: 'Administrator',
-  };
+  const defaultUser = { name: 'Raji Adeyanju', role: 'Administrator' };
 
   return (
     <div className="min-h-screen bg-neutral-50">
+      {/* Sidebar */}
       <aside className={`fixed top-0 left-0 z-40 h-screen w-64 bg-white border-r border-neutral-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between h-16 px-4 border-b border-neutral-200">
             {defaultLogo}
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100">
-              <svg className="h-5 w-5 text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <CloseIcon />
             </button>
           </div>
+
+          {/* Sidebar Navigation */}
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
             {adminSidebarItems.map((item, index) => {
-              if (item.separator) {
-                return <hr key={index} className="my-3 border-neutral-200" />;
-              }
+              if (item.separator) return <hr key={index} className="my-3 border-neutral-200" />;
               return (
                 <NavLink
                   key={item.id}
                   to={item.href}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                    ${isActive ? 'bg-neutral-100 text-neutral-900' : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'}`
+                  }
                 >
                   <span className="flex-shrink-0 h-5 w-5">{item.icon}</span>
                   <span className="flex-1">{item.name}</span>
@@ -159,6 +76,8 @@ const AdminLayout = () => {
               );
             })}
           </nav>
+
+          {/* User Info & Logout */}
           <div className="p-4 border-t border-neutral-200">
             <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-100 cursor-pointer">
               <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
@@ -173,24 +92,21 @@ const AdminLayout = () => {
               onClick={confirmLogout}
               className="w-full mt-2 flex items-center gap-2 px-3 py-2 text-sm text-neutral-600 hover:text-accent-600 hover:bg-accent-50 rounded-lg transition-colors"
             >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Sign Out
+              <LogoutIcon /> Sign Out
             </button>
           </div>
         </div>
       </aside>
+
+      {/* Sidebar backdrop */}
       {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+
+      {/* Main content */}
       <div className="lg:pl-64 min-h-screen flex flex-col">
         <header className="h-16 bg-white border-b border-neutral-200 flex items-center px-4 lg:px-6 justify-between">
-          <div className="flex items-center gap-4">
-            <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
+          <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100">
+            <MenuIcon />
+          </button>
           <img src="/Company_nams.png" alt="Company Name" className="h-8 w-auto" />
         </header>
         <main className="flex-1 p-6">
@@ -199,38 +115,7 @@ const AdminLayout = () => {
       </div>
 
       {/* Logout Confirmation Modal */}
-      {showLogoutConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm mx-4">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="h-12 w-12 rounded-full bg-accent-100 flex items-center justify-center flex-shrink-0">
-                <svg className="h-6 w-6 text-accent-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-neutral-900">Sign Out</h3>
-                <p className="text-sm text-neutral-600">Are you sure you want to sign out?</p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={cancelLogout}
-                className="flex-1 px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-accent-600 rounded-lg hover:bg-accent-700 transition-colors disabled:opacity-50"
-              >
-                {isLoggingOut ? 'Signing out...' : 'Sign Out'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {showLogoutConfirm && <LogoutModal onCancel={cancelLogout} onConfirm={handleLogout} isLoggingOut={isLoggingOut} />}
     </div>
   );
 };
