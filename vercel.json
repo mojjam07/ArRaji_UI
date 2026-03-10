@@ -9,7 +9,7 @@
       "destination": "https://arraji-backend-api.onrender.com/api/$1"
     },
     {
-      "source": "/((?!api/).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
