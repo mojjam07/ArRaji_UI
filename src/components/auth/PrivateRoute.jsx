@@ -42,8 +42,10 @@ const PrivateRoute = ({ children, roles = [] }) => {
     return <Navigate to="/user" replace />;
   }
 
-  // ✅ Key fix: render children if provided, otherwise render nested routes via <Outlet />
-  return children ? children : <Outlet />;
+  // ✅ Fixed: When children (layout component) is provided, render it directly.
+  // The child routes will be rendered via the Outlet inside the layout component (AdminLayout/Layout).
+  // This allows nested routes to work properly while still protecting the parent route.
+  return children || <Outlet />;
 };
 
 export default PrivateRoute;
