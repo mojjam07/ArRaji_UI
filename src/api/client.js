@@ -14,9 +14,10 @@ if (!API_BASE_URL || API_BASE_URL.trim() === '') {
   const isProduction = import.meta.env.PROD || (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app'));
   
   if (isProduction) {
-    // In production, use the Render backend URL directly
-    API_BASE_URL = 'https://arraji-backend-api.onrender.com/api';
-    console.log('📡 API: Using production backend URL:', API_BASE_URL);
+    // In production, use relative URL to leverage Vercel's proxy (vercel.json rewrite)
+    // This proxies /api/* to the backend and avoids CORS issues
+    API_BASE_URL = '/api';
+    console.log('📡 API: Using Vercel proxy API path /api');
   } else {
     // If VITE_API_URL is empty or not set, use relative path (works with proxy)
     API_BASE_URL = '/api';

@@ -40,16 +40,10 @@ export default function AdminDashboard() {
     const maxRetries = 3;
     const currentAttempt = retry ? retryCount + 1 : 1;
 
-    // Determine the correct API URL based on environment
-    const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
-    const API_BASE_URL = isProduction 
-      ? 'https://arraji-backend-api.onrender.com/api'
-      : 'http://localhost:5000/api';
-
-    // Test API connection first
+    // Test API connection using centralized client
     try {
-      const testResponse = await fetch(`${API_BASE_URL}/test`);
-      if (testResponse.ok) {
+      const response = await fetch('/api/test');
+      if (response.ok) {
         setConnectionStatus('connected');
       }
     } catch {
@@ -57,7 +51,7 @@ export default function AdminDashboard() {
     }
 
     try {
-      // Fetch dashboard statistics
+      // Fetch dashboard statistics - use centralized API client
       const statsResponse = await adminAPI.getDashboardStats();
       
       if (statsResponse.success && statsResponse.data) {
