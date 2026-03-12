@@ -97,12 +97,8 @@ export default function AdminDashboard() {
       
       setError(null);
     } catch (err) {
-      console.error('Admin Dashboard: Failed to fetch dashboard data:', err);
-      console.error('Admin Dashboard: Error details:', {
-        message: err.message,
-        status: err.status,
-        response: err.response?.data
-      });
+  // Removed console.error for production clean logs
+
       
       // Determine if we should retry
       const isRetryable = err.status === 0 || err.status >= 500 || err.message.includes('Network');
