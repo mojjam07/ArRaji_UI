@@ -145,6 +145,7 @@ const AdminLayout = () => {
           <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100">
             <MenuIcon />
           </button>
+          <div className="ml-auto" />
           <img src="/Company_nams.png" alt="Company Name" className="h-8 w-auto" />
         </header>
         <main className="flex-1 p-6">
